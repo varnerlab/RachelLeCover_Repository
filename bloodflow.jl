@@ -108,7 +108,7 @@ end
 function main()
 	close("all")
 	#println("In main")
-	numPoints = 100
+	numPoints = 10
 	grid = generateGrid(1,1,numPoints)
 	#println(grid)
 	#readline(STDIN)
@@ -118,7 +118,8 @@ function main()
 	deltaY = grid[2,1]-grid[2,2]
 	deltaZ = .1
 	
-	tFinal = .3;
+	tFinal = 10;
+	zEnd = .4
 
 	u0 = 1.0
 	v0 = .01
@@ -127,6 +128,7 @@ function main()
 
 	t0 = 0.0
 	tsim = t0
+	zSim = 0.0
 	allData = Array[[ceil(tFinal/deltat)],[ceil(tFinal/deltat)]] 
 	u = zeros(numPoints, numPoints)
 	v = zeros(numPoints, numPoints)
@@ -134,7 +136,8 @@ function main()
 	initials = [u0, v0]
 	numRuns = 1
 
-	while tsim < tFinal
+	#while tsim < tFinal
+	while zSim < zEnd
 		for coords in grid
 			
 				xcord = coords[1]
@@ -174,19 +177,23 @@ function main()
 		#readline(STDIN)
 #	allData[numRuns, 1] = u
 #	allData[numRuns, 2] = v		
-	tsim = tsim+deltat
+	#tsim = tsim+deltat
 #	numRuns = numRuns +1
 #	
 	figure()
 	pcolormesh(u)
 	colorbar()
-	title("z velocity")
+	title(string("z velocity at z= ", zSim ))
 
-#	figure()
-#	pcolormesh(v)
-#	colorbar()
-#	title("R velocity")
+	figure()
+	pcolormesh(v)
+	colorbar()
+	title(string("R velocity at z= ", zSim ))
+
+	zSim = zSim+deltaZ
 	end
+#end
+	
 end
 
 main()
