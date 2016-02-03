@@ -1,4 +1,4 @@
-using Sundials
+using ODE
 using PyPlot
 
 function generateGrid(xmax, ymax, numPoints)
@@ -105,7 +105,7 @@ function lookupIndex(grid, xcord, ycord)
 	end
 end
 
-function calculateU(t, w,wdot, p)
+function calculateU(t, w, p)
 	#p is for passing in parameters
 	deltaX = p[1]
 	deltaY = p[2]
@@ -136,7 +136,7 @@ end
 function calculateV(currU, currV, currX, currY, deltaZ, deltaX, deltaY)
 	#println("In calculateV")	
 	R = sqrt(currX^2+currY^2)
-	println(R)
+	#println(R)
 	#println("delta X is")
 	#println(deltaX)
 	#println("delta Y is")
@@ -179,7 +179,7 @@ end
 function main()
 	close("all")
 	#println("In main")
-	numPoints = 25
+	numPoints = 50
 	grid = generateGrid(1,1,numPoints)
 	#println(grid)
 	#readline(STDIN)
@@ -189,10 +189,10 @@ function main()
 	deltaY = grid[2,1][2]-grid[1,1][2]
 	deltaZ = .1
 	
-	tFinal = 10;
-	zEnd = .4
+	tFinal = .5;
+	zEnd = .5
 
-	u0 = 1.0
+	u0 = 1.01
 	v0 = .01
 	p0 = 1
 	R0 = 1 #initial radius of blood vessel
@@ -202,7 +202,7 @@ function main()
 	tsim = t0
 	zSim = 0.0
 	P0 = 1.0 #inital pressure
-	allData = Array[[ceil(tFinal/deltat)],[ceil(tFinal/deltat)]] 
+
 	#fill velocity vectors with initial conditions
 	u = fill(u0, (numPoints, numPoints))
 	v = fill(v0, (numPoints, numPoints))
@@ -214,97 +214,124 @@ function main()
 	#for iterative pressure calculations
 	prevX = grid[1,1][1]
 	prevY = grid[1,1][2]	
+
+	#for storing velocity data
+	velocityData = Array{Array}(2, Integer(ceil(zEnd/deltaZ)))
 	
+	#for storing data with respect to time
+	historicData = Array{Array}(1, Integer(ceil(tFinal/deltat)))
 	closeMargin = .1 #for calculating wall pressure
-	#while tsim < tFinal
-	while zSim < zEnd
-		wallcounter = 0 #for counting the number of points on the wall
-		Ptot = 0 #for running sum of wall pressures
-		for coords in grid
-				xcord = coords[1]
-				ycord = coords[2]
-				(xindex, yindex) = lookupIndex(grid, xcord, ycord)
-				#print("At indices")
-				#println(sub2ind(grid, coords))
-				inVessel = checkInside(xcord, ycord, Rwall)
-				#velocities at present coordinates
-				currU = u[xindex, yindex]
-				currV = v[xindex, yindex]
-				currP = P[xindex, yindex]
-				initials = [currU]# v[xindex, yindex]]
-				if(inVessel == 1)
-					#inside blood vessel, actually calculate velocity profile
-					println("At cordinates $xcord, $ycord")
-					p = [deltaX, deltaY, deltaZ, u[xindex, yindex], v[xindex, yindex], currP, xcord, ycord]
-					wrappedU(t,w,wdot) = calculateU(t,w,wdot, p)
-					tspan = [t0:deltat/2:t0+deltat]
-					#println(typeof(tspan)) #they're floats, like they should be
-
-					#calculated the u velocities
-					res = Sundials.cvode(wrappedU, initials, tspan)
-					#print("here")
-					#vAll = float([ a[1] for a in res])
-					#uAll = float([ a[2] for a in res])
+	
+	while tsim < tFinal
+		println(string("Tsim is ", tsim))
+		readline(STDIN)
+		zSlice = 1
+		zSim = 0.0
+		while zSim < zEnd
+			wallcounter = 0 #for counting the number of points on the wall
+			Ptot = 0 #for running sum of wall pressures
+			for coords in grid
+					xcord = coords[1]
+					ycord = coords[2]
+					(xindex, yindex) = lookupIndex(grid, xcord, ycord)
+					#print("At indices")
+					#println(sub2ind(grid, coords))
+					inVessel = checkInside(xcord, ycord, Rwall)
+					#velocities at present coordinates
+					currU = u[xindex, yindex]
+					currV = v[xindex, yindex]
+					currP = P[xindex, yindex]
+					initials = [currU]# v[xindex, yindex]]
+					if(inVessel == 1)
+						#inside blood vessel, actually calculate velocity profile
+						#println("At cordinates $xcord, $ycord")
+						p = [deltaX, deltaY, deltaZ, currU, currV, currP, xcord, ycord]
 					
-					uAll = res[:,1]
-					#println(uAll[length(uAll)])
-					#vAll = res[:,2]
-					#get last elements (the ones at tf)
-					u[xindex,yindex]= uAll[length(uAll)]
-					currU = u[xindex,yindex]
-					println("u is $currU at $xcord, $ycord")
+						#for Sundials
+						#wrappedU(t,w,wdot) = calculateU(t,w,wdot, p)
+
+						#for ODE
+						wrappedU(t,w) = calculateU(t,w, p)
+						tspan = [t0:deltat/2:t0+deltat]
+						#println(typeof(tspan)) #they're floats, like they should be
+
+						#calculated the u velocities
+						tout,res = ODE.ode23(wrappedU, initials, tspan)
+						#println(res)
+						#print("here")
+						#vAll = float([ a[1] for a in res])
+						uAll = float16([ a[1] for a in res])
 					
-					v[xindex, yindex]=calculateV(currU, currV, xcord, ycord, deltaZ, deltaX, deltaY)
-					currV = v[xindex, yindex]					
+						#uAll = res[:,1]
+						#println(uAll[length(uAll)])
+						#vAll = res[:,2]
+						#get last elements (the ones at tf)
+						u[xindex,yindex]= uAll[length(uAll)]
+						currU = u[xindex,yindex]
+						#println("u is $currU at $xcord, $ycord")
+					
+						v[xindex, yindex]=calculateV(currU, currV, xcord, ycord, deltaZ, deltaX, deltaY)
+						currV = v[xindex, yindex]					
 
-					#calculate pressures
-					#println(string("x index is ", xindex))
-					if(xindex > 1)
-						P[xindex-1, yindex]= calculateP(currP, xcord, ycord, prevX, prevY, currV, currU, deltaZ)
-					end
+						#calculate pressures
+						#println(string("x index is ", xindex))
+						if(xindex > 1)
+							P[xindex-1, yindex]= calculateP(currP, xcord, ycord, prevX, prevY, currV, currU, deltaZ)
+						end
 
-					#if on the inside and close to the wall, use this point to calculate the pressure at the wall
-					if(abs(sqrt(xcord^2+ycord^2)-Rwall)<=closeMargin)
-						Ptot = Ptot+currP
-						wallcounter = wallcounter+1
-					end
+						#if on the inside and close to the wall, use this point to calculate the pressure at the wall
+						if(abs(sqrt(xcord^2+ycord^2)-Rwall)<=closeMargin)
+							Ptot = Ptot+currP
+							wallcounter = wallcounter+1
+						end
 					
 					
 
 				
-				elseif(inVessel ==0)
-				#outside of blood vessel, set velocities to zero
-					#println("skipped")
-					u[xindex, yindex]= 0
-					v[xindex, yindex] = 0
-				end
-		prevX = xcord
-		prevY = ycord	
+					elseif(inVessel ==0)
+					#outside of blood vessel, set velocities to zero
+						#println("skipped")
+						u[xindex, yindex]= 0
+						v[xindex, yindex] = 0
+					end
+			prevX = xcord
+			prevY = ycord	
 
-		Pwall = Ptot/wallcounter
-		Rwall = calculateRwall(R0, .01, Pwall)
-		end
+			Pwall = Ptot/wallcounter
+			Rwall = calculateRwall(R0, .01, Pwall)
+			end
 		
-		#println(u)
-		#readline(STDIN)
-#	allData[numRuns, 1] = u
-#	allData[numRuns, 2] = v		
-	#tsim = tsim+deltat
-#	numRuns = numRuns +1
-#	
-	figure()
-	pcolormesh(u)
-	colorbar()
-	title(string("z velocity at z= ", zSim ))
+			#println(u)
+			#readline(STDIN)
+	#	allData[numRuns, 1] = u
+	#	allData[numRuns, 2] = v		
+		
+	
+	#	
+		figure()
+		pcolormesh(u)
+		colorbar()
+		title(string("z velocity at z= ", zSim ))
+		savestringZ = string("Zvelocityatz", zSim, "t", tsim, ".png")
+		savefig(savestringZ)
 
-	figure()
-	pcolormesh(v)
-	colorbar()
-	title(string("R velocity at z= ", zSim ))
+		figure()
+		pcolormesh(v)
+		colorbar()
+		title(string("R velocity at z= ", zSim ))
+		savestringR = string("Rvelocityatz", zSim, "t", tsim, ".png")
+		savefig(savestringR)
 
-	zSim = zSim+deltaZ
+		velocityData[1, zSlice] = u
+		velocityData[2, zSlice] = v
+
+		zSim = zSim+deltaZ
+		zSlice = zSlice+1
+		end
+		historicData[numRuns]= velocityData
+		tsim = tsim+deltat
+		numRuns = numRuns +1
 	end
-#end
 	
 end
 
