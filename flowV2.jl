@@ -1,4 +1,4 @@
-using ODE
+using Sundials
 using PyPlot
 
 function generateGrid(xmax, ymax, numPoints)
@@ -105,7 +105,7 @@ function lookupIndex(grid, xcord, ycord)
 	end
 end
 
-function calculateU(t, w, p)
+function calculateU(t, w, wdot, p)
 	#p is for passing in parameters
 	deltaX = p[1]
 	deltaY = p[2]
@@ -126,7 +126,10 @@ function calculateU(t, w, p)
 	tauRR = -2*mu*currV/deltaR
 	tauZZ = -2*mu*currU/deltaZ
 	tauRZ = -1*mu*(currU/deltaR + currV/deltaZ)
+
+	println(string("delta X is", deltaX, "delta Y is", deltaY, "delta Z is ", deltaZ, "currU is ", currU, "currP is", currP, " currX is ", currX, "currY is", currY))
 	dudt = -1*(currV*deltaR*currU+currU*deltaZ*currU) -1/rho*deltaZ*currP -1/rho*(1/R*deltaR*(R*tauRZ)*deltaZ*tauZZ)
+	println(string("dudt is", dudt))
 
 	wdot = [dudt]
 
@@ -185,12 +188,12 @@ function main()
 	#readline(STDIN)
 	#print(length(grid))
 	deltat = .1;
-	deltaX = grid[1,2][1]-grid[1,1][1]
-	deltaY = grid[2,1][2]-grid[1,1][2]
+	deltaX = grid[2,1][1]-grid[1,1][1]
+	deltaY = grid[1,2][2]-grid[1,1][2]
 	deltaZ = .1
 	
-	tFinal = .5;
-	zEnd = .5
+	tFinal = .1;
+	zEnd = .4
 
 	u0 = 1.01
 	v0 = .01
@@ -224,7 +227,7 @@ function main()
 	
 	while tsim < tFinal
 		println(string("Tsim is ", tsim))
-		readline(STDIN)
+		#readline(STDIN)
 		zSlice = 1
 		zSim = 0.0
 		while zSim < zEnd
@@ -248,15 +251,16 @@ function main()
 						p = [deltaX, deltaY, deltaZ, currU, currV, currP, xcord, ycord]
 					
 						#for Sundials
-						#wrappedU(t,w,wdot) = calculateU(t,w,wdot, p)
+						wrappedU(t,w,wdot) = calculateU(t,w,wdot, p)
 
 						#for ODE
-						wrappedU(t,w) = calculateU(t,w, p)
+						#wrappedU(t,w) = calculateU(t,w, p)
 						tspan = [t0:deltat/2:t0+deltat]
 						#println(typeof(tspan)) #they're floats, like they should be
 
 						#calculated the u velocities
-						tout,res = ODE.ode23(wrappedU, initials, tspan)
+						#tout,res = ODE.ode45(wrappedU, initials, tspan)
+						res = Sundials.cvode(wrappedU, initials, tspan)
 						#println(res)
 						#print("here")
 						#vAll = float([ a[1] for a in res])
