@@ -127,9 +127,9 @@ function calculateU(t, w, wdot, p)
 	tauZZ = -2*mu*currU/deltaZ
 	tauRZ = -1*mu*(currU/deltaR + currV/deltaZ)
 
-	println(string("delta X is", deltaX, "delta Y is", deltaY, "delta Z is ", deltaZ, "currU is ", currU, "currP is", currP, " currX is ", currX, "currY is", currY))
+	#println(string("delta X is", deltaX, "delta Y is", deltaY, "delta Z is ", deltaZ, "currU is ", currU, "currP is", currP, " currX is ", currX, "currY is", currY))
 	dudt = -1*(currV*deltaR*currU+currU*deltaZ*currU) -1/rho*deltaZ*currP -1/rho*(1/R*deltaR*(R*tauRZ)*deltaZ*tauZZ)
-	println(string("dudt is", dudt))
+	#println(string("dudt is", dudt))
 
 	wdot = [dudt]
 
@@ -192,7 +192,7 @@ function main()
 	deltaY = grid[1,2][2]-grid[1,1][2]
 	deltaZ = .1
 	
-	tFinal = .1;
+	tFinal = .8;
 	zEnd = .4
 
 	u0 = 1.01
@@ -222,7 +222,7 @@ function main()
 	velocityData = Array{Array}(2, Integer(ceil(zEnd/deltaZ)))
 	
 	#for storing data with respect to time
-	historicData = Array{Array}(1, Integer(ceil(tFinal/deltat)))
+	historicData = Array{Array}(1, Integer(ceil(tFinal/deltat))+1)
 	closeMargin = .1 #for calculating wall pressure
 	
 	while tsim < tFinal
@@ -230,9 +230,21 @@ function main()
 		#readline(STDIN)
 		zSlice = 1
 		zSim = 0.0
+
+		if(numRuns > 1)
+			#we can use historical data
+			prevVelocityData=historicData[numRuns-1]
+		end
 		while zSim < zEnd
 			wallcounter = 0 #for counting the number of points on the wall
 			Ptot = 0 #for running sum of wall pressures
+			if(numRuns > 1)			
+				prevU = prevVelocityData[1, zSlice]
+				prevV = prevVelocityData[1, zSlice]
+			else
+				prevU = u
+				prevV = v
+			end
 			for coords in grid
 					xcord = coords[1]
 					ycord = coords[2]
@@ -240,9 +252,9 @@ function main()
 					#print("At indices")
 					#println(sub2ind(grid, coords))
 					inVessel = checkInside(xcord, ycord, Rwall)
-					#velocities at present coordinates
-					currU = u[xindex, yindex]
-					currV = v[xindex, yindex]
+					#velocities at present coordinates, from historical data
+					currU = prevU[xindex, yindex]
+					currV = prevV[xindex, yindex]
 					currP = P[xindex, yindex]
 					initials = [currU]# v[xindex, yindex]]
 					if(inVessel == 1)
@@ -315,14 +327,14 @@ function main()
 		figure()
 		pcolormesh(u)
 		colorbar()
-		title(string("z velocity at z= ", zSim ))
+		title(string("z velocity at z= ", zSim, "t = ", tsim))
 		savestringZ = string("Zvelocityatz", zSim, "t", tsim, ".png")
 		savefig(savestringZ)
 
 		figure()
 		pcolormesh(v)
 		colorbar()
-		title(string("R velocity at z= ", zSim ))
+		title(string("R velocity at z= ", zSim, " t = ", tsim ))
 		savestringR = string("Rvelocityatz", zSim, "t", tsim, ".png")
 		savefig(savestringR)
 
