@@ -2,8 +2,8 @@ using ODE
 using PyPlot
 
 function generateGrid(xmax, ymax, numPoints)
-	x = linspace(0.0, xmax, numPoints)
-	y = linspace(0.0, ymax, numPoints)
+	x = linspace(-xmax, xmax, numPoints)
+	y = linspace(-ymax, ymax, numPoints)
 	#z = linspace(0, zmax, numPoints)
 	grid = Array{Array}(numPoints, numPoints) #create an array of arrays thats numpoints by numpoints
 	count = 1
@@ -133,13 +133,13 @@ function calculateU(t, w, p)
 	tauZZ = -2*mu*currU/deltaZ
 	tauRZ = -1*mu*(currU/deltaR + currV/deltaZ)
 
-	#println(string("delta X is", deltaX, "delta Y is", deltaY, "delta Z is ", deltaZ, "currU is ", currU, "currP is", currP, " currX is ", currX, "currY is", currY))
+	println(string("delta X is", deltaX, "delta Y is", deltaY, "delta Z is ", deltaZ, "currU is ", currU, "currP is", currP, " currX is ", currX, "currY is", currY))
 	dudt = -1*(currV*deltaR*currU+currU*deltaZ*currU) -1/rho*deltaZ*currP -1/rho*(1/R*deltaR*(R*tauRZ)*deltaZ*tauZZ)
 	println(string("dudt is", dudt))
 
 	#if(isnan(dudt))
-		println(string("delta X is", deltaX, "delta Y is", deltaY, "delta Z is ", deltaZ, "currU is ", currU, "currP is", currP, " currX is ", currX, "currY is", currY))
-		println(string("tauRR is", tauRR, "tauZZ is ", tauZZ, "tarRZ is ", tauRZ))
+		#println(string("delta X is", deltaX, "delta Y is", deltaY, "delta Z is ", deltaZ, "currU is ", currU, "currP is", currP, " currX is ", currX, "currY is", currY))
+		#println(string("tauRR is", tauRR, "tauZZ is ", tauZZ, "tarRZ is ", tauRZ))
 		
 	#end
 
@@ -171,11 +171,14 @@ function calculateP(currP, xcord, ycord, prevX, prevY, currV, currU, deltaZ)
 	#println("in calculate P")
 	currR = sqrt(xcord^2+ycord^2)
 	if(currR == 0)
-		currR = .00001 #prevent division by zerp
+		currR = .00001 #prevent division by zero
 	end
 
 	prevR = sqrt(prevX^2+prevY^2)
 	deltaR = abs(currR-prevR)
+	if (deltaR == 0)
+		deltaR = .000001 #prevent divison by zero
+	end
 
 	#should figure out a way to pass these so they don't need to be caculated again
 	rho = 1.05 #g/cm^3, given by GENERALIZED APPROACH TO THE MODELING OF A R T E R I A L BLOOD FLOW
@@ -188,6 +191,11 @@ function calculateP(currP, xcord, ycord, prevX, prevY, currV, currU, deltaZ)
 
 	P = currP +(currR-prevR)*(-1*(currV*1/deltaR*currV+currU*1/deltaZ*currV)-1*(1/currR*1/deltaR*currR*tauRR+1/deltaZ*tauRZ)-rho*1/deltaZ*currV)
 	#println("got here")
+
+	if(isnan(P))
+		println(string("delta Z is ", deltaZ, "currU is ", currU, "currP is", currP, " currX is ", xcord, "currY is", ycord))
+		println(string("tauRR is", tauRR, "tauZZ is ", tauZZ, "tarRZ is ", tauRZ))
+	end
 	return P
 end
 
@@ -195,11 +203,25 @@ function calculateRwall(A, B, Pwall)
 	Rwall = A+B*Pwall
 end
 
+function drawBorder(R0, x)
+	y = zeros(length(x))
+	z = zeros(length(x))
+	for(k = 1:length(x))
+		y[k] = sqrt(R0^2-x[k]^2)
+		z[k] =-1*sqrt(R0^2-x[k]^2)
+	end
+	PyPlot.hold(true)
+	plot(x, y, "kcl")
+	plot(x,z,"k")
+end
+
 function main()
 	close("all")
 	#println("In main")
-	numPoints = 50
-	grid = generateGrid(1,1,numPoints)
+	numPoints = 100
+	xmax = 1
+	ymax = 1
+	grid = generateGrid(xmax,ymax,numPoints)
 	#println(grid)
 	#readline(STDIN)
 	#print(length(grid))
@@ -208,12 +230,12 @@ function main()
 	deltaY = grid[1,2][2]-grid[1,1][2]
 	deltaZ = .1
 	
-	tFinal = .2;
+	tFinal = .5;
 	zEnd = 1
 
 	u0 = Float64(1.01)
 	v0 = Float64(.01)
-	p0 = 1
+	
 	R0 = 1 #initial radius of blood vessel
 	Rwall = R0;
 
@@ -240,6 +262,10 @@ function main()
 	#for storing data with respect to time
 	historicData = Array{Array}(1, Integer(ceil(tFinal/deltat))+1)
 	closeMargin = .1 #for calculating wall pressure
+
+	#for plotting
+	x = linspace(-xmax, xmax, numPoints)
+	y = linspace(-ymax, ymax, numPoints)
 	
 	while tsim < tFinal
 		println(string("Tsim is ", tsim))
@@ -262,6 +288,7 @@ function main()
 				prevV = v
 			end
 			for coords in grid
+			#not moving through coordinates. Need to figure out why
 					xcord = coords[1]
 					ycord = coords[2]
 					(xindex, yindex) = lookupIndex(grid, xcord, ycord)
@@ -275,7 +302,7 @@ function main()
 					initials = [currU]# v[xindex, yindex]]
 					if(inVessel == 1)
 						#inside blood vessel, actually calculate velocity profile
-						#println("At cordinates $xcord, $ycord")
+						println("At cordinates $xcord, $ycord")
 						p = [deltaX, deltaY, deltaZ, currU, currV, currP, xcord, ycord]
 					
 						#for Sundials
@@ -283,7 +310,7 @@ function main()
 
 						#for ODE
 						wrappedU(t,w) = calculateU(t,w, p)
-						tspan = [t0:deltat/2:t0+deltat]
+						tspan = [t0:deltat/10:t0+deltat;]
 						#println(typeof(tspan)) #they're floats, like they should be
 
 						#calculated the u velocities
@@ -311,6 +338,9 @@ function main()
 						#println(string("x index is ", xindex))
 						if(xindex > 1)
 							P[xindex-1, yindex]= calculateP(currP, xcord, ycord, prevX, prevY, currV, currU, deltaZ)
+
+						else
+							P[xindex, yindex] = P0
 						end
 
 						#if on the inside and close to the wall, use this point to calculate the pressure at the wall
@@ -344,15 +374,18 @@ function main()
 	
 	#	
 		figure()
-		pcolormesh(u)
+		#plt.hold(True)
+		pcolormesh(x,y,u)
 		colorbar()
+		drawBorder(R0, x)
 		title(string("z velocity at z= ", zSim, "t = ", tsim))
 		savestringZ = string("Zvelocityatz", zSim, "t", tsim, ".png")
 		savefig(savestringZ)
 
 		figure()
-		pcolormesh(v)
+		pcolormesh(x,y,v)
 		colorbar()
+		drawBorder(R0, x)
 		title(string("R velocity at z= ", zSim, " t = ", tsim ))
 		savestringR = string("Rvelocityatz", zSim, "t", tsim, ".png")
 		savefig(savestringR)
