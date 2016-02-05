@@ -30,10 +30,11 @@ function calculateMu(gammaDot)
 	#from http://www.ncbi.nlm.nih.gov/pmc/articles/PMC1552100/
 
 	mu0 = .056 #Pa s
+	muInf = 0.0035 #Pa s
 	lambda = 3.313 # s
 	n = .2568
 	
-	mu = mu0+2*mu0*(1+(lambda*gammaDot)^2)^(n-1)/2
+	mu = mu0+(mu0-muInf)*(1+(lambda*gammaDot)^2)^(n-1)/2
 	return mu
 end
 
@@ -211,7 +212,7 @@ function drawBorder(R0, x)
 		z[k] =-1*sqrt(R0^2-x[k]^2)
 	end
 	PyPlot.hold(true)
-	plot(x, y, "kcl")
+	plot(x, y, "k")
 	plot(x,z,"k")
 end
 
@@ -376,6 +377,7 @@ function main()
 		figure()
 		#plt.hold(True)
 		pcolormesh(x,y,u)
+		PyPlot.pcolor(x,y,u, vmin = -1, vmax = 1)
 		colorbar()
 		drawBorder(R0, x)
 		title(string("z velocity at z= ", zSim, "t = ", tsim))
@@ -384,6 +386,7 @@ function main()
 
 		figure()
 		pcolormesh(x,y,v)
+		PyPlot.pcolor(x,y,v, vmin = -1, vmax = 1)
 		colorbar()
 		drawBorder(R0, x)
 		title(string("R velocity at z= ", zSim, " t = ", tsim ))
