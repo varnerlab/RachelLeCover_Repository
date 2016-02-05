@@ -1,4 +1,4 @@
-using Sundials
+using ODE
 using PyPlot
 
 function generateGrid(xmax, ymax, numPoints)
@@ -105,7 +105,8 @@ function lookupIndex(grid, xcord, ycord)
 	end
 end
 
-function calculateU(t, w, wdot, p)
+function calculateU(t, w, p)
+	#getting negative inifities for u, leads to Nans. Why?
 	#p is for passing in parameters
 	deltaX = p[1]
 	deltaY = p[2]
@@ -117,6 +118,11 @@ function calculateU(t, w, wdot, p)
 	currY = p[8]
 	deltaR = sqrt(deltaX^2 + deltaY^2)
 	R = sqrt(currX^2+currY^2)
+
+	if(R == 0)
+	#to prevent division by zero
+		R = .00001
+	end
 	
 
 	rho = 1.05 #g/cm^3, given by GENERALIZED APPROACH TO THE MODELING OF A R T E R I A L BLOOD FLOW
@@ -129,7 +135,13 @@ function calculateU(t, w, wdot, p)
 
 	#println(string("delta X is", deltaX, "delta Y is", deltaY, "delta Z is ", deltaZ, "currU is ", currU, "currP is", currP, " currX is ", currX, "currY is", currY))
 	dudt = -1*(currV*deltaR*currU+currU*deltaZ*currU) -1/rho*deltaZ*currP -1/rho*(1/R*deltaR*(R*tauRZ)*deltaZ*tauZZ)
-	#println(string("dudt is", dudt))
+	println(string("dudt is", dudt))
+
+	#if(isnan(dudt))
+		println(string("delta X is", deltaX, "delta Y is", deltaY, "delta Z is ", deltaZ, "currU is ", currU, "currP is", currP, " currX is ", currX, "currY is", currY))
+		println(string("tauRR is", tauRR, "tauZZ is ", tauZZ, "tarRZ is ", tauRZ))
+		
+	#end
 
 	wdot = [dudt]
 
@@ -158,6 +170,10 @@ function calculateP(currP, xcord, ycord, prevX, prevY, currV, currU, deltaZ)
 	#may need to fix assigment as to what is i and i-1
 	#println("in calculate P")
 	currR = sqrt(xcord^2+ycord^2)
+	if(currR == 0)
+		currR = .00001 #prevent division by zerp
+	end
+
 	prevR = sqrt(prevX^2+prevY^2)
 	deltaR = abs(currR-prevR)
 
@@ -170,7 +186,7 @@ function calculateP(currP, xcord, ycord, prevX, prevY, currV, currU, deltaZ)
 	tauZZ = -2*mu*currU/deltaZ
 	tauRZ = -1*mu*(currU/deltaR + currV/deltaZ)
 
-	P = currP +(currR-prevR)*(-1*(currV*deltaR*currV+currU*deltaZ*currV)-1*(1/currR*deltaR*currR*tauRR+deltaZ*tauRZ)-rho*deltaZ*currV)
+	P = currP +(currR-prevR)*(-1*(currV*1/deltaR*currV+currU*1/deltaZ*currV)-1*(1/currR*1/deltaR*currR*tauRR+1/deltaZ*tauRZ)-rho*1/deltaZ*currV)
 	#println("got here")
 	return P
 end
@@ -192,11 +208,11 @@ function main()
 	deltaY = grid[1,2][2]-grid[1,1][2]
 	deltaZ = .1
 	
-	tFinal = .8;
-	zEnd = .4
+	tFinal = .2;
+	zEnd = 1
 
-	u0 = 1.01
-	v0 = .01
+	u0 = Float64(1.01)
+	v0 = Float64(.01)
 	p0 = 1
 	R0 = 1 #initial radius of blood vessel
 	Rwall = R0;
@@ -219,7 +235,7 @@ function main()
 	prevY = grid[1,1][2]	
 
 	#for storing velocity data
-	velocityData = Array{Array}(2, Integer(ceil(zEnd/deltaZ)))
+	velocityData = Array{Array}(2, Integer(ceil(zEnd/deltaZ))+1)
 	
 	#for storing data with respect to time
 	historicData = Array{Array}(1, Integer(ceil(tFinal/deltat))+1)
@@ -263,26 +279,28 @@ function main()
 						p = [deltaX, deltaY, deltaZ, currU, currV, currP, xcord, ycord]
 					
 						#for Sundials
-						wrappedU(t,w,wdot) = calculateU(t,w,wdot, p)
+						#wrappedU(t,w,wdot) = calculateU(t,w,wdot, p)
 
 						#for ODE
-						#wrappedU(t,w) = calculateU(t,w, p)
+						wrappedU(t,w) = calculateU(t,w, p)
 						tspan = [t0:deltat/2:t0+deltat]
 						#println(typeof(tspan)) #they're floats, like they should be
 
 						#calculated the u velocities
-						#tout,res = ODE.ode45(wrappedU, initials, tspan)
-						res = Sundials.cvode(wrappedU, initials, tspan)
+						tout,res = ODE.ode45(wrappedU, initials, tspan)
+						#res = Sundials.cvode(wrappedU, initials, tspan)
 						#println(res)
 						#print("here")
 						#vAll = float([ a[1] for a in res])
 						uAll = float16([ a[1] for a in res])
 					
-						#uAll = res[:,1]
+						
+					
 						#println(uAll[length(uAll)])
 						#vAll = res[:,2]
 						#get last elements (the ones at tf)
 						u[xindex,yindex]= uAll[length(uAll)]
+					
 						currU = u[xindex,yindex]
 						#println("u is $currU at $xcord, $ycord")
 					
@@ -305,10 +323,11 @@ function main()
 
 				
 					elseif(inVessel ==0)
-					#outside of blood vessel, set velocities to zero
+					#outside of blood vessel, set velocities to zero, pressure to zero
 						#println("skipped")
 						u[xindex, yindex]= 0
 						v[xindex, yindex] = 0
+						P[xindex, yindex] = 0
 					end
 			prevX = xcord
 			prevY = ycord	
