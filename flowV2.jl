@@ -1,6 +1,7 @@
 using ODE
 using PyPlot
 
+
 function generateGrid(xmax, ymax, numPoints)
 	x = linspace(-xmax, xmax, numPoints)
 	y = linspace(-ymax, ymax, numPoints)
@@ -134,9 +135,9 @@ function calculateU(t, w, p)
 	tauZZ = -2*mu*currU/deltaZ
 	tauRZ = -1*mu*(currU/deltaR + currV/deltaZ)
 
-	println(string("delta X is", deltaX, "delta Y is", deltaY, "delta Z is ", deltaZ, "currU is ", currU, "currP is", currP, " currX is ", currX, "currY is", currY))
+	#println(string("delta X is", deltaX, "delta Y is", deltaY, "delta Z is ", deltaZ, "currU is ", currU, "currP is", currP, " currX is ", currX, "currY is", currY))
 	dudt = -1*(currV*deltaR*currU+currU*deltaZ*currU) -1/rho*deltaZ*currP -1/rho*(1/R*deltaR*(R*tauRZ)*deltaZ*tauZZ)
-	println(string("dudt is", dudt))
+	#println(string("dudt is", dudt))
 
 	#if(isnan(dudt))
 		#println(string("delta X is", deltaX, "delta Y is", deltaY, "delta Z is ", deltaZ, "currU is ", currU, "currP is", currP, " currX is ", currX, "currY is", currY))
@@ -216,10 +217,98 @@ function drawBorder(R0, x)
 	plot(x,z,"k")
 end
 
+function plotConstantX(historicData, zMax, deltaZ, yMax, deltaY, xMax, deltaX, deltat)
+	zcords = [0:deltaZ:zMax;]
+	ycords = [-yMax:deltaY:yMax;]
+	xcords = [-xMax:deltaX:xMax;]
+	t0 = 0.0
+	t = 0.0
+#	println("zcords")
+#	println(size(zcords))
+#	println("ycords")
+#	println(size(ycords))
+
+	uYZ = fill(-1.0, length(ycords), length(zcords))	
+	vYZ = fill(-1.0,length(ycords), length(zcords))
+	allU = Array{Array}(length(xcords),1)
+	allV = Array{Array}(length(xcords),1)
+
+	#println(string("uYZ is size", size(uYZ)))
+
+	zcounter = 1
+	timecounter = 1
+	for timepoint in historicData
+		#println("time point is")
+		println(size(timepoint))
+		#println("time counter is", timecounter)
+		#zindex = 1
+		for j = 1:length(zcords)-1
+			zindex = j
+			println(string("j is ", j))
+			udata = timepoint[j,1] 
+			vdata = timepoint[j,2]
+			#println(string("size of u data is", size(udata)))
+			for k = 1:size(udata,1)-1
+				#for each slice of constant x
+				desiredIndex = k 
+				for n = 1:size(udata, 1)-1
+					yindex = 1
+					for m = 1:size(udata,2)-1
+						#store the data at selected x
+						if(n == desiredIndex)
+							#println(string("at x index = ", desiredIndex, "at y index ", yindex, "at zindex", zindex))
+							uYZ[yindex, zindex] = udata[k,m]
+							vYZ[yindex, zindex] = vdata[k,m]
+							yindex = yindex +1
+							#println("uYZ is")
+							#println(uYZ)
+						end
+					end
+					allU[k] = uYZ
+					allV[k]= vYZ
+				end
+				
+			end
+			
+		end
+			for q = 1:length(allU)
+				println(string("q = ", q))
+				currU = allU[q]
+				currV = allV[q]
+				figure()
+				pcolormesh(zcords, ycords, currU)
+				PyPlot.pcolor(zcords, ycords,currU, vmin = -1, vmax = 1)
+				xlabel("Z")
+				ylabel("Y")
+				usefulString = string("Z velocity at t = ", t, "x = ", xcords[q])
+				colorbar()
+				title(usefulString)
+				saveStringZ = (string("Z velocity at t = ", t, "x = ", xcords[q], ".png"))
+				savefig(saveStringZ)
+
+				figure()
+				pcolormesh(zcords, ycords, currV)
+				PyPlot.pcolor(zcords, ycords,currV, vmin = -1, vmax = 1)
+				xlabel("Z")
+				ylabel("Y")
+				usefulString2 = string("R velocity at t = ", t, "x = ", xcords[q])
+				colorbar()
+				title(usefulString2)
+				saveStringR= (string("R velocity at t = ", t, "x = ", xcords[q], ".png"))
+				savefig(saveStringR)
+				close("all")
+			end
+		t = t0+deltat
+		timecounter = timecounter +1
+	end
+end
+
+
+
 function main()
 	close("all")
 	#println("In main")
-	numPoints = 100
+	numPoints = 50
 	xmax = 1
 	ymax = 1
 	grid = generateGrid(xmax,ymax,numPoints)
@@ -231,8 +320,8 @@ function main()
 	deltaY = grid[1,2][2]-grid[1,1][2]
 	deltaZ = .1
 	
-	tFinal = .5;
-	zEnd = 1
+	tFinal = .2;
+	zEnd = .3
 
 	u0 = Float64(1.01)
 	v0 = Float64(.01)
@@ -258,10 +347,11 @@ function main()
 	prevY = grid[1,1][2]	
 
 	#for storing velocity data
-	velocityData = Array{Array}(2, Integer(ceil(zEnd/deltaZ))+1)
+	velocityData = Array{Array}(Integer(ceil(zEnd/deltaZ)),2)
+	#maybe plus one?
 	
 	#for storing data with respect to time
-	historicData = Array{Array}(1, Integer(ceil(tFinal/deltat))+1)
+	historicData = Array{Array}(1, Integer(ceil(tFinal/deltat)))
 	closeMargin = .1 #for calculating wall pressure
 
 	#for plotting
@@ -282,8 +372,8 @@ function main()
 			wallcounter = 0 #for counting the number of points on the wall
 			Ptot = 0 #for running sum of wall pressures
 			if(numRuns > 1)			
-				prevU = prevVelocityData[1, zSlice]
-				prevV = prevVelocityData[1, zSlice]
+				prevU = prevVelocityData[zSlice,1]
+				prevV = prevVelocityData[zSlice,1]
 			else
 				prevU = u
 				prevV = v
@@ -303,7 +393,7 @@ function main()
 					initials = [currU]# v[xindex, yindex]]
 					if(inVessel == 1)
 						#inside blood vessel, actually calculate velocity profile
-						println("At cordinates $xcord, $ycord")
+						#println("At cordinates $xcord, $ycord")
 						p = [deltaX, deltaY, deltaZ, currU, currV, currP, xcord, ycord]
 					
 						#for Sundials
@@ -375,26 +465,30 @@ function main()
 	
 	#	
 		figure()
+		PyPlot.hold(true)
 		#plt.hold(True)
 		pcolormesh(x,y,u)
 		PyPlot.pcolor(x,y,u, vmin = -1, vmax = 1)
 		colorbar()
-		drawBorder(Rwall, x)
+		drawBorder(R0, x)
 		title(string("z velocity at z= ", zSim, "t = ", tsim))
 		savestringZ = string("Zvelocityatz", zSim, "t", tsim, ".png")
 		savefig(savestringZ)
 
 		figure()
+		PyPlot.hold(true)
 		pcolormesh(x,y,v)
 		PyPlot.pcolor(x,y,v, vmin = -1, vmax = 1)
 		colorbar()
-		drawBorder(Rwall, x)
+		drawBorder(R0, x)
 		title(string("R velocity at z= ", zSim, " t = ", tsim ))
 		savestringR = string("Rvelocityatz", zSim, "t", tsim, ".png")
 		savefig(savestringR)
 
-		velocityData[1, zSlice] = u
-		velocityData[2, zSlice] = v
+		velocityData[zSlice, 1] = u
+		velocityData[zSlice,2] = v
+		
+	
 
 		zSim = zSim+deltaZ
 		zSlice = zSlice+1
@@ -403,6 +497,8 @@ function main()
 		tsim = tsim+deltat
 		numRuns = numRuns +1
 	end
+	close("all")
+	plotConstantX(historicData, zEnd, deltaZ, ymax, deltaY, xmax, deltaX, deltat)
 	
 end
 
