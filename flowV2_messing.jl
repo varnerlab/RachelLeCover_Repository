@@ -120,6 +120,7 @@ function calculateU(t, w, p)
 	currY = p[8]
 	deltaR = sqrt(deltaX^2 + deltaY^2)
 	R = sqrt(currX^2+currY^2)
+	u = w[1]
 
 	if(R == 0)
 	#to prevent division by zero
@@ -132,20 +133,21 @@ function calculateU(t, w, p)
 	mu = calculateMu(gammaDot)
 
 	tauRR = -2*mu*currV/deltaR
-	tauZZ = -2*mu*currU/deltaZ
-	tauRZ = -1*mu*(currU/deltaR + currV/deltaZ)
+	tauZZ = -2*mu*u/deltaZ
+	tauRZ = -1*mu*(u/deltaR + currV/deltaZ)
 
 	#println(string("delta X is", deltaX, "delta Y is", deltaY, "delta Z is ", deltaZ, "currU is ", currU, "currP is", currP, " currX is ", currX, "currY is", currY))
 	#dudt = -1*(currV*deltaR*currU+currU*deltaZ*currU) -1/rho*deltaZ*currP -1/rho*(1/R*deltaR*(R*tauRZ)*deltaZ*tauZZ)
 	#dudt = -1*(currV*1/deltaR*currU+currU*1/deltaZ*currU) -1/rho*1/deltaZ*currP -1/rho*(1/R*1/deltaR*(R*tauRZ)*1/deltaZ*tauZZ)
-	dudt = -1*(currV*1/deltaR*currU+currU*1/deltaZ*currU) -1/rho*1/deltaZ*currP -1/rho*(1/R*(tauRZ+R*tauRZ*1/deltaR)*1/deltaZ*tauZZ)
+	#dudt = -1*(currV*1/deltaR*currU+currU*1/deltaZ*currU) -1/rho*1/deltaZ*currP -1/rho*(1/R*(tauRZ+R*tauRZ*1/deltaR)*1/deltaZ*tauZZ)
+	dudt = -1*(currV*1/deltaR*u+u*1/deltaZ*u) -1/rho*1/deltaZ*currP -1/rho*(1/R*(tauRZ+R*tauRZ*1/deltaR)*1/deltaZ*tauZZ)
 	println(string("dudt is", dudt))
 
 	if(isnan(dudt) || isinf(dudt))
 		println("dudt is Nan or Inf")
 		println(string("delta X is", deltaX, "delta Y is", deltaY, "delta Z is ", deltaZ, "currU is ", currU, "currP is", currP, " currX is ", currX, "currY is", currY))
 		println(string("tauRR is", tauRR, "tauZZ is ", tauZZ, "tarRZ is ", tauRZ))
-		readline(STDIN)
+		#readline(STDIN)
 		
 	end
 
