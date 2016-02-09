@@ -307,6 +307,18 @@ function plotConstantX(historicData, zMax, deltaZ, yMax, deltaY, xMax, deltaX, d
 	end
 end
 
+function plotPressure(x,y,P,R0,zSim, tsim)
+	figure()
+	PyPlot.hold(true)
+	pcolormesh(x,y,P)
+	PyPlot.pcolor(x,y,P, vmin = -1, vmax = 1)
+	colorbar()
+	drawBorder(R0, x)
+	title(string("Pressure at z= ", zSim, " t = ", tsim ))
+	savestringP = string("Pressureatz=", zSim, "t", tsim, ".png")
+	savefig(savestringP)
+end
+
 
 
 function main()
@@ -439,7 +451,7 @@ function main()
 						end
 
 						#if on the inside and close to the wall, use this point to calculate the pressure at the wall
-						if(abs(sqrt(xcord^2+ycord^2)-Rwall)<=closeMargin)
+						if(Rwall-(sqrt(xcord^2+ycord^2))<=closeMargin && Rwall-sqrt(xcord^2+ycord^2)>= 0)
 							Ptot = Ptot+currP
 							wallcounter = wallcounter+1
 						end
@@ -488,6 +500,8 @@ function main()
 		title(string("R velocity at z= ", zSim, " t = ", tsim ))
 		savestringR = string("Rvelocityatz", zSim, "t", tsim, ".png")
 		savefig(savestringR)
+
+		plotPressure(x,y,P,R0,zSim, tsim)
 
 		velocityData[zSlice, 1] = u
 		velocityData[zSlice,2] = v
