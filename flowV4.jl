@@ -195,7 +195,8 @@ function calculateP(currP, xcord, ycord, prevX, prevY, currV, currU, deltaZ)
 	tauZZ = -2*mu*currU/deltaZ
 	tauRZ = -1*mu*(currU/deltaR + currV/deltaZ)
 
-	P = currP +(currR-prevR)*(-1*(currV*1/deltaR*currV+currU*1/deltaZ*currV)-1*(1/currR*1/deltaR*currR*tauRR+1/deltaZ*tauRZ)-rho*1/deltaZ*currV)
+	#P = currP +(currR-prevR)*(-1*(currV*1/deltaR*currV+currU*1/deltaZ*currV)-1*(1/currR*1/deltaR*currR*tauRR+1/deltaZ*tauRZ)-rho*1/deltaZ*currV)
+	P = currP +(currR-prevR)*(-1*(currV*deltaR*currV+currU*deltaZ*currV)-1*(1/currR*deltaR*currR*tauRR+deltaZ*tauRZ)-rho*deltaZ*currV)
 	#println("got here")
 
 	if(isnan(P))
@@ -207,6 +208,10 @@ end
 
 function calculateRwall(A, B, Pwall)
 	Rwall = A+B*Pwall
+	if(isnan(Rwall))
+		println(string("R wall is a Nan A = ", A, " P wall = ", Pwall))
+	end
+	return Rwall
 end
 
 function drawBorder(R0, x)
@@ -311,7 +316,7 @@ function plotPressure(x,y,P,R0,zSim, tsim)
 	figure()
 	PyPlot.hold(true)
 	pcolormesh(x,y,P)
-	PyPlot.pcolor(x,y,P, vmin = -1, vmax = 1)
+	PyPlot.pcolor(x,y,P, vmin = 0, vmax = 3)
 	colorbar()
 	drawBorder(R0, x)
 	title(string("Pressure at z= ", zSim, " t = ", tsim ))
@@ -319,6 +324,12 @@ function plotPressure(x,y,P,R0,zSim, tsim)
 	savefig(savestringP)
 end
 
+function findCenter(R)
+	xcord = R/2.0
+	ycord =R/2.0
+	centercords = [xcenter, ycenter]
+	return centercords
+end
 
 
 function main()
@@ -336,10 +347,10 @@ function main()
 	deltaY = grid[1,2][2]-grid[1,1][2]
 	deltaZ = .1
 	
-	tFinal = .5;
-	zEnd = .5
+	tFinal = .2;
+	zEnd = .3
 
-	u0 = Float64(1.01)
+	u0 = Float64(1.0)
 	v0 = Float64(.01)
 	
 	R0 = 1 #initial radius of blood vessel
@@ -373,6 +384,10 @@ function main()
 	#for plotting
 	x = linspace(-xmax, xmax, numPoints)
 	y = linspace(-ymax, ymax, numPoints)
+
+	#centerCoords = findCenter(R0)
+	xcenter = R0/2
+	ycenter = R0/2
 	
 	while tsim < tFinal
 		println(string("Tsim is ", tsim))
@@ -437,8 +452,13 @@ function main()
 					
 						currU = u[xindex,yindex]
 						#println("u is $currU at $xcord, $ycord")
-					
-						v[xindex, yindex]=calculateV(currU, currV, xcord, ycord, deltaZ, deltaX, deltaY)
+						#if at center of pipe, set R velocity to zero
+						
+						if(xcenter-closeMargin<=xcenter && xcenter<=xcenter+closeMargin && ycenter-closeMargin<=ycenter && ycenter<=ycenter+closeMargin)						v[xindex, yindex] = 0.0
+						else
+							v[xindex, yindex]=calculateV(currU, currV, xcord, ycord, deltaZ, deltaX, deltaY)
+						end
+						
 						currV = v[xindex, yindex]					
 
 						#calculate pressures
@@ -451,9 +471,14 @@ function main()
 						end
 
 						#if on the inside and close to the wall, use this point to calculate the pressure at the wall
-						if(Rwall-(sqrt(xcord^2+ycord^2))<=closeMargin && Rwall-sqrt(xcord^2+ycord^2)>= 0)
-							Ptot = Ptot+currP
-							wallcounter = wallcounter+1
+						#should actually use Rwall
+						if(R0-(sqrt(xcord^2+ycord^2))<=closeMargin && R0-sqrt(xcord^2+ycord^2)>= 0)
+							#println(string("Ptot is ", Ptot, " and wall counter is ", wallcounter))
+							if(isnan(currP))
+							else
+								Ptot = Ptot+currP
+								wallcounter = wallcounter+1
+							end
 						end
 					
 					
@@ -471,6 +496,8 @@ function main()
 
 			Pwall = Ptot/wallcounter
 			Rwall = calculateRwall(R0, .01, Pwall)
+			println(string("R wall is ", Rwall))
+			println(string("P wall is ", Pwall))
 			end
 		
 			#println(u)
@@ -486,9 +513,10 @@ function main()
 		pcolormesh(x,y,u)
 		PyPlot.pcolor(x,y,u, vmin = -1, vmax = 1)
 		colorbar()
-		drawBorder(R0, x)
+		drawBorder(Rwall, x)
 		title(string("z velocity at z= ", zSim, "t = ", tsim))
 		savestringZ = string("Zvelocityatz", zSim, "t", tsim, ".png")
+		PyPlot.axis([-xmax, xmax, -ymax, ymax])
 		savefig(savestringZ)
 
 		figure()
@@ -496,9 +524,10 @@ function main()
 		pcolormesh(x,y,v)
 		PyPlot.pcolor(x,y,v, vmin = -1, vmax = 1)
 		colorbar()
-		drawBorder(R0, x)
+		drawBorder(Rwall, x)
 		title(string("R velocity at z= ", zSim, " t = ", tsim ))
 		savestringR = string("Rvelocityatz", zSim, "t", tsim, ".png")
+		PyPlot.axis([-xmax, xmax, -ymax, ymax])
 		savefig(savestringR)
 
 		plotPressure(x,y,P,R0,zSim, tsim)
