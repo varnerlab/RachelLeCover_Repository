@@ -219,8 +219,8 @@ function drawBorder(R0, x)
 	y = zeros(length(x))
 	z = zeros(length(x))
 	for(k = 1:length(x))
-		y[k] = sqrt(R0^2-x[k]^2)
-		z[k] =-1*sqrt(R0^2-x[k]^2)
+		y[k] = sqrt(abs(R0^2-x[k]^2))
+		z[k] =-1*sqrt(abs(R0^2-x[k]^2))
 	end
 	PyPlot.hold(true)
 	plot(x, y, "k")
@@ -384,6 +384,7 @@ function main()
 	#for storing data with respect to time
 	historicData = Array{Array}(1, Integer(ceil(tFinal/deltat)))
 	closeMargin = .1 #for calculating wall pressure
+	centerMargin = .01
 
 	#for plotting
 	x = linspace(-xmax, xmax, numPoints)
@@ -464,7 +465,8 @@ function main()
 						xcenter = Rwall/2
 						ycenter = Rwall/2
 						
-						if(xcenter-closeMargin<=xcenter && xcenter<=xcenter+closeMargin && ycenter-closeMargin<=ycenter && ycenter<=ycenter+closeMargin)						v[xindex, yindex] = 0.0
+						if(xcenter-centerMargin<=xcord && xcenter<=xcord+centerMargin && ycenter-centerMargin<=ycord && ycord<=ycenter+centerMargin)						v[xindex, yindex] = 0.0
+									println(string("set r velocity at ", xcord, ", ", ycord, " to zero"))
 						else
 							v[xindex, yindex]=calculateV(currU, currV, xcord, ycord, deltaZ, deltaX, deltaY)
 						end
@@ -481,13 +483,13 @@ function main()
 						
 						if(isnan(Rwall))
 							println("Rwall is a NaN")
-							println(string("at cordinates ", xcord, ", ", ycord, "z slice ", zSim, "t = ", tsim))
-							#readline(STDIN)
+							println(string("at cordinates ", xcord, ", ", ycord, " z slice ", zSim, "t = ", tsim))
+							readline(STDIN)
 						end
 						if(isnan(Ptot))
 							println("Ptot is a NaN")
-							println(string("at cordinates ", xcord, ", ", ycord, "z slice ", zSim, "t = ", tsim))
-							#readline(STDIN)
+							println(string("at cordinates ", xcord, ", ", ycord, " z slice ", zSim, "t = ", tsim))
+							readline(STDIN)
 						end
 						if(Rwall-(sqrt(xcord^2+ycord^2))<closeMargin && Rwall-sqrt(xcord^2+ycord^2)> 0)
 							println(string("Ptot is ", Ptot, " and vRtot is ", vRtot, " and wall counter is ", wallcounter))
@@ -517,12 +519,12 @@ function main()
 			
 			end
 		
-			Pwall = Ptot/wallcounter
-			vRwallAvg = vRtot/wallcounter
-			Rwall = Rwall + vRwallAvg*deltat
-			#Rwall = calculateRwall(R0, b, Pwall)
-			println(string("R wall is ", Rwall))
-			#println(string("P wall is ", Pwall))	
+		Pwall = Ptot/wallcounter
+		vRwallAvg = vRtot/wallcounter
+		Rwall = Rwall + vRwallAvg*deltat
+		#Rwall = calculateRwall(R0, b, Pwall)
+		println(string("R wall is ", Rwall))
+		#println(string("P wall is ", Pwall))	
 		
 	
 	#	
