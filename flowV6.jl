@@ -22,7 +22,7 @@ function generateGrid(xmax, ymax, numPoints)
 end
 
 function calculateGammaDot(u, v, deltaZ, deltaR, r)
-	gammaDot = sqrt((v/deltaR)^2 +(v/r)^2 + (u/deltaZ)^2 + (u/deltaZ+u*deltaR)^2)
+	gammaDot = sqrt((v/deltaR)^2 +(v/r)^2 + (u/deltaZ)^2 + (u/deltaZ+u/deltaR)^2)
 	return gammaDot
 end
 
@@ -118,20 +118,16 @@ function calculateU(t, w, p)
 	currP = p[6]
 	currX = p[7]
 	currY = p[8]
-	deltaR = sqrt(deltaX^2 + deltaY^2)
+	#deltaR = sqrt(deltaX^2 + deltaY^2)
+	deltaR = .1
 	R = sqrt(currX^2+currY^2)
 
-	if(R == 0)
-	#to prevent division by zero
-		R = .00001
-	end
-	
 
 	rho = 1.05 #g/cm^3, given by GENERALIZED APPROACH TO THE MODELING OF A R T E R I A L BLOOD FLOW
 	gammaDot = calculateGammaDot(currU, currV, deltaZ, deltaR, R)
 	mu = calculateMu(gammaDot)
 
-	tauRR = -2*mu*currV/deltaR
+	tauRR =- 2*mu*currV/deltaR
 	tauZZ = -2*mu*currU/deltaZ
 	tauRZ = -1*mu*(currU/deltaR + currV/deltaZ)
 
@@ -142,13 +138,33 @@ function calculateU(t, w, p)
 	#dudt = -1*(currV*deltaR*currU+currU*deltaZ*currU) -1/rho*deltaZ*currP -1/rho*(deltaR*(tauRZ)*deltaZ*tauZZ)
 	#println(string("dudt is", dudt))
 	#as I think it should be written
-	dudt = -1*(currV*1/deltaR*currU+currU*1/deltaZ*currU) -1/rho*1/deltaZ*currP -1/rho*(1/R*(tauRZ+R*tauRZ/deltaR)*1/deltaZ*tauZZ)
+	if(R == 0)
+	#to prevent division by zero
+		dudt = 0
+	else
+		#dudt = -1*(currV*1/deltaR*currU+currU*1/deltaZ*currU) -1/rho*1/deltaZ*currP +1/rho*(1/R*(R*tauRZ)/deltaR*1/deltaZ*tauZZ)
+		dudt = -1*(currV*deltaR*currU+currU*deltaZ*currU) -1/rho*deltaZ*currP -1/rho*(1/R*deltaR*(R*tauRZ)*deltaZ*tauZZ)
+	end
+
+	if(dudt > 20)
+		dudt = 20.0
+	elseif(dudt< -20)
+		dudt = -20.0
+	end
 
 	if(isnan(dudt) || isinf(dudt))
 		println("dudt is Nan or inf")
 		println(string("delta X is", deltaX, "delta Y is", deltaY, "delta Z is ", deltaZ, "currU is ", currU, "currP is", currP, " currX is ", currX, "currY is", currY))
 		println(string("tauRR is", tauRR, "tauZZ is ", tauZZ, "tarRZ is ", tauRZ))
-		
+	elseif(dudt>1000)
+		println(string("dudt is ", dudt))
+		println(string("mu is", mu))
+		println(string("delta X is", deltaX, "delta Y is", deltaY, "delta Z is ", deltaZ, "currU is ", currU, "currP is", currP, " currX is ", currX, "currY is", currY))
+		println(string("tauRR is ", tauRR, " tauZZ is ", tauZZ, " tarRZ is ", tauRZ))
+		println(string("-1*(currV*1/deltaR*currU+currU*1/deltaZ*currU) is ", -1*(currV*1/deltaR*currU+currU*1/deltaZ*currU)))	
+		println(string("-1/rho*1/deltaZ*currP is ", -1/rho*1/deltaZ*currP ))
+		println(string("1/rho*(1/R*(R*tauRZ)/deltaR*1/deltaZ*tauZZ) is "), 1/rho*(1/R*(tauRZ+R*tauRZ/deltaR)*1/deltaZ*tauZZ))
+	
 	end
 
 	wdot = [dudt]
@@ -205,10 +221,10 @@ function calculateP(currP, xcord, ycord, prevX, prevY, currV, currU, deltaZ)
 	#println("got here")
 
 	if(isnan(P))
-		println("In calculcate P")
+		println("In calculate P")
 		println(string("delta Z is ", deltaZ, "currU is ", currU, "currP is", currP, " currX is ", xcord, "currY is", ycord))
-		println(string("tauRR is", tauRR, "tauZZ is ", tauZZ, "tarRZ is ", tauRZ))
-		#quit()
+		println(string("tauRR is ", tauRR, " tauZZ is ", tauZZ, " tarRZ is ", tauRZ))
+		quit()
 		
 	end
 	#force pressures to be positive
@@ -366,7 +382,7 @@ function main()
 	mkdir(presentTime) #create directory with datetime
 	path = joinpath("/home/rachel/Documents/RachelLeCover_Repository/", presentTime)
 	#println("In main")
-	numPoints = 50
+	numPoints =50
 	xmax = 1
 	ymax = 1
 	grid = generateGrid(xmax,ymax,numPoints)
@@ -383,7 +399,7 @@ function main()
 	
 	#actual blood velocities between 66-12 cm/sec, depending on location in body
 	#from http://circ.ahajournals.org/content/40/5/603
-	u0 = Float64(50.0) #from Methods in the analysis of the effects of gravity..., flow rate is .5m/s, through aeorta,  now divided by number of vessels
+	u0 = Float64(1.0) #from Methods in the analysis of the effects of gravity..., flow rate is .5m/s, through aeorta,  now divided by number of vessels
 	v0 = Float64(.01)
 	
 	R0 = 1.0 #initial radius of blood vessel, in cm
@@ -395,7 +411,7 @@ function main()
 	#according to wolfram alpha, average systolic blood pressure is 90-171 mmHg and diastolic is 40-95 mmHg, corresponding to 133322 barnes = dyne/cm^2
 	#P0 = 133322.0 #inital pressure, in dyne/cm^2
 	#run into problems when pressure greater than 1000 dyne/cm^2
-	P0 = Float64(133322.0)
+	P0 = Float64(10.0)
 
 	#fill velocity vectors with initial conditions
 	u = fill(u0, (numPoints, numPoints))
@@ -430,8 +446,8 @@ function main()
 	#from Relation Between Pressure and Diameter in the Ascending Aorta of Man
 	#b = 1.82E-3 #in cm/cm H20
 	#b = 1.82E-3/980.665 # in cm/(dyne cm^2)
-	#b = 1E-3
-	b = 1.214E-6 #cm^3/dyne from http://stroke.ahajournals.org/content/25/1/11.full.pdf	
+	b = 1E-3
+	#b = 1.214E-6 #cm^3/dyne from http://stroke.ahajournals.org/content/25/1/11.full.pdf	
 
 	#for storing radii as move through Z
 	radii = fill(R0, Integer(ceil(zEnd/deltaZ)), 1)
@@ -508,7 +524,7 @@ function main()
 						#force z velocity to be non-negative
 						udesired = uAll[length(uAll)]
 						if(udesired < 0)
-							u[xindex, yindex] = 0
+							u[xindex, yindex] = abs(udesired)
 						else
 							u[xindex,yindex]= udesired
 						end
