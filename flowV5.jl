@@ -233,7 +233,7 @@ function drawBorder(R0, x)
 	plot(x,z,"k")
 end
 
-function plotConstantX(historicData, zMax, deltaZ, yMax, deltaY, xMax, deltaX, deltat)
+function plotConstantX(historicData, zMax, deltaZ, yMax, deltaY, xMax, deltaX, deltat, path)
 	zcords = [0:deltaZ:zMax;]
 	ycords = [-yMax:deltaY:yMax;]
 	xcords = [-xMax:deltaX:xMax;]
@@ -311,7 +311,7 @@ function plotConstantX(historicData, zMax, deltaZ, yMax, deltaY, xMax, deltaX, d
 				colorbar()
 				title(usefulString2)
 				saveStringR= (string("R velocity at t = ", t, "x = ", xcords[q], ".png"))
-				savefig(saveStringR)
+				savefig(joinpath(path, saveStringR))
 				close("all")
 			end
 		t = t0+deltat
@@ -319,7 +319,7 @@ function plotConstantX(historicData, zMax, deltaZ, yMax, deltaY, xMax, deltaX, d
 	end
 end
 
-function plotPressure(x,y,P,R0,zSim, tsim)
+function plotPressure(x,y,P,R0,zSim, tsim, path)
 	figure()
 	PyPlot.hold(true)
 	pcolormesh(x,y,P)
@@ -328,7 +328,7 @@ function plotPressure(x,y,P,R0,zSim, tsim)
 	drawBorder(R0, x)
 	title(string("Pressure at z= ", zSim, " t = ", tsim ))
 	savestringP = string("Pressureatz=", zSim, "t", tsim, ".png")
-	savefig(savestringP)
+	savefig(joinpath(path, savestringP))
 end
 
 function findCenter(R)
@@ -338,18 +338,25 @@ function findCenter(R)
 	return centercords
 end
 
-function plotRvsT(zcords, radii, tsim)
+function plotRvsT(zcords, radii, tsim, path)
 	figure()
 	plot(zcords, radii)
 	xlabel("Z displacement")
 	ylabel("Radius")
 	title(string("Radius as a function of z at t = ", tsim))
 	saveStringRvsT=(string("RadiiWRTZat t = ", tsim, ".png"))
-	savefig(saveStringRvsT)
+	savefig(joinpath(path, saveStringRvsT))
+end
+
+function createSaveDir(dirName)
+	mkdir(dirName)
 end
 
 function main()
 	close("all")
+	presentTime = string(now())
+	mkdir(presentTime) #create directory with datetime
+	path = joinpath("/home/rachel/Documents/RachelLeCover_Repository/", presentTime)
 	#println("In main")
 	numPoints = 50
 	xmax = 1
@@ -368,7 +375,7 @@ function main()
 	
 	#actual blood velocities between 66-12 cm/sec, depending on location in body
 	#from http://circ.ahajournals.org/content/40/5/603
-	u0 = Float64(10.0)
+	u0 = Float64(5.0) #from Methods in the analysis of the effects of gravity..., flow rate is .5m/s, through aeorta,  now divided by number of vessels
 	v0 = Float64(.01)
 	
 	R0 = 1.0 #initial radius of blood vessel, in cm
@@ -380,7 +387,7 @@ function main()
 	#according to wolfram alpha, average systolic blood pressure is 90-171 mmHg and diastolic is 40-95 mmHg, corresponding to 133322 barnes = dyne/cm^2
 	#P0 = 133322.0 #inital pressure, in dyne/cm^2
 	#run into problems when pressure greater than 1000 dyne/cm^2
-	P0 = 10.0
+	P0 = Float64(10.0)
 
 	#fill velocity vectors with initial conditions
 	u = fill(u0, (numPoints, numPoints))
@@ -400,7 +407,7 @@ function main()
 	
 	#for storing data with respect to time
 	historicData = Array{Array}(1, Integer(ceil(tFinal/deltat)))
-	closeMargin = .1 #for calculating wall pressure
+	closeMargin = .01 #for calculating wall pressure
 	centerMargin = .01
 
 	#for plotting
@@ -416,6 +423,7 @@ function main()
 	#b = 1.82E-3 #in cm/cm H20
 	#b = 1.82E-3/980.665 # in cm/(dyne cm^2)
 	b = 1E-3
+	#b = 1.214E-6 #cm^3/dyne from http://stroke.ahajournals.org/content/25/1/11.full.pdf	
 
 	#for storing radii as move through Z
 	radii = fill(R0, Integer(ceil(zEnd/deltaZ)), 1)
@@ -497,7 +505,7 @@ function main()
 						xcenter = Rwall/2
 						ycenter = Rwall/2
 						
-						if(xcenter-centerMargin<=xcord && xcenter<=xcord+centerMargin && ycenter-centerMargin<=ycord && ycord<=ycenter+centerMargin)						v[xindex, yindex] = 0.0
+						if(xcenter-centerMargin<=xcord && xcord<=xcenter+centerMargin && ycenter-centerMargin<=ycord && ycord<=ycenter+centerMargin)						v[xindex, yindex] = 0.0
 									println(string("set r velocity at ", xcord, ", ", ycord, " to zero"))
 						else
 							v[xindex, yindex]=calculateV(currU, currV, xcord, ycord, deltaZ, deltaX, deltaY)
@@ -525,14 +533,14 @@ function main()
 						end
 						if(Rwall-(sqrt(xcord^2+ycord^2))<closeMargin && Rwall-sqrt(xcord^2+ycord^2)> 0)
 							#println(string("Ptot is ", Ptot, " and vRtot is ", vRtot, " and wall counter is ", wallcounter))
-							P[xindex, yindex] = (Rwall-A)/b
+							P[xindex, yindex] = (Rwall-A)/b #absolute value may not be correct
 							currP = P[xindex, yindex]
 							Ptot = Ptot + P[xindex, yindex]
 							wallcounter = wallcounter +1
 							vRtot = vRtot+currV
 
 						else
-							P[xindex-1, yindex]= calculateP(currP, xcord, ycord, prevX, prevY, currV, currU, deltaZ)
+							P[xindex, yindex]= calculateP(currP, xcord, ycord, prevX, prevY, currV, currU, deltaZ)
 
 						end
 					
@@ -569,9 +577,10 @@ function main()
 		colorbar()
 		drawBorder(Rwall, x)
 		title(string("z velocity at z= ", zSim, "t = ", tsim))
-		savestringZ = string("Zvelocityatz", zSim, "t", tsim, ".png")
+		savestringZ = string( "Zvelocityatz", zSim, "t", tsim, ".png")
 		PyPlot.axis([-xmax, xmax, -ymax, ymax])
-		savefig(savestringZ)
+		println(joinpath(path, savestringZ))
+		savefig(joinpath(path, savestringZ))
 
 		figure()
 		PyPlot.hold(true)
@@ -582,9 +591,9 @@ function main()
 		title(string("R velocity at z= ", zSim, " t = ", tsim ))
 		savestringR = string("Rvelocityatz", zSim, "t", tsim, ".png")
 		PyPlot.axis([-xmax, xmax, -ymax, ymax])
-		savefig(savestringR)
+		savefig(joinpath(path, savestringR))
 
-		plotPressure(x,y,P,R0,zSim, tsim)
+		plotPressure(x,y,P,R0,zSim, tsim, path)
 		
 
 		velocityData[zSlice, 1] = u
@@ -594,14 +603,14 @@ function main()
 		zSim = zSim+deltaZ
 		zSlice = zSlice+1
 		end
-		plotRvsT(z, radii, tsim)
+		plotRvsT(z, radii, tsim, path)
 		historicData[numRuns]= velocityData
 		historicRadii[numRuns]=radii
 		tsim = tsim+deltat
 		numRuns = numRuns +1
 	end
 	close("all")
-	#plotConstantX(historicData, zEnd, deltaZ, ymax, deltaY, xmax, deltaX, deltat)
+	plotConstantX(historicData, zEnd, deltaZ, ymax, deltaY, xmax, deltaX, deltat, path)
 	
 end
 
