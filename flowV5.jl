@@ -137,7 +137,9 @@ function calculateU(t, w, p)
 
 	#println(string("delta X is", deltaX, "delta Y is", deltaY, "delta Z is ", deltaZ, "currU is ", currU, "currP is", currP, " currX is ", currX, "currY is", currY))
 	#as given in paper
-	dudt = -1*(currV*deltaR*currU+currU*deltaZ*currU) -1/rho*deltaZ*currP -1/rho*(1/R*deltaR*(R*tauRZ)*deltaZ*tauZZ)
+	#dudt = -1*(currV*deltaR*currU+currU*deltaZ*currU) -1/rho*deltaZ*currP -1/rho*(1/R*deltaR*(R*tauRZ)*deltaZ*tauZZ)
+	#slightly modified to remove division by R, equivalent algebraically
+	dudt = -1*(currV*deltaR*currU+currU*deltaZ*currU) -1/rho*deltaZ*currP -1/rho*(deltaR*(tauRZ)*deltaZ*tauZZ)
 	#println(string("dudt is", dudt))
 	#as I think it should be written
 	#dudt = -1*(currV*1/deltaR*currU+currU*1/deltaZ*currU) -1/rho*1/deltaZ*currP -1/rho*(1/R*(tauRZ+R*tauRZ/deltaR)*1/deltaZ*tauZZ)
@@ -196,12 +198,16 @@ function calculateP(currP, xcord, ycord, prevX, prevY, currV, currU, deltaZ)
 	tauRZ = -1*mu*(currU/deltaR + currV/deltaZ)
 
 	#P = currP +(currR-prevR)*(-1*(currV*1/deltaR*currV+currU*1/deltaZ*currV)-1*(1/currR*1/deltaR*currR*tauRR+1/deltaZ*tauRZ)-rho*1/deltaZ*currV)
-	P = currP +(currR-prevR)*(-1*(currV*deltaR*currV+currU*deltaZ*currV)-1*(1/currR*deltaR*currR*tauRR+deltaZ*tauRZ)-rho*deltaZ*currV)
+	#absolute value may or may not be correct
+	P = abs(currP +(currR-prevR)*(-1*(currV*deltaR*currV+currU*deltaZ*currV)-1*(1/currR*deltaR*currR*tauRR+deltaZ*tauRZ)-rho*deltaZ*currV))
 	#println("got here")
 
 	if(isnan(P))
+		println("In calculcate P")
 		println(string("delta Z is ", deltaZ, "currU is ", currU, "currP is", currP, " currX is ", xcord, "currY is", ycord))
 		println(string("tauRR is", tauRR, "tauZZ is ", tauZZ, "tarRZ is ", tauRZ))
+		quit()
+		
 	end
 	return P
 end
@@ -317,7 +323,7 @@ function plotPressure(x,y,P,R0,zSim, tsim)
 	figure()
 	PyPlot.hold(true)
 	pcolormesh(x,y,P)
-	PyPlot.pcolor(x,y,P, vmin = 0, vmax = 3)
+	#PyPlot.pcolor(x,y,P, vmin = 0, vmax = 3)
 	colorbar()
 	drawBorder(R0, x)
 	title(string("Pressure at z= ", zSim, " t = ", tsim ))
@@ -357,7 +363,7 @@ function main()
 	deltaY = grid[1,2][2]-grid[1,1][2]
 	deltaZ = .1
 	
-	tFinal = .3;
+	tFinal = .5;
 	zEnd = .7
 
 	u0 = Float64(1.0)
@@ -406,7 +412,8 @@ function main()
 
 	#from Relation Between Pressure and Diameter in the Ascending Aorta of Man
 	#b = 1.82E-3 #in cm/cm H20
-	b = 1.82E-3/980.665 # in cm/(dyne cm^2)
+	#b = 1.82E-3/980.665 # in cm/(dyne cm^2)
+	b = 1E-3
 
 	#for storing radii as move through Z
 	radii = fill(R0, Integer(ceil(zEnd/deltaZ)), 1)
@@ -515,8 +522,9 @@ function main()
 							#readline(STDIN)
 						end
 						if(Rwall-(sqrt(xcord^2+ycord^2))<closeMargin && Rwall-sqrt(xcord^2+ycord^2)> 0)
-							println(string("Ptot is ", Ptot, " and vRtot is ", vRtot, " and wall counter is ", wallcounter))
+							#println(string("Ptot is ", Ptot, " and vRtot is ", vRtot, " and wall counter is ", wallcounter))
 							P[xindex, yindex] = (Rwall-A)/b
+							currP = P[xindex, yindex]
 							Ptot = Ptot + P[xindex, yindex]
 							wallcounter = wallcounter +1
 							vRtot = vRtot+currV
@@ -575,7 +583,7 @@ function main()
 		savefig(savestringR)
 
 		plotPressure(x,y,P,R0,zSim, tsim)
-		plotRvsT(z, radii, tsim)
+		
 
 		velocityData[zSlice, 1] = u
 		velocityData[zSlice,2] = v
@@ -584,6 +592,7 @@ function main()
 		zSim = zSim+deltaZ
 		zSlice = zSlice+1
 		end
+		plotRvsT(z, radii, tsim)
 		historicData[numRuns]= velocityData
 		historicRadii[numRuns]=radii
 		tsim = tsim+deltat
