@@ -81,7 +81,7 @@ end
 
 function checkInside(x,y, R)
 	#if inside, return 1, else 0
-	if sqrt(x^2+y^2) < 1
+	if sqrt(x^2+y^2) < R
 		inside = 1
 	else
 		inside = 0
@@ -146,10 +146,10 @@ function calculateU(t, w, p)
 		dudt = -1*(currV*deltaR*currU+currU*deltaZ*currU) -1/rho*deltaZ*currP -1/rho*(1/R*deltaR*(R*tauRZ)*deltaZ*tauZZ)
 	end
 
-	if(dudt > 20)
-		dudt = 20.0
-	elseif(dudt< -20)
-		dudt = -20.0
+	if(dudt > 100)
+		dudt = 100.0
+	elseif(dudt< -100)
+		dudt = -100.0
 	end
 
 	if(isnan(dudt) || isinf(dudt))
@@ -244,12 +244,12 @@ function calculateRwall(A, B, Pwall)
 	return Rwall
 end
 
-function drawBorder(R0, x)
+function drawBorder(Rwall, x)
 	y = zeros(length(x))
 	z = zeros(length(x))
 	for(k = 1:length(x))
-		y[k] = sqrt(abs(R0^2-x[k]^2))
-		z[k] =-1*sqrt(abs(R0^2-x[k]^2))
+		y[k] = sqrt(abs(Rwall^2-x[k]^2))
+		z[k] =-1*sqrt(abs(Rwall^2-x[k]^2))
 	end
 	PyPlot.hold(true)
 	plot(x, y, "k")
@@ -343,13 +343,13 @@ function plotConstantX(historicData, zMax, deltaZ, yMax, deltaY, xMax, deltaX, d
 	end
 end
 
-function plotPressure(x,y,P,R0,zSim, tsim, path)
+function plotPressure(x,y,P,Rwall,zSim, tsim, path)
 	figure()
 	PyPlot.hold(true)
 	pcolormesh(x,y,P)
 	#PyPlot.pcolor(x,y,P, vmin = 0, vmax = 3)
 	colorbar()
-	drawBorder(R0, x)
+	drawBorder(Rwall, x)
 	title(string("Pressure at z= ", zSim, " t = ", tsim ))
 	savestringP = string("Pressureatz=", zSim, "t", tsim, ".png")
 	savefig(joinpath(path, savestringP))
@@ -399,7 +399,7 @@ function main()
 	
 	#actual blood velocities between 66-12 cm/sec, depending on location in body
 	#from http://circ.ahajournals.org/content/40/5/603
-	u0 = Float64(1.0) #from Methods in the analysis of the effects of gravity..., flow rate is .5m/s, through aeorta,  now divided by number of vessels
+	u0 = Float64(50.0) #from Methods in the analysis of the effects of gravity..., flow rate is .5m/s, through aeorta,  now divided by number of vessels
 	v0 = Float64(.01)
 	
 	R0 = 1.0 #initial radius of blood vessel, in cm
@@ -411,7 +411,8 @@ function main()
 	#according to wolfram alpha, average systolic blood pressure is 90-171 mmHg and diastolic is 40-95 mmHg, corresponding to 133322 barnes = dyne/cm^2
 	#P0 = 133322.0 #inital pressure, in dyne/cm^2
 	#run into problems when pressure greater than 1000 dyne/cm^2
-	P0 = Float64(10.0)
+	P0 = Float64(1000.0)
+	maxP = 2*P0
 
 	#fill velocity vectors with initial conditions
 	u = fill(u0, (numPoints, numPoints))
@@ -446,8 +447,8 @@ function main()
 	#from Relation Between Pressure and Diameter in the Ascending Aorta of Man
 	#b = 1.82E-3 #in cm/cm H20
 	#b = 1.82E-3/980.665 # in cm/(dyne cm^2)
-	b = 1E-3
-	#b = 1.214E-6 #cm^3/dyne from http://stroke.ahajournals.org/content/25/1/11.full.pdf	
+	#b = 1E-6
+	b = 1.214E-6 #cm^3/dyne from http://stroke.ahajournals.org/content/25/1/11.full.pdf	
 
 	#for storing radii as move through Z
 	radii = fill(R0, Integer(ceil(zEnd/deltaZ)), 1)
@@ -509,7 +510,7 @@ function main()
 						#println(typeof(tspan)) #they're floats, like they should be
 
 						#calculated the u velocities
-						tout,res = ODE.ode45(wrappedU, initials, tspan)
+						tout,res = ODE.ode23(wrappedU, initials, tspan)
 						#res = Sundials.cvode(wrappedU, initials, tspan)
 						#println(res)
 						#print("here")
@@ -569,6 +570,10 @@ function main()
 							else
 								P[xindex, yindex] = calcP
 							end
+							#putting bounds on pressures
+							if(P[xindex, yindex] > maxP)
+								P = maxP
+							end
 							
 							currP = P[xindex, yindex]
 							Ptot = Ptot + P[xindex, yindex]
@@ -595,16 +600,7 @@ function main()
 
 			
 			end
-		
-		Pwall = Ptot/wallcounter
-		vRwallAvg = vRtot/wallcounter
-		newRwall = Rwall + vRwallAvg*deltat
-		radii[zSlice] = newRwall
-		println(string("R wall is ", Rwall))
-		#println(string("P wall is ", Pwall))	
-		
-	
-	#	
+			#	
 		figure()
 		PyPlot.hold(true)
 		#plt.hold(True)
@@ -628,7 +624,12 @@ function main()
 		PyPlot.axis([-xmax, xmax, -ymax, ymax])
 		savefig(joinpath(path, savestringR))
 
-		plotPressure(x,y,P,R0,zSim, tsim, path)
+		plotPressure(x,y,P,Rwall,zSim, tsim, path)
+		Pwall = Ptot/wallcounter
+		vRwallAvg = vRtot/wallcounter
+		newRwall = Rwall + vRwallAvg*deltat
+		radii[zSlice] = newRwall
+		println(string("R wall is ", Rwall))	
 		
 
 		velocityData[zSlice, 1] = u
