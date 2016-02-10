@@ -332,11 +332,20 @@ function findCenter(R)
 	return centercords
 end
 
+function plotRvsT(zcords, radii, tsim)
+	figure()
+	plot(zcords, radii)
+	xlabel("Z displacement")
+	ylabel("Radius")
+	title(string("Radius as a function of z at t = ", tsim))
+	saveStringRvsT=(string("RadiiWRTZat t = ", tsim, ".png"))
+	savefig(saveStringRvsT)
+end
 
 function main()
 	close("all")
 	#println("In main")
-	numPoints = 70
+	numPoints = 50
 	xmax = 1
 	ymax = 1
 	grid = generateGrid(xmax,ymax,numPoints)
@@ -348,8 +357,8 @@ function main()
 	deltaY = grid[1,2][2]-grid[1,1][2]
 	deltaZ = .1
 	
-	tFinal = .2;
-	zEnd = .2
+	tFinal = .3;
+	zEnd = .7
 
 	u0 = Float64(1.0)
 	v0 = Float64(.01)
@@ -389,6 +398,7 @@ function main()
 	#for plotting
 	x = linspace(-xmax, xmax, numPoints)
 	y = linspace(-ymax, ymax, numPoints)
+	z = linspace(0, zEnd, Integer(ceil(zEnd/deltaZ)))
 
 	#centerCoords = findCenter(R0)
 	xcenter = R0/2
@@ -397,6 +407,11 @@ function main()
 	#from Relation Between Pressure and Diameter in the Ascending Aorta of Man
 	#b = 1.82E-3 #in cm/cm H20
 	b = 1.82E-3/980.665 # in cm/(dyne cm^2)
+
+	#for storing radii as move through Z
+	radii = fill(R0, Integer(ceil(zEnd/deltaZ)), 1)
+	#for storing radii with respect to time
+	historicRadii = Array{Array}(1, Integer(ceil(tFinal/deltat))) 
 	
 	while tsim < tFinal
 		println(string("Tsim is ", tsim))
@@ -407,8 +422,16 @@ function main()
 		if(numRuns > 1)
 			#we can use historical data
 			prevVelocityData=historicData[numRuns-1]
+			prevRadii = historicRadii[numRuns-1]
+			#for  radius calculations, to prevent pressure from being zero
+			A = R0 -.0001
+		else
+			prevRadii = fill(R0, 1, Integer(ceil(zEnd/deltaZ)))
+			A = R0
 		end
+		
 		while zSim < zEnd
+			Rwall = prevRadii[zSlice]
 			wallcounter = 0 #for counting the number of points on the wall
 			Ptot = 0 #for running sum of wall pressures
 			vRtot = 0
@@ -484,16 +507,16 @@ function main()
 						if(isnan(Rwall))
 							println("Rwall is a NaN")
 							println(string("at cordinates ", xcord, ", ", ycord, " z slice ", zSim, "t = ", tsim))
-							readline(STDIN)
+							#readline(STDIN)
 						end
 						if(isnan(Ptot))
 							println("Ptot is a NaN")
 							println(string("at cordinates ", xcord, ", ", ycord, " z slice ", zSim, "t = ", tsim))
-							readline(STDIN)
+							#readline(STDIN)
 						end
 						if(Rwall-(sqrt(xcord^2+ycord^2))<closeMargin && Rwall-sqrt(xcord^2+ycord^2)> 0)
 							println(string("Ptot is ", Ptot, " and vRtot is ", vRtot, " and wall counter is ", wallcounter))
-							P[xindex, yindex] = (Rwall-(R0-.01))/b
+							P[xindex, yindex] = (Rwall-A)/b
 							Ptot = Ptot + P[xindex, yindex]
 							wallcounter = wallcounter +1
 							vRtot = vRtot+currV
@@ -521,8 +544,8 @@ function main()
 		
 		Pwall = Ptot/wallcounter
 		vRwallAvg = vRtot/wallcounter
-		Rwall = Rwall + vRwallAvg*deltat
-		#Rwall = calculateRwall(R0, b, Pwall)
+		newRwall = Rwall + vRwallAvg*deltat
+		radii[zSlice] = newRwall
 		println(string("R wall is ", Rwall))
 		#println(string("P wall is ", Pwall))	
 		
@@ -552,16 +575,17 @@ function main()
 		savefig(savestringR)
 
 		plotPressure(x,y,P,R0,zSim, tsim)
+		plotRvsT(z, radii, tsim)
 
 		velocityData[zSlice, 1] = u
 		velocityData[zSlice,2] = v
 		
-	
 
 		zSim = zSim+deltaZ
 		zSlice = zSlice+1
 		end
 		historicData[numRuns]= velocityData
+		historicRadii[numRuns]=radii
 		tsim = tsim+deltat
 		numRuns = numRuns +1
 	end
