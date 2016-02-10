@@ -365,8 +365,10 @@ function main()
 	
 	tFinal = .5;
 	zEnd = .7
-
-	u0 = Float64(1.0)
+	
+	#actual blood velocities between 66-12 cm/sec, depending on location in body
+	#from http://circ.ahajournals.org/content/40/5/603
+	u0 = Float64(10.0)
 	v0 = Float64(.01)
 	
 	R0 = 1.0 #initial radius of blood vessel, in cm
