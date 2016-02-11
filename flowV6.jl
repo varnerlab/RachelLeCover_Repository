@@ -39,38 +39,6 @@ function calculateMu(gammaDot)
 	return mu
 end
 
-function momentum(t, w, wdot, p)
-	#deltaX, deltaY, deltaZ, x, y
-	#p is for passing in parameters
-	deltaX = p[1]
-	deltaY = p[2]
-	deltaZ = p[3]
-	x = p[4]
-	y = p[5]
-	tsim = p[6]
-
-	v = w[1]
-	u = w[2]
-
-	P = calculatePressure(tsim, 1, 1) #need to actually deal with this later
-	rho = 1.05 #g/cm^3, given by GENERALIZED APPROACH TO THE MODELING OF A R T E R I A L BLOOD FLOW
-
-	deltaR = sqrt(deltaX^2 + deltaY^2)
-	r = sqrt(x^2+y^2)
-	gammaDot = calculateGammaDot(u, v, deltaZ, deltaR, r)
-	mu = calculateMu(gammaDot)
-
-	tauRR = -2*mu*v/deltaR
-	tauZZ = -2*mu*u/deltaZ
-	tauRZ = -1*mu*(u/deltaR + v/deltaZ)
-	
-
-	dvdt = -1*(u*v/deltaZ+v*v/deltaR)-1/rho*P/deltaR - 1/rho*(1/r*1/deltaR*(r*tauRR)+1/deltaZ*tauRZ)
-	dudt = -1*(v*u/deltaR+u*u/deltaZ)-1/rho*P/deltaZ - 1/rho*(1/r*1/deltaR*(r*tauRZ)-1/deltaZ*tauZZ)
-	wdot = [dvdt, dudt]
-	return wdot
-end
-
 function calculatePressure(t, A, B)
 	# pressure is periodic, with constants A and B from a P vs t curve
 	# omega is period of pressure-if assume heartrate of 120 bpm, omega =1/2 (in seconds) 
@@ -127,7 +95,7 @@ function calculateU(t, w, p)
 	gammaDot = calculateGammaDot(currU, currV, deltaZ, deltaR, R)
 	mu = calculateMu(gammaDot)
 
-	tauRR =- 2*mu*currV/deltaR
+	tauRR = -2*mu*currV/deltaR
 	tauZZ = -2*mu*currU/deltaZ
 	tauRZ = -1*mu*(currU/deltaR + currV/deltaZ)
 
@@ -142,33 +110,33 @@ function calculateU(t, w, p)
 	#to prevent division by zero
 		dudt = 0
 	else
-		#dudt = -1*(currV*1/deltaR*currU+currU*1/deltaZ*currU) -1/rho*1/deltaZ*currP +1/rho*(1/R*(R*tauRZ)/deltaR*1/deltaZ*tauZZ)
-		dudt = -1*(currV*deltaR*currU+currU*deltaZ*currU) -1/rho*deltaZ*currP -1/rho*(1/R*deltaR*(R*tauRZ)*deltaZ*tauZZ)
-	end
-
-	if(dudt > 100)
-		dudt = 100.0
-	elseif(dudt< -100)
-		dudt = -100.0
+		dudt = -1*(currV*deltaR*currU+currU*deltaZ*currU) -1/rho*deltaZ*currP -1/rho*(1/R*deltaR*(R*tauRZ)+deltaZ*tauZZ)
+		#dudt = -1*(currV*1/deltaR*currU+currU*1/deltaZ*currU) -1/rho*1/deltaZ*currP -1/rho*(1/R*(tauRZ+1/deltaR*(R*tauRZ))+1/deltaZ*tauZZ)
 	end
 
 	if(isnan(dudt) || isinf(dudt))
 		println("dudt is Nan or inf")
 		println(string("delta X is", deltaX, "delta Y is", deltaY, "delta Z is ", deltaZ, "currU is ", currU, "currP is", currP, " currX is ", currX, "currY is", currY))
 		println(string("tauRR is", tauRR, "tauZZ is ", tauZZ, "tarRZ is ", tauRZ))
-	elseif(dudt>1000)
+	elseif(abs(dudt)>1000)
 		println(string("dudt is ", dudt))
 		println(string("mu is", mu))
-		println(string("delta X is", deltaX, "delta Y is", deltaY, "delta Z is ", deltaZ, "currU is ", currU, "currP is", currP, " currX is ", currX, "currY is", currY))
+		println(string("delta X is", deltaX, "delta Y is", deltaY, "delta Z is ", deltaZ, "currU is ", currU, " curr V is ", currV, "currP is", currP, " currX is ", currX, "currY is", currY))
 		println(string("tauRR is ", tauRR, " tauZZ is ", tauZZ, " tarRZ is ", tauRZ))
 		println(string("-1*(currV*1/deltaR*currU+currU*1/deltaZ*currU) is ", -1*(currV*1/deltaR*currU+currU*1/deltaZ*currU)))	
 		println(string("-1/rho*1/deltaZ*currP is ", -1/rho*1/deltaZ*currP ))
-		println(string("1/rho*(1/R*(R*tauRZ)/deltaR*1/deltaZ*tauZZ) is "), 1/rho*(1/R*(tauRZ+R*tauRZ/deltaR)*1/deltaZ*tauZZ))
+		println(string("-1/rho*(1/R*(R*tauRZ)/deltaR+1/deltaZ*tauZZ) is "), -1/rho*(1/R*(tauRZ+R*tauRZ/deltaR)+1/deltaZ*tauZZ))
 	
+	end
+	
+	if(dudt > 1000)
+		dudt = 1000.0
+	elseif(dudt< -1000)
+		dudt = -1000.0
 	end
 
 	wdot = [dudt]
-	println(string("dudt is ", dudt))
+	#println(string("dudt is ", dudt))
 
 	return wdot
 end
@@ -186,7 +154,7 @@ function calculateV(currU, currV, currX, currY, deltaZ, deltaX, deltaY)
 	if(R == 0)
 		v = 0
 	else
-		v = -1*R*(deltaR*currV+deltaZ*currU)
+		v = -1*R*(1/deltaR*currV+1/deltaZ*currU)
 	end
 	return v
 end
@@ -202,7 +170,7 @@ function calculateP(currP, xcord, ycord, prevX, prevY, currV, currU, deltaZ)
 	prevR = sqrt(prevX^2+prevY^2)
 	deltaR = abs(currR-prevR)
 	if (deltaR == 0)
-		deltaR = .000001 #prevent divison by zero
+		deltaR = .1 #prevent divison by zero
 	end
 
 	#should figure out a way to pass these so they don't need to be caculated again
@@ -215,10 +183,8 @@ function calculateP(currP, xcord, ycord, prevX, prevY, currV, currU, deltaZ)
 	tauRZ = -1*mu*(currU/deltaR + currV/deltaZ)
 
 	#P = currP +(currR-prevR)*(-1*(currV*1/deltaR*currV+currU*1/deltaZ*currV)-1*(1/currR*1/deltaR*currR*tauRR+1/deltaZ*tauRZ)-rho*1/deltaZ*currV)
-	P = currP +(currR-prevR)*(-1*(currV*1/deltaR*currV+currU*1/deltaZ*currV)-1*(tauRR+currR*tauRR/deltaR+1/deltaZ*tauRZ)-rho*1/deltaZ*currV)
-	#absolute value may or may not be correct
-	#P = (currP +(currR-prevR)*(-1*(currV*deltaR*currV+currU*deltaZ*currV)-1*(1/currR*deltaR*currR*tauRR+deltaZ*tauRZ)-rho*deltaZ*currV))
-	#println("got here")
+	P = (currP +deltaR*(-1*(currV*1/deltaR*currV+currU*1/deltaZ*currV)-1*(tauRR+currR*tauRR/deltaR+1/deltaZ*tauRZ)-rho*1/deltaZ*currV))
+
 
 	if(isnan(P))
 		println("In calculate P")
@@ -399,7 +365,7 @@ function main()
 	
 	#actual blood velocities between 66-12 cm/sec, depending on location in body
 	#from http://circ.ahajournals.org/content/40/5/603
-	u0 = Float64(50.0) #from Methods in the analysis of the effects of gravity..., flow rate is .5m/s, through aeorta,  now divided by number of vessels
+	u0 = Float64(1.0) #from Methods in the analysis of the effects of gravity..., flow rate is .5m/s, through aeorta,  now divided by number of vessels
 	v0 = Float64(.01)
 	
 	R0 = 1.0 #initial radius of blood vessel, in cm
@@ -412,7 +378,9 @@ function main()
 	#P0 = 133322.0 #inital pressure, in dyne/cm^2
 	#run into problems when pressure greater than 1000 dyne/cm^2
 	P0 = Float64(1000.0)
-	maxP = 2*P0
+	maxP = 10*P0
+	maxU = 10*u0
+	maxV = 10*v0
 
 	#fill velocity vectors with initial conditions
 	u = fill(u0, (numPoints, numPoints))
@@ -466,10 +434,10 @@ function main()
 			prevVelocityData=historicData[numRuns-1]
 			prevRadii = historicRadii[numRuns-1]
 			#for  radius calculations, to prevent pressure from being zero
-			A = R0 -.0001
+			A = R0 
 		else
 			prevRadii = fill(R0, 1, Integer(ceil(zEnd/deltaZ)))
-			A = R0
+			A = R0-.00001
 		end
 		
 		while zSim < zEnd
@@ -510,7 +478,7 @@ function main()
 						#println(typeof(tspan)) #they're floats, like they should be
 
 						#calculated the u velocities
-						tout,res = ODE.ode23(wrappedU, initials, tspan)
+						tout,res = ODE.ode23s(wrappedU, initials, tspan, abstol = 1E-8)
 						#res = Sundials.cvode(wrappedU, initials, tspan)
 						#println(res)
 						#print("here")
@@ -522,8 +490,12 @@ function main()
 						#println(uAll[length(uAll)])
 						#vAll = res[:,2]
 						#get last elements (the ones at tf)
-						#force z velocity to be non-negative
+						#force z velocity to be non-negative and within limits
 						udesired = uAll[length(uAll)]
+						if(abs(udesired)> maxU)
+							udesired = maxU
+						end
+						
 						if(udesired < 0)
 							u[xindex, yindex] = abs(udesired)
 						else
@@ -539,7 +511,14 @@ function main()
 						if(xcenter-centerMargin<=xcord && xcord<=xcenter+centerMargin && ycenter-centerMargin<=ycord && ycord<=ycenter+centerMargin)						v[xindex, yindex] = 0.0
 									println(string("set r velocity at ", xcord, ", ", ycord, " to zero"))
 						else
-							v[xindex, yindex]=calculateV(currU, currV, xcord, ycord, deltaZ, deltaX, deltaY)
+							calculatedV=calculateV(currU, currV, xcord, ycord, deltaZ, deltaX, deltaY)
+							if(calculatedV >maxV)
+								#println("caught too large V")
+								calculatedV = maxV
+							elseif (calculatedV <-maxV)
+								calculatedV = -maxV
+							end
+							v[xindex, yindex] = calculatedV
 						end
 						
 						currV = v[xindex, yindex]					
@@ -581,10 +560,15 @@ function main()
 							vRtot = vRtot+currV
 
 						else
-							P[xindex, yindex]= calculateP(currP, xcord, ycord, prevX, prevY, currV, currU, deltaZ)
-
+							calculatedP = calculateP(currP, xcord, ycord, prevX, prevY, currV, currU, deltaZ)
+							if(calculatedP > maxP)
+								P[xindex, yindex] = maxP
+							else
+								P[xindex, yindex] = calculatedP
+							end
+							
 						end
-					
+						
 					
 
 				
