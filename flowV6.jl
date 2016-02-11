@@ -142,19 +142,15 @@ function calculateU(t, w, p)
 end
 
 function calculateV(currU, currV, currX, currY, deltaZ, deltaX, deltaY)
+	
 	#println("In calculateV")	
 	R = sqrt(currX^2+currY^2)
-	#println(R)
-	#println("delta X is")
-	#println(deltaX)
-	#println("delta Y is")
-	#println(deltaY)
-	deltaR = sqrt(deltaX^2+deltaY^2)
+	deltaR = .1
 	#println(deltaR)
 	if(R == 0)
 		v = 0
 	else
-		v = -1*R*(1/deltaR*currV+1/deltaZ*currU)
+		v = -1*R*(deltaR*currV+deltaZ*currU)
 	end
 	return v
 end
@@ -183,7 +179,7 @@ function calculateP(currP, xcord, ycord, prevX, prevY, currV, currU, deltaZ)
 	tauRZ = -1*mu*(currU/deltaR + currV/deltaZ)
 
 	#P = currP +(currR-prevR)*(-1*(currV*1/deltaR*currV+currU*1/deltaZ*currV)-1*(1/currR*1/deltaR*currR*tauRR+1/deltaZ*tauRZ)-rho*1/deltaZ*currV)
-	P = (currP +deltaR*(-1*(currV*1/deltaR*currV+currU*1/deltaZ*currV)-1*(tauRR+currR*tauRR/deltaR+1/deltaZ*tauRZ)-rho*1/deltaZ*currV))
+	P = (currP +deltaR*(-1*(currV*deltaR*currV+currU*deltaZ*currV)-1*(tauRR+currR*tauRR*deltaR+deltaZ*tauRZ)-rho*deltaZ*currV))
 
 
 	if(isnan(P))
@@ -365,7 +361,7 @@ function main()
 	
 	#actual blood velocities between 66-12 cm/sec, depending on location in body
 	#from http://circ.ahajournals.org/content/40/5/603
-	u0 = Float64(1.0) #from Methods in the analysis of the effects of gravity..., flow rate is .5m/s, through aeorta,  now divided by number of vessels
+	u0 = Float64(50.0) #from Methods in the analysis of the effects of gravity..., flow rate is .5m/s, through aeorta,  now divided by number of vessels
 	v0 = Float64(.01)
 	
 	R0 = 1.0 #initial radius of blood vessel, in cm
@@ -380,7 +376,7 @@ function main()
 	P0 = Float64(1000.0)
 	maxP = 10*P0
 	maxU = 10*u0
-	maxV = 10*v0
+	maxV = 100*v0
 
 	#fill velocity vectors with initial conditions
 	u = fill(u0, (numPoints, numPoints))
@@ -478,7 +474,7 @@ function main()
 						#println(typeof(tspan)) #they're floats, like they should be
 
 						#calculated the u velocities
-						tout,res = ODE.ode23s(wrappedU, initials, tspan, abstol = 1E-8)
+						tout,res = ODE.ode23s(wrappedU, initials, tspan, abstol = 1E-12)
 						#res = Sundials.cvode(wrappedU, initials, tspan)
 						#println(res)
 						#print("here")
@@ -508,12 +504,13 @@ function main()
 						xcenter = Rwall/2
 						ycenter = Rwall/2
 						
-						if(xcenter-centerMargin<=xcord && xcord<=xcenter+centerMargin && ycenter-centerMargin<=ycord && ycord<=ycenter+centerMargin)						v[xindex, yindex] = 0.0
-									println(string("set r velocity at ", xcord, ", ", ycord, " to zero"))
+						if(xcenter-centerMargin<=xcord && xcord<=xcenter+centerMargin && ycenter-centerMargin<=ycord && ycord<=ycenter+centerMargin)						
+								v[xindex, yindex] = 0.0
+								println(string("set r velocity at ", xcord, ", ", ycord, " to zero"))
 						else
 							calculatedV=calculateV(currU, currV, xcord, ycord, deltaZ, deltaX, deltaY)
 							if(calculatedV >maxV)
-								#println("caught too large V")
+								println("caught too large V")
 								calculatedV = maxV
 							elseif (calculatedV <-maxV)
 								calculatedV = -maxV
@@ -589,7 +586,7 @@ function main()
 		PyPlot.hold(true)
 		#plt.hold(True)
 		pcolormesh(x,y,u)
-		#PyPlot.pcolor(x,y,u, vmin = -1, vmax = 1)
+		#PyPlot.pcolor(x,y,u, vmin = 0, vmax = 12)
 		colorbar()
 		drawBorder(Rwall, x)
 		title(string("z velocity at z= ", zSim, "t = ", tsim))
