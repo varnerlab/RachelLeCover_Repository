@@ -95,10 +95,13 @@ function calculateU(t, w, p)
 	gammaDot = calculateGammaDot(currU, currV, deltaZ, deltaR, R)
 	mu = calculateMu(gammaDot)
 
-	tauRR = -2*mu*currV/deltaR
-	tauZZ = -2*mu*currU/deltaZ
-	tauRZ = -1*mu*(currU/deltaR + currV/deltaZ)
+#	tauRR = -2*mu*currV/deltaR
+#	tauZZ = -2*mu*currU/deltaZ
+#	tauRZ = -1*mu*(currU/deltaR + currV/deltaZ)
 
+	tauRR = -2*mu*currV*deltaR
+	tauZZ = -2*mu*currU*deltaZ
+	tauRZ = -1*mu*(currU*deltaR + currV*deltaZ)
 	#println(string("delta X is", deltaX, "delta Y is", deltaY, "delta Z is ", deltaZ, "currU is ", currU, "currP is", currP, " currX is ", currX, "currY is", currY))
 	#as given in paper
 	#dudt = -1*(currV*deltaR*currU+currU*deltaZ*currU) -1/rho*deltaZ*currP -1/rho*(1/R*deltaR*(R*tauRZ)*deltaZ*tauZZ)
@@ -174,9 +177,12 @@ function calculateP(currP, xcord, ycord, prevX, prevY, currV, currU, deltaZ)
 	gammaDot = calculateGammaDot(currU, currV, deltaZ, deltaR, currR)
 	mu = calculateMu(gammaDot)
 
-	tauRR = -2*mu*currV/deltaR
-	tauZZ = -2*mu*currU/deltaZ
-	tauRZ = -1*mu*(currU/deltaR + currV/deltaZ)
+	#tauRR = -2*mu*currV/deltaR
+	#tauZZ = -2*mu*currU/deltaZ
+	#tauRZ = -1*mu*(currU/deltaR + currV/deltaZ)
+	tauRR = -2*mu*currV*deltaR
+	tauZZ = -2*mu*currU*deltaZ
+	tauRZ = -1*mu*(currU*deltaR + currV*deltaZ)
 
 	#P = currP +(currR-prevR)*(-1*(currV*1/deltaR*currV+currU*1/deltaZ*currV)-1*(1/currR*1/deltaR*currR*tauRR+1/deltaZ*tauRZ)-rho*1/deltaZ*currV)
 	P = (currP +deltaR*(-1*(currV*deltaR*currV+currU*deltaZ*currV)-1*(tauRR+currR*tauRR*deltaR+deltaZ*tauRZ)-rho*deltaZ*currV))
@@ -344,7 +350,7 @@ function main()
 	mkdir(presentTime) #create directory with datetime
 	path = joinpath("/home/rachel/Documents/RachelLeCover_Repository/", presentTime)
 	#println("In main")
-	numPoints =50
+	numPoints =70
 	xmax = 1
 	ymax = 1
 	grid = generateGrid(xmax,ymax,numPoints)
@@ -361,9 +367,12 @@ function main()
 	
 	#actual blood velocities between 66-12 cm/sec, depending on location in body
 	#from http://circ.ahajournals.org/content/40/5/603
-	u0 = Float64(50.0) #from Methods in the analysis of the effects of gravity..., flow rate is .5m/s, through aeorta,  now divided by number of vessels
+	#u0 = Float64(50.0) #from Methods in the analysis of the effects of gravity..., flow rate is .5m/s, through aeorta,  now divided by number of vessels
+	#for small artery
+	u0 = Float64(4)
 	v0 = Float64(.01)
 	
+	#.2cm for small vein
 	R0 = 1.0 #initial radius of blood vessel, in cm
 	Rwall = R0;
 
@@ -373,6 +382,7 @@ function main()
 	#according to wolfram alpha, average systolic blood pressure is 90-171 mmHg and diastolic is 40-95 mmHg, corresponding to 133322 barnes = dyne/cm^2
 	#P0 = 133322.0 #inital pressure, in dyne/cm^2
 	#run into problems when pressure greater than 1000 dyne/cm^2
+	#4000 dyne/cm^2 for small vein
 	P0 = Float64(1000.0)
 	maxP = 10*P0
 	maxU = 10*u0
@@ -411,7 +421,7 @@ function main()
 	#from Relation Between Pressure and Diameter in the Ascending Aorta of Man
 	#b = 1.82E-3 #in cm/cm H20
 	#b = 1.82E-3/980.665 # in cm/(dyne cm^2)
-	#b = 1E-6
+	#b = .01
 	b = 1.214E-6 #cm^3/dyne from http://stroke.ahajournals.org/content/25/1/11.full.pdf	
 
 	#for storing radii as move through Z
@@ -474,7 +484,7 @@ function main()
 						#println(typeof(tspan)) #they're floats, like they should be
 
 						#calculated the u velocities
-						tout,res = ODE.ode23s(wrappedU, initials, tspan, abstol = 1E-12)
+						tout,res = ODE.ode23s(wrappedU, initials, tspan, abstol = 1E-8)
 						#res = Sundials.cvode(wrappedU, initials, tspan)
 						#println(res)
 						#print("here")
@@ -518,15 +528,8 @@ function main()
 							v[xindex, yindex] = calculatedV
 						end
 						
-						currV = v[xindex, yindex]					
-
-						#calculate pressures
-						#println(string("x index is ", xindex))
-
-						#if on the inside and close to the wall, use this point to calculate the pressure at the wall
-						#should actually use Rwall
-						#println(string("Rwall-(sqrt(xcord^2+ycord^2))", Rwall-(sqrt(xcord^2+ycord^2))))
-						#println(string("Rwall-sqrt(xcord^2+ycord^2)", Rwall-sqrt(xcord^2+ycord^2)))
+						currV = v[xindex, yindex]
+						#println(string("At cordinates x = ", xcord, " y cord ", ycord, " u = ", currU, " v = ", currV))					
 						
 						if(isnan(Rwall))
 							println("Rwall is a NaN")
@@ -581,7 +584,17 @@ function main()
 
 			
 			end
-			#	
+			#
+
+		plotPressure(x,y,P,Rwall,zSim, tsim, path)
+		Pwall = Ptot/wallcounter
+		vRwallAvg = vRtot/wallcounter
+		Rwall = Rwall + vRwallAvg*deltat
+		radii[zSlice] = Rwall
+		#println(string("wall counter is ", wallcounter))
+		#println(string("VR wall avg is ", vRwallAvg))
+		println(string("R wall is ", Rwall))	
+	
 		figure()
 		PyPlot.hold(true)
 		#plt.hold(True)
@@ -605,12 +618,7 @@ function main()
 		PyPlot.axis([-xmax, xmax, -ymax, ymax])
 		savefig(joinpath(path, savestringR))
 
-		plotPressure(x,y,P,Rwall,zSim, tsim, path)
-		Pwall = Ptot/wallcounter
-		vRwallAvg = vRtot/wallcounter
-		newRwall = Rwall + vRwallAvg*deltat
-		radii[zSlice] = newRwall
-		println(string("R wall is ", Rwall))	
+	
 		
 
 		velocityData[zSlice, 1] = u
