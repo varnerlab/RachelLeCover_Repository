@@ -225,7 +225,7 @@ function drawBorder(Rwall, x)
 end
 
 function plotConstantX(historicData, zMax, deltaZ, yMax, deltaY, xMax, deltaX, deltat, path)
-	#why is everything zero?
+	
 	zcords = [0:deltaZ:zMax;]
 	ycords = [-yMax:deltaY:yMax;]
 	xcords = [-xMax:deltaX:xMax;]
@@ -240,6 +240,10 @@ function plotConstantX(historicData, zMax, deltaZ, yMax, deltaY, xMax, deltaX, d
 	vYZ = fill(-1.0,length(ycords), length(zcords))
 	allU = Array{Array}(length(xcords),1)
 	allV = Array{Array}(length(xcords),1)
+
+	numTimeSteps = size(historicData, 2)
+	totalU = Array{Array}(numTimeSteps, 1)
+	totalV = Array{Array}(numTimeSteps, 1)
 
 	#println(string("uYZ is size", size(uYZ)))
 	println(string("histoic data is size ", size(historicData)))
@@ -283,44 +287,49 @@ function plotConstantX(historicData, zMax, deltaZ, yMax, deltaY, xMax, deltaX, d
 				end
 			end
 			allU[p] = uYZ
-			println(string("all U[p]  is", allU[p]))
+			#println(string("all U[p]  is", allU[p]))
 			allV[p]= vYZ
-			#println(string("size of allU is", size(allU)))
 		
 		end	
-		
-		println(string("all U[18]"), allU[18], "time is ", t)
-		for q = 1:length(allU)-1
-			println(string("q = ", q))
-			#println(string("allU is ", allU))
-			currU = allU[q,1]
-			println(string("Curr U is ", currU))
-			#readline(STDIN)
-			currV = allV[q,1]
-			figure()
-			pcolormesh(zcords, ycords, currU)
-			#PyPlot.pcolor(zcords, ycords,currU, vmin = -1, vmax = 1)
-			xlabel("Z")
-			ylabel("Y")
-			usefulString = string("Z velocity at t = ", t, "x =  ", xcords[q])
-			colorbar()
-			title(usefulString)
-			saveStringZ = (string("Z velocity at t = ", t, "x = ", xcords[q], ".png"))
-			savefig(joinpath(path, saveStringZ))
+			println("all u is ", typeof(allU))
+			println("all u is ", (allU))
+			println("all u is ", size(allU))
+			for q = 1:length(allU-1)
+				currItemU = allU[q]
+				println("all currItemU is ", (currItemU))
+				println("all currItemU is ", size(currItemU))
+				currItemV = allV[q]
+				
+					println(string("q = ", q, "tcounter is ", t))
+					#println(string("allU is ", allU))
+					currU = currItemU
+					println(string("Curr U is ", currU))
+					#readline(STDIN)
+					currV = currItemV
+					figure()
+					pcolormesh(zcords, ycords, currU)
+					#PyPlot.pcolor(zcords, ycords,currU, vmin = -1, vmax = 1)
+					xlabel("Z")
+					ylabel("Y")
+					usefulString = string("Z velocity at t = ", t, "x =  ", xcords[q])
+					colorbar()
+					title(usefulString)
+					saveStringZ = (string("Z velocity at t = ", t, "x = ", xcords[q], ".png"))
+					savefig(joinpath(path, saveStringZ))
 
-			figure()
-			pcolormesh(zcords, ycords, currV)
-			#PyPlot.pcolor(zcords, ycords,currV, vmin = -1, vmax = 1)
-			xlabel("Z")
-			ylabel("Y")
-			usefulString2 = string("R velocity at t = ", t, "x = ", xcords[q])
-			colorbar()
-			title(usefulString2)
-			saveStringR= (string("R velocity at t = ", t, "x = ", xcords[q], ".png"))
-			savefig(joinpath(path, saveStringR))
-			close("all")
-		end
-		
+					figure()
+					pcolormesh(zcords, ycords, currV)
+					#PyPlot.pcolor(zcords, ycords,currV, vmin = -1, vmax = 1)
+					xlabel("Z")
+					ylabel("Y")
+					usefulString2 = string("R velocity at t = ", t, "x = ", xcords[q])
+					colorbar()
+					title(usefulString2)
+					saveStringR= (string("R velocity at t = ", t, "x = ", xcords[q], ".png"))
+					savefig(joinpath(path, saveStringR))
+					close("all")
+				\
+			end
 		t = t0+deltat
 		timecounter = timecounter +1
 		
@@ -366,7 +375,7 @@ function main()
 	mkdir(presentTime) #create directory with datetime
 	path = joinpath("/home/rachel/Documents/RachelLeCover_Repository/", presentTime)
 	#println("In main")
-	numPoints =20
+	numPoints =10
 	xmax = 1
 	ymax = 1
 	grid = generateGrid(xmax,ymax,numPoints)
