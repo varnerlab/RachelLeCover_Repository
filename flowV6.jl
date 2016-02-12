@@ -225,6 +225,7 @@ function drawBorder(Rwall, x)
 end
 
 function plotConstantX(historicData, zMax, deltaZ, yMax, deltaY, xMax, deltaX, deltat, path)
+	#why is everything zero?
 	zcords = [0:deltaZ:zMax;]
 	ycords = [-yMax:deltaY:yMax;]
 	xcords = [-xMax:deltaX:xMax;]
@@ -241,73 +242,88 @@ function plotConstantX(historicData, zMax, deltaZ, yMax, deltaY, xMax, deltaX, d
 	allV = Array{Array}(length(xcords),1)
 
 	#println(string("uYZ is size", size(uYZ)))
-
+	println(string("histoic data is size ", size(historicData)))
 	zcounter = 1
 	timecounter = 1
-	for timepoint in historicData
+	for l = 1:size(historicData, 2)
+		#number of time steps
+		timepoint = historicData[1,l]
 		#println("time point is")
-		println(size(timepoint))
-		#println("time counter is", timecounter)
-		#zindex = 1
-		for j = 1:length(zcords)-1
-			zindex = j
-			println(string("j is ", j))
-			udata = timepoint[j,1] 
-			vdata = timepoint[j,2]
-			#println(string("size of u data is", size(udata)))
-			for k = 1:size(udata,1)-1
-				#for each slice of constant x
-				desiredIndex = k 
-				for n = 1:size(udata, 1)-1
-					yindex = 1
-					for m = 1:size(udata,2)-1
-						#store the data at selected x
-						if(n == desiredIndex)
-							#println(string("at x index = ", desiredIndex, "at y index ", yindex, "at zindex", zindex))
-							uYZ[yindex, zindex] = udata[k,m]
-							vYZ[yindex, zindex] = vdata[k,m]
-							yindex = yindex +1
-							#println("uYZ is")
-							#println(uYZ)
+		println(string("size of timepoint is", size(timepoint)))
+	
+		for p = 1:length(xcords)
+				desiredIndex = p
+				xindex = desiredIndex
+				println(string("xindex is ", xindex))
+			for j = 1:size(timepoint,1)-1
+				#number of zslices
+				udata = timepoint[j,1] 
+				vdata = timepoint[j,2]
+				for k = 1:length(zcords)
+					#for each slice of constant z
+					zindex = k
+					for n = 1:length(xcords)-1
+						yindex = 1
+						for m = 1:size(udata,2)-1
+							#store the data at selected x
+							if(n == desiredIndex)
+								#println(string("at x index = ", desiredIndex, "at y index ", yindex, "at zindex", zindex, "u at these coordinates is ", udata[desiredIndex,yindex], "v at these cordinates is ", vdata[desiredIndex,yindex]))
+								uYZ[yindex, zindex] = udata[desiredIndex,yindex]
+								vYZ[yindex, zindex] = vdata[desiredIndex,yindex]
+								#println("uYZ is")
+								#println(uYZ[yindex, zindex])
+								yindex = yindex +1
+							
+							end
+					
 						end
-					end
-					allU[k] = uYZ
-					allV[k]= vYZ
-				end
 				
+					end
+				
+				end
 			end
-			
-		end
-			println(string("length of allU is", length(allU)))
-			for q = 1:length(allU)
-				println(string("q = ", q))
-				currU = allU[q]
-				currV = allV[q]
-				figure()
-				pcolormesh(zcords, ycords, currU)
-				PyPlot.pcolor(zcords, ycords,currU, vmin = -1, vmax = 1)
-				xlabel("Z")
-				ylabel("Y")
-				usefulString = string("Z velocity at t = ", t, "x = ", xcords[q])
-				colorbar()
-				title(usefulString)
-				saveStringZ = (string("Z velocity at t = ", t, "x = ", xcords[q], ".png"))
-				savefig(joinpath(path, saveStringZ))
+			allU[p] = uYZ
+			println(string("all U[p]  is", allU[p]))
+			allV[p]= vYZ
+			#println(string("size of allU is", size(allU)))
+		
+		end	
+		
+		println(string("all U[18]"), allU[18], "time is ", t)
+		for q = 1:length(allU)-1
+			println(string("q = ", q))
+			#println(string("allU is ", allU))
+			currU = allU[q,1]
+			println(string("Curr U is ", currU))
+			#readline(STDIN)
+			currV = allV[q,1]
+			figure()
+			pcolormesh(zcords, ycords, currU)
+			#PyPlot.pcolor(zcords, ycords,currU, vmin = -1, vmax = 1)
+			xlabel("Z")
+			ylabel("Y")
+			usefulString = string("Z velocity at t = ", t, "x =  ", xcords[q])
+			colorbar()
+			title(usefulString)
+			saveStringZ = (string("Z velocity at t = ", t, "x = ", xcords[q], ".png"))
+			savefig(joinpath(path, saveStringZ))
 
-				figure()
-				pcolormesh(zcords, ycords, currV)
-				PyPlot.pcolor(zcords, ycords,currV, vmin = -1, vmax = 1)
-				xlabel("Z")
-				ylabel("Y")
-				usefulString2 = string("R velocity at t = ", t, "x = ", xcords[q])
-				colorbar()
-				title(usefulString2)
-				saveStringR= (string("R velocity at t = ", t, "x = ", xcords[q], ".png"))
-				savefig(joinpath(path, saveStringR))
-				close("all")
-			end
+			figure()
+			pcolormesh(zcords, ycords, currV)
+			#PyPlot.pcolor(zcords, ycords,currV, vmin = -1, vmax = 1)
+			xlabel("Z")
+			ylabel("Y")
+			usefulString2 = string("R velocity at t = ", t, "x = ", xcords[q])
+			colorbar()
+			title(usefulString2)
+			saveStringR= (string("R velocity at t = ", t, "x = ", xcords[q], ".png"))
+			savefig(joinpath(path, saveStringR))
+			close("all")
+		end
+		
 		t = t0+deltat
 		timecounter = timecounter +1
+		
 	end
 end
 
@@ -350,7 +366,7 @@ function main()
 	mkdir(presentTime) #create directory with datetime
 	path = joinpath("/home/rachel/Documents/RachelLeCover_Repository/", presentTime)
 	#println("In main")
-	numPoints =70
+	numPoints =20
 	xmax = 1
 	ymax = 1
 	grid = generateGrid(xmax,ymax,numPoints)
@@ -362,14 +378,14 @@ function main()
 	deltaY = grid[1,2][2]-grid[1,1][2]
 	deltaZ = .1
 	
-	tFinal = .5;
-	zEnd = .7
+	tFinal = .2;
+	zEnd = .3
 	
 	#actual blood velocities between 66-12 cm/sec, depending on location in body
 	#from http://circ.ahajournals.org/content/40/5/603
 	#u0 = Float64(50.0) #from Methods in the analysis of the effects of gravity..., flow rate is .5m/s, through aeorta,  now divided by number of vessels
 	#for small artery
-	u0 = Float64(4)
+	u0 = Float64(40)
 	v0 = Float64(.01)
 	
 	#.2cm for small vein
@@ -383,7 +399,7 @@ function main()
 	#P0 = 133322.0 #inital pressure, in dyne/cm^2
 	#run into problems when pressure greater than 1000 dyne/cm^2
 	#4000 dyne/cm^2 for small vein
-	P0 = Float64(1000.0)
+	P0 = Float64(100.0)
 	maxP = 10*P0
 	maxU = 10*u0
 	maxV = 100*v0
@@ -398,16 +414,16 @@ function main()
 	numRuns = 1
 	#for iterative pressure calculations
 	prevX = grid[1,1][1]
-	prevY = grid[1,1][2]	
-
+	prevY = grid[1,1][2]
+	
 	#for storing velocity data
 	velocityData = Array{Array}(Integer(ceil(zEnd/deltaZ)),2)
 	#maybe plus one?
 	
 	#for storing data with respect to time
 	historicData = Array{Array}(1, Integer(ceil(tFinal/deltat)))
-	closeMargin = .01 #for calculating wall pressure
-	centerMargin = .01
+	closeMargin = .1 #for calculating wall pressure
+	centerMargin = .1
 
 	#for plotting
 	x = linspace(-xmax, xmax, numPoints)
@@ -635,7 +651,7 @@ function main()
 		numRuns = numRuns +1
 	end
 	close("all")
-	#plotConstantX(historicData, zEnd, deltaZ, ymax, deltaY, xmax, deltaX, deltat, path)
+	plotConstantX(historicData, zEnd, deltaZ, ymax, deltaY, xmax, deltaX, deltat, path)
 	
 end
 
