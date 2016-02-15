@@ -42,6 +42,7 @@ end
 function calculatePressure(t, A, B)
 	# pressure is periodic, with constants A and B from a P vs t curve
 	# omega is period of pressure-if assume heartrate of 120 bpm, omega =1/2 (in seconds) 
+	#B is pressure at t = 0
 	omega = .5
 	pressure = A*sin(omega*t)+B
 	return pressure
@@ -126,9 +127,9 @@ function calculateU(t, w, p)
 		println(string("mu is", mu))
 		println(string("delta X is", deltaX, "delta Y is", deltaY, "delta Z is ", deltaZ, "currU is ", currU, " curr V is ", currV, "currP is", currP, " currX is ", currX, "currY is", currY))
 		println(string("tauRR is ", tauRR, " tauZZ is ", tauZZ, " tarRZ is ", tauRZ))
-		println(string("-1*(currV*1/deltaR*currU+currU*1/deltaZ*currU) is ", -1*(currV*1/deltaR*currU+currU*1/deltaZ*currU)))	
-		println(string("-1/rho*1/deltaZ*currP is ", -1/rho*1/deltaZ*currP ))
-		println(string("-1/rho*(1/R*(R*tauRZ)/deltaR+1/deltaZ*tauZZ) is "), -1/rho*(1/R*(tauRZ+R*tauRZ/deltaR)+1/deltaZ*tauZZ))
+		println(string("-1*(currV*deltaR*currU+currU*deltaZ*currU) is ", -1*(currV*deltaR*currU+currU*deltaZ*currU)))	
+		println(string("-1/rho*deltaZ*currP is ", -1/rho*deltaZ*currP ))
+		println(string("-1/rho*(1/R*(R*tauRZ)*deltaR+deltaZ*tauZZ) is ", -1/rho*((1/R*deltaR*(R*tauRZ)+deltaZ*tauZZ))))
 	
 	end
 	
@@ -252,7 +253,7 @@ function plotConstantX(historicData, zMax, deltaZ, yMax, deltaY, xMax, deltaX, d
 	for l = 1:size(historicData, 2)
 		#number of time steps
 		timepoint = historicData[1,l]
-		#println("time point is")
+		println("time point is")
 		println(string("size of timepoint is", size(timepoint)))
 	
 		for p = 1:length(xcords)
@@ -271,7 +272,7 @@ function plotConstantX(historicData, zMax, deltaZ, yMax, deltaY, xMax, deltaX, d
 						for m = 1:size(udata,2)-1
 							#store the data at selected x
 							if(n == desiredIndex)
-								println(string("at x index = ", desiredIndex, "at y index ", yindex, "at zindex", zindex, "u at these coordinates is ", udata[desiredIndex,yindex], "v at these cordinates is ", vdata[desiredIndex,yindex]))
+								#println(string("at x index = ", desiredIndex, "at y index ", yindex, "at zindex", zindex, "u at these coordinates is ", udata[desiredIndex,yindex], "v at these cordinates is ", vdata[desiredIndex,yindex]))
 								uYZ[yindex, zindex] = udata[desiredIndex,yindex]
 								vYZ[yindex, zindex] = vdata[desiredIndex,yindex]
 								#println("uYZ is")
@@ -287,51 +288,51 @@ function plotConstantX(historicData, zMax, deltaZ, yMax, deltaY, xMax, deltaX, d
 				end
 			end
 			allU[p] = uYZ
+			#this appears to be getting stored correctly 
 			#println(string("all U[p]  is", allU[p]))
+			#readline(STDIN)
 			allV[p]= vYZ
 		
-		end	
-			println("all u is ", typeof(allU))
-			println("all u is ", (allU))
-			println("all u is ", size(allU))
-			for q = 1:length(allU-1)
-				currItemU = allU[q]
-				println("all currItemU is ", (currItemU))
-				println("all currItemU is ", size(currItemU))
-				currItemV = allV[q]
-				
-					println(string("q = ", q, "tcounter is ", t))
-					#println(string("allU is ", allU))
-					currU = currItemU
-					println(string("Curr U is ", currU))
-					#readline(STDIN)
-					currV = currItemV
-					figure()
-					pcolormesh(zcords, ycords, currU)
-					#PyPlot.pcolor(zcords, ycords,currU, vmin = -1, vmax = 1)
-					xlabel("Z")
-					ylabel("Y")
-					usefulString = string("Z velocity at t = ", t, "x =  ", xcords[q])
-					colorbar()
-					title(usefulString)
-					saveStringZ = (string("Z velocity at t = ", t, "x = ", xcords[q], ".png"))
-					savefig(joinpath(path, saveStringZ))
 
-					figure()
-					pcolormesh(zcords, ycords, currV)
-					#PyPlot.pcolor(zcords, ycords,currV, vmin = -1, vmax = 1)
-					xlabel("Z")
-					ylabel("Y")
-					usefulString2 = string("R velocity at t = ", t, "x = ", xcords[q])
-					colorbar()
-					title(usefulString2)
-					saveStringR= (string("R velocity at t = ", t, "x = ", xcords[q], ".png"))
-					savefig(joinpath(path, saveStringR))
-					close("all")
-				\
-			end
+			currItemU = allU[p]
+			#println("all currItemU is ", (currItemU))
+			#readline(STDIN)
+			#println("all currItemU is ", size(currItemU))
+			currItemV = allV[p]
+				
+			#println(string("q = ", q, "tcounter is ", t))
+			#println(string("allU is ", allU))
+			currU = currItemU
+			#println(string("Curr U is ", currU))
+			#readline(STDIN)
+			currV = currItemV
+			figure()
+			pcolormesh(zcords, ycords, currU)
+			#PyPlot.pcolor(zcords, ycords,currU, vmin = -1, vmax = 1)
+			xlabel("Z")
+			ylabel("Y")
+			usefulString = string("Z velocity at t = ", t, "x =  ", xcords[p])
+			colorbar()
+			title(usefulString)
+			saveStringZ = (string("Z velocity at t = ", t, "x = ", xcords[p], ".png"))
+			savefig(joinpath(path, saveStringZ))
+
+			figure()
+			pcolormesh(zcords, ycords, currV)
+			#PyPlot.pcolor(zcords, ycords,currV, vmin = -1, vmax = 1)
+			xlabel("Z")
+			ylabel("Y")
+			usefulString2 = string("R velocity at t = ", t, "x = ", xcords[p])
+			colorbar()
+			title(usefulString2)
+			saveStringR= (string("R velocity at t = ", t, "x = ", xcords[p], ".png"))
+			savefig(joinpath(path, saveStringR))
+			close("all")
+				
+			
 		t = t0+deltat
 		timecounter = timecounter +1
+	end
 		
 	end
 end
@@ -375,7 +376,7 @@ function main()
 	mkdir(presentTime) #create directory with datetime
 	path = joinpath("/home/rachel/Documents/RachelLeCover_Repository/", presentTime)
 	#println("In main")
-	numPoints =50
+	numPoints =70
 	xmax = 1
 	ymax = 1
 	grid = generateGrid(xmax,ymax,numPoints)
@@ -387,14 +388,14 @@ function main()
 	deltaY = grid[1,2][2]-grid[1,1][2]
 	deltaZ = .1
 	
-	tFinal = .5;
-	zEnd = .5
+	tFinal = .7;
+	zEnd = .7
 	
 	#actual blood velocities between 66-12 cm/sec, depending on location in body
 	#from http://circ.ahajournals.org/content/40/5/603
 	#u0 = Float64(50.0) #from Methods in the analysis of the effects of gravity..., flow rate is .5m/s, through aeorta,  now divided by number of vessels
 	#for small artery
-	u0 = Float64(40)
+	u0 = Float64(50)
 	v0 = Float64(.01)
 	
 	#.2cm for small vein
@@ -408,7 +409,7 @@ function main()
 	#P0 = 133322.0 #inital pressure, in dyne/cm^2
 	#run into problems when pressure greater than 1000 dyne/cm^2
 	#4000 dyne/cm^2 for small vein
-	P0 = Float64(100.0)
+	P0 = Float64(10.0)
 	maxP = 10*P0
 	maxU = 10*u0
 	maxV = 100*v0
@@ -431,8 +432,8 @@ function main()
 	
 	#for storing data with respect to time
 	historicData = Array{Array}(1, Integer(ceil(tFinal/deltat)))
-	closeMargin = .1 #for calculating wall pressure
-	centerMargin = .1
+	closeMargin = .01 #for calculating wall pressure
+	centerMargin = .01
 
 	#for plotting
 	x = linspace(-xmax, xmax, numPoints)
@@ -566,7 +567,12 @@ function main()
 							println(string("at cordinates ", xcord, ", ", ycord, " z slice ", zSim, "t = ", tsim))
 							#readline(STDIN)
 						end
-						if(Rwall-(sqrt(xcord^2+ycord^2))<closeMargin && Rwall-sqrt(xcord^2+ycord^2)> 0)
+		
+						#apply forcing pressure at z = 0
+						if(zSlice == 0)
+							P[xindex, yindex] = calculatePressure(tsim, 10, P0)
+						end
+						if(Rwall-(sqrt(xcord^2+ycord^2))<closeMargin && Rwall-sqrt(xcord^2+ycord^2)> 0 && zSlice != 0)
 							#println(string("Ptot is ", Ptot, " and vRtot is ", vRtot, " and wall counter is ", wallcounter))
 							calcP = (Rwall-A)/b
 							if(calcP < 0)
