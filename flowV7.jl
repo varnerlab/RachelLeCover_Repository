@@ -337,15 +337,20 @@ function plotConstantX(historicData, zMax, deltaZ, yMax, deltaY, xMax, deltaX, d
 	end
 end
 
-function plotPressure(x,y,P,Rwall,zSim, tsim, path)
+function plotPressure(x,y,P,Rwall,zSim, tsim, path, mode)
 	figure()
 	PyPlot.hold(true)
 	pcolormesh(x,y,P)
 	#PyPlot.pcolor(x,y,P, vmin = 0, vmax = 3)
 	colorbar()
 	drawBorder(Rwall, x)
-	title(string("Pressure at z= ", zSim, " t = ", tsim ))
-	savestringP = string("Pressureatz=", zSim, "t", tsim, ".png")
+	if(mode == 'r')
+		usefulstring = "Pressure in R direction "
+	elseif(mode == 'z')
+		usefulstring = "Pressure in Z direction "
+	end
+	title(string(usefulstring, " at z= ", zSim, " t = ", tsim ))
+	savestringP = string(usefulstring, "atz=", zSim, "t", tsim, ".png")
 	savefig(joinpath(path, savestringP))
 end
 
@@ -368,6 +373,16 @@ end
 
 function createSaveDir(dirName)
 	mkdir(dirName)
+end
+
+function threePtDifference(h, fplus, fminus)
+	result = (fplus-fminus)/(2*h)
+	return result
+end
+
+function twoPtDifference(h, f, fminus)
+	result = (f-fminus)/h
+	return result
 end
 
 function main()
@@ -394,8 +409,8 @@ function main()
 	#actual blood velocities between 66-12 cm/sec, depending on location in body
 	#from http://circ.ahajournals.org/content/40/5/603
 	#u0 = Float64(50.0) #from Methods in the analysis of the effects of gravity..., flow rate is .5m/s, through aeorta,  now divided by number of vessels
-	#for small artery
-	u0 = Float64(50)
+	#for small vein .4 cm/s
+	u0 = Float64(4)
 	v0 = Float64(.01)
 	
 	#.2cm for small vein
@@ -417,7 +432,8 @@ function main()
 	#fill velocity vectors with initial conditions
 	u = fill(u0, (numPoints, numPoints))
 	v = fill(v0, (numPoints, numPoints))
-	P = fill(P0, (numPoints, numPoints))
+	Pz = fill(P0, (numPoints, numPoints)) #pressure in z direction
+	Pr = fill(0.0, (numPoints, numPoints)) #pressure in r direction
 	avgP = 0;
 
 	
@@ -448,7 +464,8 @@ function main()
 	#b = 1.82E-3 #in cm/cm H20
 	#b = 1.82E-3/980.665 # in cm/(dyne cm^2)
 	#b = .01
-	b = 1.214E-6 #cm^3/dyne from http://stroke.ahajournals.org/content/25/1/11.full.pdf	
+	#b = 1.214E-6 #cm^3/dyne from http://stroke.ahajournals.org/content/25/1/11.full.pdf	
+	b = .1208 #cm^3/dyne #Quantitative estimation of compliance of human systemic veins be occlusion plethysmography with radionuclide. Metholdology and the effect of nitroglycerin. For veins
 
 	#for storing radii as move through Z
 	radii = fill(R0, Integer(ceil(zEnd/deltaZ)), 1)
@@ -494,12 +511,13 @@ function main()
 					#velocities at present coordinates, from historical data
 					currU = prevU[xindex, yindex]
 					currV = prevV[xindex, yindex]
-					currP = P[xindex, yindex]
+					currPz = Pz[xindex, yindex]
+					currPr = Pr[xindex, yindex]
 					initials = [currU]# v[xindex, yindex]]
 					if(inVessel == 1)
 						#inside blood vessel, actually calculate velocity profile
 						#println("At cordinates $xcord, $ycord")
-						p = [deltaX, deltaY, deltaZ, currU, currV, currP, xcord, ycord]
+						p = [deltaX, deltaY, deltaZ, currU, currV, currPz, xcord, ycord]
 					
 						#for Sundials
 						#wrappedU(t,w,wdot) = calculateU(t,w,wdot, p)
@@ -570,32 +588,39 @@ function main()
 		
 						#apply forcing pressure at z = 0
 						if(zSlice == 0)
-							P[xindex, yindex] = calculatePressure(tsim, 10, P0)
+							Pz[xindex, yindex] = calculatePressure(tsim, 10, P0)
 						end
 						if(Rwall-(sqrt(xcord^2+ycord^2))<closeMargin && Rwall-sqrt(xcord^2+ycord^2)> 0 && zSlice != 0)
 							#println(string("Ptot is ", Ptot, " and vRtot is ", vRtot, " and wall counter is ", wallcounter))
 							calcP = (Rwall-A)/b
 							if(calcP < 0)
-								P[xindex, yindex] = 0
+								Pr[xindex, yindex] = 0
 							else
-								P[xindex, yindex] = calcP
+								Pr[xindex, yindex] = calcP
 							end
 							#putting bounds on pressures
-							if(P[xindex, yindex] > maxP)
+							if(Pr[xindex, yindex] > maxP)
 								P = maxP
 							end
 							
-							currP = P[xindex, yindex]
-							Ptot = Ptot + P[xindex, yindex]
+							currP = Pr[xindex, yindex]
+							Ptot = Ptot + Pr[xindex, yindex]
 							wallcounter = wallcounter +1
 							vRtot = vRtot+currV
 
-						else
-							calculatedP = calculateP(currP, xcord, ycord, prevX, prevY, currV, currU, deltaZ)
+							calculatedP = calculateP(currPz, xcord, ycord, prevX, prevY, currV, currU, deltaZ)
 							if(calculatedP > maxP)
-								P[xindex, yindex] = maxP
+								Pz[xindex, yindex] = maxP
 							else
-								P[xindex, yindex] = calculatedP
+								Pz[xindex, yindex] = calculatedP
+							end
+
+						else
+							calculatedP = calculateP(currPz, xcord, ycord, prevX, prevY, currV, currU, deltaZ)
+							if(calculatedP > maxP)
+								Pz[xindex, yindex] = maxP
+							else
+								Pz[xindex, yindex] = calculatedP
 							end
 							
 						end
@@ -608,7 +633,8 @@ function main()
 						#println("skipped")
 						u[xindex, yindex]= 0
 						v[xindex, yindex] = 0
-						P[xindex, yindex] = 0
+						Pz[xindex, yindex] = 0
+						Pr[xindex, yindex] = 0
 					end
 			prevX = xcord
 			prevY = ycord	
@@ -617,7 +643,8 @@ function main()
 			end
 			#
 
-		plotPressure(x,y,P,Rwall,zSim, tsim, path)
+		plotPressure(x,y,Pr,Rwall,zSim, tsim, path, 'r')
+		plotPressure(x,y,Pr,Rwall,zSim, tsim, path, 'z')
 		Pwall = Ptot/wallcounter
 		vRwallAvg = vRtot/wallcounter
 		Rwall = Rwall + vRwallAvg*deltat
