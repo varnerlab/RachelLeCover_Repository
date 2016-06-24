@@ -1,0 +1,4 @@
+'Elapsed time','HR','ABPSys','ABPDias','ABPMean','PAPSys','PAPDias','PAPMean','CVP','PULSE','RESP','SpO2','NBPSys','NBPDias','NBPMean'
+'seconds','bpm','mmHg','mmHg','mmHg','mmHg','mmHg','mmHg','mmHg','bpm','pm','%','mmHg','mmHg','mmHg'
+0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000,94.000,-,-,-
+60.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000,0.000,93.500,165.000,73.000,102.000

@@ -1,0 +1,3 @@
+'Elapsed time','HR','ABPSys','ABPDias','ABPMean','PULSE','RESP','SpO2'
+'seconds','bpm','mmHg','mmHg','mmHg','bpm','pm','%'
+0.000,0.000,0.000,0.000,0.000,103.100,0.000,0.000
