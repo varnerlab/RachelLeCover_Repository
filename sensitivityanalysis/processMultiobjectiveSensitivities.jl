@@ -2,8 +2,8 @@
 using DataFrames
 
 function processMultiobjectiveSensitivities()
-	dirOfInterest = "/home/rachel/Documents/optimization/sensitivityanalysis/ParallelUsingFDSlowerCoolingParamsCluster1n10/"
-	outputdir = "/home/rachel/Documents/optimization/sensitivityanalysis/ParallelUsingFDSlowerCoolingParamsIntermediateDirCluster1n10/"
+	dirOfInterest = "/home/rachel/Documents/optimization/sensitivityanalysis/ParallelUsingFDSlowerCoolingParamsCluster1n10Jun22/"
+	outputdir = "/home/rachel/Documents/optimization/sensitivityanalysis/ParallelUsingFDSlowerCoolingParamsIntermediateDirCluster1n10Jun22/"
 	filesinDir = readdir(dirOfInterest)
 	usefulfiles = AbstractString[]
 	totaldata = DataFrame(patientIDs = Any[], dhdN = Any[], dhdk1=Any[], dhdtau1 = Any[], dhdtau2 = Any[], dhdtauach = Any[], dhdtaunor = Any[], dhdh0 = Any[], dhdmnor = Any[], dhdmach = Any[])

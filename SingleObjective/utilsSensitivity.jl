@@ -5,8 +5,8 @@ require("/home/rachel/Documents/optimization/sensitivityanalysis/OlufsenModel201
 	df=readtable(filename, separator=',',nastrings=["-"])
 	units = df[1,:]
 	deleterows!(df,1) #remove the row that had units
-	writetable(string("tempoutputSDF", myid(), ".csv"), df)
-	dfnew = readtable(string("tempoutputSDF", myid(), ".csv"), separator=',')
+	writetable(string("tempoutputSF", myid(), ".csv"), df)
+	dfnew = readtable(string("tempoutputSF", myid(), ".csv"), separator=',')
 	return dfnew, units
 end
 
@@ -221,11 +221,12 @@ function doSensitivitiesMakeDFs_parallel()
 	 N = 75.0
         M = 120.0
 	 beta = 6
-	#params= [75,1.5,.5,250, .5, .5, 1.67,.96, .7]
+	params= [75,1.5,.5,250, .5, .5, 1.67,.96, .7]
 	#params = [77.21810611260562,14.0659798715,2.3595665995,252.9553108258,0.4708140794,9.7720706413,1.7454283859,0.1612547652,0.30946585943989047]
 	params =[107.33612908104033,41.138842557517954,14.062116217939991,202.92519160829795,2.941876046317941e-5,8.15596008945017,1.4743606995666585,0.1654851281383664,0.05218327316554491]
 	inputdir = "/home/rachel/Documents/modelingHR/LinkedRecordsTimeData10min/"
-	outputdir = "/home/rachel/Documents/optimization/sensitivityanalysis/usingBestParamsJun20/"
+	#outputdir = "/home/rachel/Documents/optimization/sensitivityanalysis/usingBestParamsJun20/"
+	outputdir = "/home/rachel/Documents/optimization/sensitivityanalysis/usingOriginalParamsJun23/"
 	touch(string(outputdir, "AllS0.txt"))
 	cluster1path = "/home/rachel/Documents/optimization/multiobjective/usingPOETs/cluster1subjectIDs"
 	cluster2path = "/home/rachel/Documents/optimization/multiobjective/usingPOETs/cluster2subjectIDs"
