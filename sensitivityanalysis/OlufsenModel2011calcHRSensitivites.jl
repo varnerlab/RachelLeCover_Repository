@@ -236,6 +236,19 @@ function calculateSensitivitesUsingCDForAll(cnor, cach,fsym, fpar,n,t,params,Pda
 	return S
 end
 
+function calculateSensitivitesUsingCDForSetParams(cnor, cach,fsym, fpar,n,t,params,Pdata,tdata,nsprev,bfprev)
+	S = Float64[]
+	num_params = 5
+	startindex = 10
+	delta = 1E-8;
+	for j in collect(startindex:startindex+num_params-1)
+		dhdthetaj = calculateCenteredFDSetParams(Pdata, tdata, params, nsprev, bfprev,delta, j)
+		#@show S
+		push!(S,dhdthetaj)
+	end
+	return S
+end
+
 function calculateFiniteDiff(Pdata, tdata, params0,params1,nsprev, bfprev,h)
 	
 	fd = (calculateModel(Pdata,tdata,nsprev, bfprev,params0)[1]-calculateModel(Pdata,tdata,nsprev, bfprev,params1)[1])/h
@@ -252,8 +265,24 @@ function calculateCenteredFD(Pdata, tdata, params, nsprev, bfprev,delta, index)
 
 	cd = (fForward-fBackwards)/h
 	#toc()
+	#@show paramsforward, paramsbackwards, fForward, fBackwards, cd
 	return cd
 end
+
+function calculateCenteredFDSetParams(Pdata, tdata, params, nsprev, bfprev,delta, index)
+	tic()
+	h = delta*params[index]
+	paramsforward = params+h/2.0*squeeze(eye(index,length(params))[index,:],1)
+	paramsbackwards = params-h/2.0*squeeze(eye(index,length(params))[index,:],1)
+	fForward = calculateModelPassInMore(Pdata,tdata,nsprev, bfprev,paramsforward)[1]
+	fBackwards = calculateModelPassInMore(Pdata,tdata,nsprev, bfprev,paramsbackwards)[1]
+
+	cd = (fForward-fBackwards)/h
+	toc()
+	#@show paramsforward, paramsbackwards, fForward, fBackwards, cd
+	return cd
+end
+
 
 function calculateModel(Pdata,tdata,nsprev, bfprev,params)
 		
@@ -413,5 +442,162 @@ function calculateModel(Pdata,tdata,nsprev, bfprev,params)
 		
 end
 
+function calculateModelPassInMore(Pdata,tdata,nsprev, bfprev,params)
+		
+	t = Float64[]
+	P = Float64[]
+
+	tstepavg = 0.0
+
+	#@show length(tdata)
+	#@show length(Pdata)
+	numIntervals = 2.0
+	hasData = Int[] #to keep track of gaps in the data. 1 means data present, 0 means gap
+	for j = 1:length(tdata)-1
+		tstep = tdata[j+1]-tdata[j];
+		dataPresent = 1
+		if(tstep>5)
+			#println(string("found gap in data at between t = "), tdata[j+1], " and t = ", tdata[j])
+			dataPresent = 0
+			numIntervals = tstep*2.0
+		else
+			dataPresent = 1
+			numIntervals = 2.0
+		end
+		for k = 1:numIntervals
+			step = tstep/numIntervals*k
+			currT = tdata[j]+step
+			currP = linearInterp(Pdata[j], Pdata[j+1], tdata[j], tdata[j+1],step)
+			if(!in(currT,t)&& !in(currT+eps(), t) && !in(currT-eps(), t))
+				push!(t, currT)
+				push!(P, currP)
+				push!(hasData, dataPresent)
+			end
+		end
+	end
+	tstep = 1.0/numIntervals
+	counter = 1
+	#define parametrse to optimize
+	#both alpha,beta, M,k2 , taud are set, not estimated
+	global alpha =params[10]
+	global beta = params[11]
+	global M = params[12]
+	global k2 = params[13]
+	global tauD = params[14]
+
+	global N = params[1]
+	global k1 = params[2]
+	global tau1 = params[3]
+	global tau2 = params[4]
+	global tauach = params[5]
+	global taunor = params[6]
+	global h0 = params[7]
+	global Mnor = params[8]
+	global Mach = params[9]
+	
+
+
+	#should play with these
+	global tol = .1
+	global tolHR = .15
+	treset =0.0 #for heartbeat logic
+	#nsprev = [(1-N/M)/(1+beta*N/M), N/M, 0.0]
+	#bfprev = [0.0,0.0,90.0]
+
+	n1TS = Float64[]
+	n2TS =Float64[]
+	nTS = Float64[]
+
+	pbarTS = Float64[]
+
+	CnorTS = Float64[]
+	CachTS = Float64[]
+	phiTS = Float64[]
+
+	fparTS = Float64[]
+	fsymTS = Float64[]
+	beatsTS = Float64[]
+	push!(beatsTS,0)#put in an initial value
+	heartRate = Float64[]
+	heartRate2012= Float64[]
+	currHR = 100;
+	currn = 0
+
+	for time in t
+		if(mod(counter,10000)==0)
+			#println(string("at time "), time)
+		end
+		currP = P[counter]
+		bf(tspan,y)= baroreflex(tspan,y,currP)
+		tspan = collect(time-5*tstep:tstep/10:time)
+		tout, res = ODE.ode78(bf, bfprev,tspan,abstol = 1E-8, reltol = 1E-8)
+
+		y1 = [a[1] for a in res]
+		y2 = [a[2] for a in res]
+		y3 =[a[3] for a in res]
+
+		push!(n1TS, y1[end])
+		push!(n2TS, y2[end])
+		push!(pbarTS, y3[end])
+
+		currn= y1[end]+y2[end]+N
+		push!(nTS, currn)
+		fpar = calculatefpar(currn)
+		
+		fsym = calculatefsym(currn,time,fpar)
+		push!(fparTS, fpar)
+		push!(fsymTS, fsym)
+
+		ns(tspan, y)=nervous_system(tspan, y, fsym, fpar)
+		tout, nsRes = ODE.ode23(ns, nsprev, tspan, abstol = 1E-8, reltol = 1E-8)
+		Cnor = [a[1] for a in nsRes]
+		Cach = [a[2] for a in nsRes]
+		phi = [a[3] for a in nsRes]
+
+		if(Cnor[end]< 0)
+			Cnor[end] = 0.0
+		end
+
+		if(Cach[end]<0)
+			Cach[end] = 0.0
+		end
+
+		push!(CnorTS, Cnor[end])
+		push!(CachTS, Cach[end])
+		currHeartRate =calculateHR2012(Cnor[end], Cach[end])
+		push!(heartRate2012, currHeartRate)
+	
+		counter = counter+1
+		#use previous result as starting point for next integration
+		bfprev = [y1[end],y2[end],y3[end]]
+
+		currPhi = phi[end]
+
+		tbuffer = tstep*1.1
+		if(counter>2)
+		
+			if(currPhi-.8>0 && phiTS[counter-2]-.8<0)# && time-tbuffer>treset)
+				##println("In this logic")
+				#currPhi = 0.0
+				treset = time
+				push!(beatsTS, time)
+				currHR = 1/(time-beatsTS[length(beatsTS)-1])*60
+			end
+			if(currPhi-1>0 && phiTS[counter-2]-1<0)
+				currPhi = 0.0
+			end
+		end
+
+
+		push!(phiTS, currPhi)
+		push!(heartRate, currHR)
+		nsprev = [Cnor[end], Cach[end], currPhi]
+	end
+#	savestrpretty = string(savestr[1:search(savestr, '.')-1], "Pretty", savestr[search(savestr, '.'):end])
+#	plotPretty(tdata, Pdata, data[:_HR_], t, heartRate2012, pbarTS, savestrpretty)
+#	PyPlot.close()
+	return [heartRate2012[end], CnorTS[end], CachTS[end], currn, n1TS[end], n2TS[end], fparTS[end], fsymTS[end], pbarTS[end], phiTS[end]]
+		
+end
 
 
