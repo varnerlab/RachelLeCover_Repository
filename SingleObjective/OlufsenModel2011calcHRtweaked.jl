@@ -3,19 +3,6 @@
 @everywhere using DataFrames
 
 function nervous_system(t,y,fsym,fpar)
-#	#H0 = 1.67 #beats/sec
-#	H0=2.17 #beats/sec, corresponds to resting HR of 80 bpm
-#	#H0 =100.0
-#	taunor = .5
-#	tauach = .5
-#	Mach = .7
-#	Mnor = .96
-#	#from third line in 2012 paper
-##	taunor =.558
-##	tauach= .509
-##	Mach = .699
-##	Mnor =.963
-#	
 	cnor = y[1]
 	cach = y[2]
 	phi = y[3]
@@ -31,17 +18,6 @@ function baroreflex(t,y,currP)
 	n1=y[1]
 	n2=y[2]
 	pbar=y[3]
-	#constants, as givien by Olufsen 2011 in healthy young
-#	k1 = 1.5
-#	k2 = 1.5
-#	tau1 = .5
-#	tau2 = 250
-#	#from third line in 2012 paper
-##	k1 =.945
-##	k2 = 1.5
-##	tau1 = .896
-##	tau2 = 229
-#	
 
 	dpbardt = alpha*(currP-pbar)
 	n = n1+n2+N
@@ -61,9 +37,6 @@ function calculatefpar(n)
 end
 
 function calculatefsym(n,t,fpar)
-#	M = 120.0#*10000
-#	tauD = 7
-#	beta = 6
 
 	fsym = (1-n*(t-tauD)/M)/(1+beta*fpar)
 	if(fsym < 0)
