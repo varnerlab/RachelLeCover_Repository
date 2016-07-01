@@ -277,8 +277,8 @@ function calculateHeartRateHigherFdata(data,lowfdata,params,savestr)
 	fpar =  calculatefpar(n)
 	fsym = calculatefsymArr(n,tout,fpar)
 	h = calculateHR2012(Cnor, Cach)
-	plotPrettyHighF(lowfdata[:_Elapsed_time_], Pdata, lowfdata[:_HR_], tout,h,Pbar,savestr)
-	plotall(tout, Pbar, n1, n2, n,fpar, fsym,Cnor, Cach,lowfdata[:_HR_], h, lowfdata[:_Elapsed_time_],string("moretesting/higherfreqPdata/","allvars.pdf"))
+	plotPrettyHighF(lowfdata[:_Elapsed_time_], Pdata, lowfdata[:_HR_], tout,h,Pbar,string(savestr, ".pdf"))
+	plotall(tout, Pbar, n1, n2, n,fpar, fsym,Cnor, Cach,lowfdata[:_HR_], h, lowfdata[:_Elapsed_time_],string(savestr, "allvars.pdf"))
 	toc()
 
 end

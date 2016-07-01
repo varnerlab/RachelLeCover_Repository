@@ -87,16 +87,16 @@ end
 
 function calculatetotalMSE(params)
 	tic()
-	outputdir = "moretesting/higherfreqPdata/"
-	inputdir = "/home/rachel/Documents/modelingHR/LinkedRecordsTimeData10min/"
-	inputdirHighFreqP = "/home/rachel/Documents/modelingHR/LinkedRecordsTimeData10minNonNumerics/"
-	#allpatients = readdir(inputdir)
-	allpatients =["s00652-2965-06-14-18-19n"]
+	outputdir = "/moretesting/higherFreqPbestParams/"
+	inputdir = "../LinkedRecordsTimeData10min/"
+	inputdirHighFreqP = "../LinkedRecordsTimeData10minNonNumerics/"
+	allpatients = readdir(inputdir)
+	#allpatients =["s00652-2965-06-14-18-19n"]
 	highFreqPatients = readdir(inputdirHighFreqP)
 	dataWriteTo = string(outputdir, "usefuldatatolAll1E-4only2steps", ".txt")
 	paramsWriteTo = string(outputdir, "paramstolAll1E-4only2steps", ".txt")
-	touch(dataWriteTo)
-	touch(paramsWriteTo)
+	#touch(dataWriteTo)
+	#touch(paramsWriteTo)
 	totalMSE = 0.0
 	usefulpatients = 0.0
 
@@ -113,7 +113,7 @@ function calculatetotalMSE(params)
 		numericPatientID = patient[2:6]
 		date = patient[7:end-7]
 		println(string("processing patient", patient))
-		savestr = string(outputdir, "Id = ", patient,"usingfewersteps", ".png")
+		savestr = string(outputdir, "Id = ", patient)
 		data, units= processNumericalData(string(inputdir, patient))
 		if(in(patient[1:end-1], highFreqPatients))
 			highFreqData, units=processNumericalData(string(inputdirHighFreqP, patient[1:end-1]))
@@ -157,5 +157,6 @@ function calculatetotalMSE(params)
 end
 
 params = [75.0,1.5,0.5,250.0,0.5,0.5,1.67,0.96,0.7]
-calculatetotalMSE(params)
+bestparams =[107.33612908104033,41.138842557517954,14.062116217939991,202.92519160829795,2.941876046317941e-5,8.15596008945017,1.4743606995666585,0.1654851281383664,0.05218327316554491]
+calculatetotalMSE(bestparams)
 
