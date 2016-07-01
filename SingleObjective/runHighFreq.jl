@@ -39,6 +39,15 @@ end
 function cleanHighFreqData(data)
 	data[~isna(data[:,symbol("_ABP_")]),:]	
 	deleterows!(data,find(isna(data[:,symbol("_ABP_")])))
+	numrows = size(data,1)
+	j = 1
+	while(j<numrows)
+		if(data[:_ABP_][j]<40.0)
+			deleterows!(data,j)# remove unphysical measurements
+		end
+		numrows = size(data,1)
+		j = j+1
+	end
 
 	return data
 end
@@ -156,7 +165,89 @@ function calculatetotalMSE(params)
 	return overallMSE
 end
 
-params = [75.0,1.5,0.5,250.0,0.5,0.5,1.67,0.96,0.7]
-bestparams =[107.33612908104033,41.138842557517954,14.062116217939991,202.92519160829795,2.941876046317941e-5,8.15596008945017,1.4743606995666585,0.1654851281383664,0.05218327316554491]
-calculatetotalMSE(bestparams)
+function findpatients()
+	tic()
+	outputdir = "/home/rachel/Documents/optimization/SingleObjective/moretesting/higherFreqPbestParams/"
+	inputdir = "../LinkedRecordsTimeData10min/"
+	inputdirHighFreqP = "../LinkedRecordsTimeData10minNonNumerics/"
+	#allpatients = readdir(inputdir)
+	#allpatients =["s00652-2965-06-14-18-19n"]
+	highFreqPatients = readdir(inputdirHighFreqP)
+	dataWriteTo = string(outputdir, "usefulpatientsThrowingAwayBadPdataStartingWClusteredPatients", ".txt")
+	paramsWriteTo = string(outputdir, "paramstolAll1E-4only2steps", ".txt")
+	touch(dataWriteTo)
+	touch(paramsWriteTo)
+	totalMSE = 0.0
+	usefulpatients = 0.0
+	cluster1path = "/home/rachel/Documents/optimization/multiobjective/usingPOETs/cluster1subjectIDs"
+	cluster2path = "/home/rachel/Documents/optimization/multiobjective/usingPOETs/cluster2subjectIDs"
+	allpatients = AbstractString[]
+
+	f = open(cluster1path)
+	for ln in eachline(f)
+		if(length(ln)>1)
+			push!(allpatients, strip(ln))
+		end
+	end
+	close(f)
+
+	f = open(cluster2path)
+	for ln in eachline(f)
+		if(length(ln)>1)
+			push!(allpatients, strip(ln))
+		end
+	end
+	close(f)
+
+
+	for patient in allpatients
+		numericPatientID = patient[2:6]
+		date = patient[7:end-7]
+		println(string("processing patient", patient))
+		savestr = string(outputdir, "Id = ", patient)
+		data, units= processNumericalData(string(inputdir, patient))
+		if(in(patient[1:end-1], highFreqPatients))
+			highFreqData, units=processNumericalData(string(inputdirHighFreqP, patient[1:end-1]))
+			if(size(highFreqData,1)>0)
+				highFreqCols = names(highFreqData)
+			else
+				highFreqCols = AbstractString[]
+
+			end
+			sort!(data, cols = [order(:_Elapsed_time_)])
+			colnames = (names(data))
+			if(in(:_ABP_Mean_, colnames) && in(:_HR_, colnames)&& (length(data[:_Elapsed_time_])>2) &&in(:_ABP_, highFreqCols)&&(length(highFreqData[:_Elapsed_time_])>2))
+				println("has complete data")
+				data = cleandata(data)
+				highFreqData = cleanHighFreqData(highFreqData)
+				if(size(data,1)>5 && size(highFreqData,1)>5)
+					combinedframe = generateCombinedFrame(data, highFreqData)
+					@show head(combinedframe)
+					#MSE= calculateHeartRate(data, params,savestr)
+					#MSE = calculateHeartRateHigherFdata(combinedframe, data, params, savestr)
+					#@show MSE
+					#if(contains(string(typeof(MSE)), "Void"))
+					#	continue
+					#end
+					#totalMSE = MSE + totalMSE
+					usefulpatients = usefulpatients +1
+
+					f = open(dataWriteTo, "a")
+					f = write(f, string(patient, "\n"))
+					close(f)
+				end
+			end
+		end
+		#overallMSE = totalMSE/usefulpatients
+		#g = open(paramsWriteTo, "a")
+		#write(g, string(patient, "\n"))
+		#close(g)
+	end
+	toc()
+	#return overallMSE
+end
+
+#params = [75.0,1.5,0.5,250.0,0.5,0.5,1.67,0.96,0.7]
+#bestparams =[107.33612908104033,41.138842557517954,14.062116217939991,202.92519160829795,2.941876046317941e-5,8.15596008945017,1.4743606995666585,0.1654851281383664,0.05218327316554491]
+#calculatetotalMSE(bestparams)
 

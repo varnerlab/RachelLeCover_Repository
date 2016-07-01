@@ -88,5 +88,56 @@ function main()
 	end
 
 end
-main()
+
+function mainExtendedSensitivites()
+	inputfilename = "/home/rachel/Documents/optimization/multiobjective/usingPOETs/outputJun3parallel/poetsinfo.txt"
+	ec_array, pc_array, ra_array = parsePoetsoutput(inputfilename)
+
+	zeroRankParams = zeros(size(pc_array,1))
+	zeroRankErrors = zeros(size(ec_array,1))
+	#get the rank zero params and errors
+	for j in collect(2:size(ec_array,2)-1)
+		if(ra_array[j]==0)
+			zeroRankErrors = [zeroRankErrors ec_array[:,j]]
+			zeroRankParams = [zeroRankParams pc_array[:,j]]
+		end
+	end
+	zeroRankErrors = zeroRankErrors[:,2:end]
+	zeroRankParams = zeroRankParams[:, 2:end]
+
+	
+	#get the "good" parameters for cluster 1
+	upperlimit = 135.2 #135.2 for 10 sets #137-for 24 sets in cluster 1
+	goodparams = zeros(size(pc_array,1))
+	for j in collect(1:size(zeroRankErrors,2))
+		if(zeroRankErrors[1,j]<=upperlimit)
+			goodparams = [goodparams zeroRankParams[:,j]]
+		end
+	end
+#	upperlimit = 178.9 for 10 parameter sets in cluster 2
+#	goodparams = zeros(size(pc_array,1))
+#	for j in collect(1:size(zeroRankErrors,2))
+#		if(zeroRankErrors[2,j]<=upperlimit)
+#			goodparams = [goodparams zeroRankParams[:,j]]
+#		end
+#	end
+
+	goodparams = goodparams[:,2:end]
+	@show size(goodparams)
+	#paramsetcounter = 1
+	touch("cluster1bestparams.txt")
+	for k in collect(1:size(goodparams,2))
+		set = goodparams[:,k]
+		@show set
+		g = open("cluster1bestparams.txt", "a")
+		write(g, string(set))
+		close(g)
+		println(string("On set number", k, "out of ", size(goodparams,2)))
+		MultiObjdoExtendedSensitivitiesMakeDFs_parallel(set,k)
+		#paramsetcounter=paramsetcounter+1
+		
+	end
+
+end
+
 

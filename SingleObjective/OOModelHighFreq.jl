@@ -112,6 +112,7 @@ function calculatefsym(n,t,fpar)
 end
 
 function calculatefsymArr(n,t,fpar)
+	#@show sizeof(n), sizeof(t), sizeof(fpar)
 	fsym = (1-n.*(t-tauD)./M)./(1+beta.*fpar)
 	return fsym
 end
@@ -146,6 +147,38 @@ function lookUpP(t,PTframe)
 	end
 	return currP
 end
+
+function calculateMSE(tdata, HRdata, tsim, HRsim)
+	#need to map tdata to tsim
+	totalError = 0.0;
+	indexdata = 1;
+	indexsim = 1;
+	eps = 1E-6;
+	startindex = 1;
+	numMatched = 0.0
+	
+	for timeSim in tsim
+		for time in tdata
+			if(timeSim==time|| (timeSim <= time+eps && timeSim>=time-eps))
+				indexdata = findfirst(tdata,time)
+				indexsim = findfirst(tsim,timeSim)
+
+				currError = (HRdata[indexdata]-HRsim[indexsim])^2
+				totalError = totalError+currError
+				numMatched = numMatched+1;
+				continue
+			else
+				#no exact match found, find one close enough
+				##println(string("no match found at t = ", tdata[indexdata]))
+				##println(string("tsim is ", timeSim))
+			end
+		end
+	end
+	#println(string("matched ", numMatched, " out of ", length(HRdata)))
+	MSE = totalError/(numMatched)
+	return MSE
+end
+
 
 function plotPrettyHighF(tdata, pdata, HRdata, tsim, HRsim, Psim, savestr)
 	figure(figsize=(40,20))
@@ -230,6 +263,13 @@ function plotall(t, pbarTS, n1TS, n2TS, nTS, fparTS, fsymTS, CnorTS, CachTS, hea
 	PyPlot.close()
 end
 
+function saveDataToFile(tsim, HRsim,filename)
+	f = open(filename, "a")
+	write(f, string(tsim, "\n"))
+	write(f, string(HRsim, "\n"))
+	close(f)
+end
+
 function calculateHeartRateHigherFdata(data,lowfdata,params,savestr)
 	tic()
 	Pdata = data[:_ABP_]
@@ -254,7 +294,7 @@ function calculateHeartRateHigherFdata(data,lowfdata,params,savestr)
 
 	initialconditions = [(1-N/M)/(1+beta*N/M), N/M,0.0,0.0,90.0]
 	fedeqns(lowFreqt,y) = eqns(lowFreqt,y,data)
-	tout,res = ODE.ode45(fedeqns, initialconditions, lowFreqt, reltol = 1E-4, abstol =1E-4)
+	tout,res = ODE.ode78(fedeqns, initialconditions, lowFreqt, reltol = 1E-3, abstol =1E-3, points=:specified)
 
 
 	Cnor = [a[1] for a in res]
@@ -275,10 +315,11 @@ function calculateHeartRateHigherFdata(data,lowfdata,params,savestr)
 
 	n = n1+n2+N
 	fpar =  calculatefpar(n)
-	fsym = calculatefsymArr(n,tout,fpar)
+	fsym = calculatefsymArr(n,lowFreqt,fpar)
 	h = calculateHR2012(Cnor, Cach)
-	plotPrettyHighF(lowfdata[:_Elapsed_time_], Pdata, lowfdata[:_HR_], tout,h,Pbar,string(savestr, ".pdf"))
-	plotall(tout, Pbar, n1, n2, n,fpar, fsym,Cnor, Cach,lowfdata[:_HR_], h, lowfdata[:_Elapsed_time_],string(savestr, "allvars.pdf"))
+	#plotPrettyHighF(lowfdata[:_Elapsed_time_], Pdata, lowfdata[:_HR_], tout,h,Pbar,string(savestr, ".pdf"))
+	#plotall(tout, Pbar, n1, n2, n,fpar, fsym,Cnor, Cach,lowfdata[:_HR_], h, lowfdata[:_Elapsed_time_],string(savestr, "allvars.pdf"))
+	saveDataToFile(tout,h,string(savestr,".txt"))
 	toc()
 
 end

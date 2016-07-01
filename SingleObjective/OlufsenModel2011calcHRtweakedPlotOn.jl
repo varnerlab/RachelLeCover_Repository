@@ -117,6 +117,13 @@ function calculateHR2012(cnor, cach)
 	return h
 end
 
+function saveDataToFile(tsim, HRsim,filename)
+	f = open(filename, "a")
+	write(f, string(tsim, "\n"))
+	write(f, string(HRsim, "\n"))
+	close(f)
+end
+
 function plotPretty(tdata, pdata, HRdata, tsim, HRsim, Psim, savestr)
 	figure(figsize=(20,20))
 	patientID = savestr[1:search(savestr, 'P')-1]
@@ -438,6 +445,7 @@ function calculateHeartRateHigherFdata(data,lowfdata,params,savestr)
 	heartRate = Float64[]
 	heartRate2012= Float64[]
 	currHR = 100;
+	tout =Float64[]
 
 	for time in tdata
 		if(mod(counter,10000)==0)
@@ -509,10 +517,11 @@ function calculateHeartRateHigherFdata(data,lowfdata,params,savestr)
 		push!(heartRate, currHR)
 		nsprev = [Cnor[end], Cach[end], currPhi]
 	end
-	savestrpretty = string(savestr[1:search(savestr, '.')-1], "Pretty", savestr[search(savestr, '.'):end])
-	plotPrettyHighF(tdata, Pdata, data[:_HR_], tdata, heartRate2012, pbarTS, savestrpretty)
-	PyPlot.close()
+	#savestrpretty = string(savestr[1:search(savestr, '.')-1], "Pretty", savestr[search(savestr, '.'):end])
+	#plotPrettyHighF(tdata, Pdata, data[:_HR_], tdata, heartRate2012, pbarTS, savestrpretty)
+	#PyPlot.close()
 	MSE = calculateMSE(lowfdata[:_Elapsed_time_], lowfdata[:_HR_], tdata, heartRate2012)
+	saveDataToFile(tout,heartRate2012,string(savestr,".txt"))
 	return MSE
 		
 end

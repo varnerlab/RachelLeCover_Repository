@@ -241,7 +241,8 @@ function calculateSensitivitesUsingCDForSetParams(cnor, cach,fsym, fpar,n,t,para
 	num_params = 5
 	startindex = 10
 	delta = 1E-8;
-	for j in collect(startindex:startindex+num_params-1)
+	for j in collect(startindex:num_params+startindex-1)
+		#@show j
 		dhdthetaj = calculateCenteredFDSetParams(Pdata, tdata, params, nsprev, bfprev,delta, j)
 		#@show S
 		push!(S,dhdthetaj)
@@ -271,6 +272,7 @@ end
 
 function calculateCenteredFDSetParams(Pdata, tdata, params, nsprev, bfprev,delta, index)
 	tic()
+	#@show index
 	h = delta*params[index]
 	paramsforward = params+h/2.0*squeeze(eye(index,length(params))[index,:],1)
 	paramsbackwards = params-h/2.0*squeeze(eye(index,length(params))[index,:],1)
