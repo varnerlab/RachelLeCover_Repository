@@ -473,7 +473,7 @@ function calculateHeartRateHigherFdata(data,lowfdata,params,savestr)
 		push!(fsymTS, fsym)
 
 		ns(tspan, y)=nervous_system(tspan, y, fsym, fpar)
-		tout, nsRes = ODE.ode23(ns, nsprev, tspan, abstol = 1E-8, reltol=1E-8)
+		tout, nsRes = ODE.ode78(ns, nsprev, tspan, abstol = 1E-8, reltol=1E-8)
 		Cnor = [a[1] for a in nsRes]
 		Cach = [a[2] for a in nsRes]
 		phi = [a[3] for a in nsRes]

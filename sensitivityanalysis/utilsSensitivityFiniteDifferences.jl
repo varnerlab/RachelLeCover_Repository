@@ -494,7 +494,7 @@ function MultiObjdoExtendedSensitivitiesMakeDFs_parallel(params,setnumber)
 	push!(params, taud)
 	inputdir = "/home/rachel/Documents/modelingHR/LinkedRecordsTimeData10min/"
 	#outputdir = "/home/rachel/Documents/optimization/sensitivityanalysis/usingBestParamsJun20/"
-	outputdir = "/home/rachel/Documents/optimization/sensitivityanalysis/Cluster1ExtendedSensitivities/"
+	outputdir = "/home/rachel/Documents/optimization/sensitivityanalysis/Cluster2ExtendedSensitivities/"
 	touch(string(outputdir, "AllS0.txt"))
 	cluster1path = "/home/rachel/Documents/optimization/multiobjective/usingPOETs/cluster1subjectIDs"
 	cluster2path = "/home/rachel/Documents/optimization/multiobjective/usingPOETs/cluster2subjectIDs"

@@ -356,7 +356,7 @@ function mainforSingleObjectiveHighF()
 	end
 	close(f)
 
-
+	shuffle!(allpatients)
 	for patientID in allpatients
 		close("all")
 		@show patientID
