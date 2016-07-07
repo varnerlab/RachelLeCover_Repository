@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<PBPKModel>
+	<listOfCompartments>
+		<compartment index="1" symbol="C1" initial_volume="1.0"/>
+		<compartment index="2" symbol="C2" initial_volume="1.0"/>
+	</listOfCompartments>
+
+	<listOfCompartmentConnections>
+		<connection index="1" name="C1_C2" parameter_value="0.0" start_symbol="C1" end_symbol="C2" />
+		<connection index="2" name="C1_C2_reverse" parameter_value="0.0" start_symbol="C2" end_symbol="C1" />
+	</listOfCompartmentConnections>
+
+	<listOfSpecies>
+		<species symbol="MBL" initial_condition="0.0"/>
+		<species symbol="MASP1_2" initial_condition="0.0"/>
+		<species symbol="C1_a_similar" initial_condition="0.0"/>
+		<species symbol="C4" initial_condition="0.0"/>
+		<species symbol="C4a" initial_condition="0.0"/>
+		<species symbol="C4b" initial_condition="0.0"/>
+		<species symbol="C4b2" initial_condition="0.0"/>
+		<species symbol="C2" initial_condition="0.0"/>
+		<species symbol="C1" initial_condition="0.0"/>
+		<species symbol="C1a" initial_condition="0.0"/>
+		<species symbol="Ag_Ab" initial_condition="0.0"/>
+		<species symbol="C3" initial_condition="0.0"/>
+		<species symbol="C3a" initial_condition="0.0"/>
+		<species symbol="C3b" initial_condition="0.0"/>
+		<species symbol="microbes" initial_condition="0.0"/>
+		<species symbol="Bb" initial_condition="0.0"/>
+		<species symbol="factor_B" initial_condition="0.0"/>
+		<species symbol="factor_D" initial_condition="0.0"/>
+		<species symbol="Ba" initial_condition="0.0"/>
+		<species symbol="properdin" initial_condition="0.0"/>
+		<species symbol="C3bBb" initial_condition="0.0"/>
+		<species symbol="C2b" initial_condition="0.0"/>
+		<species symbol="C4b2a" initial_condition="0.0"/>
+		<species symbol="C4b2a3b" initial_condition="0.0"/>
+		<species symbol="C3bBb3b" initial_condition="0.0"/>
+		<species symbol="C5" initial_condition="0.0"/>
+		<species symbol="C4bBb3b" initial_condition="0.0"/>
+		<species symbol="C5a" initial_condition="0.0"/>
+		<species symbol="C5b" initial_condition="0.0"/>
+		<species symbol="MAC" initial_condition="0.0"/>
+		<species symbol="C6_C9" initial_condition="0.0"/>
+	</listOfSpecies>
+
+	<listOfReactions>
+		<location compartment="C1">
+			<reaction name="generation_of_MBL" enzyme_symbol="MASP1_2" formatted_raw_string="generation_of_MBL: compartment: C1 [] -(MASP1_2)-> MBL" index="1">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="MBL" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="generation_of_C1_a_similar" enzyme_symbol="MBL" formatted_raw_string="generation_of_C1_a_similar: compartment: C1 [] -(MBL)-> C1_a_similar" index="2">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="C1_a_similar" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="cleavage_of_C4" enzyme_symbol="C1_a_similar" formatted_raw_string="cleavage_of_C4: compartment: C1 C4 -(C1_a_similar)-> 1.0*C4a+1.0*C4b" index="3">
+				<listOfReactants>
+					<speciesReference species="C4" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="C4a" stoichiometry="1.0"/>
+					<speciesReference species="C4b" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="generation_of_C4b2" enzyme_symbol="C2" formatted_raw_string="generation_of_C4b2: compartment: C1 C4b -(C2)-> C4b2" index="4">
+				<listOfReactants>
+					<speciesReference species="C4b" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="C4b2" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="generation_of_C1" enzyme_symbol="[]" formatted_raw_string="generation_of_C1: compartment: C1 [] -([])-> C1" index="5">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="C1" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="generation_of_C1a" enzyme_symbol="Ag_Ab" formatted_raw_string="generation_of_C1a: compartment: C1 C1 -(Ag_Ab)-> C1a" index="6">
+				<listOfReactants>
+					<speciesReference species="C1" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="C1a" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="cleavage_of_C3_alt" enzyme_symbol="microbes" formatted_raw_string="cleavage_of_C3_alt: compartment: C1 C3 -(microbes)-> C3a+C3b" index="7">
+				<listOfReactants>
+					<speciesReference species="C3" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="C3a" stoichiometry="1.0"/>
+					<speciesReference species="C3b" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="conversion_of_C3_to_Bb" enzyme_symbol="[]" formatted_raw_string="conversion_of_C3_to_Bb: compartment: C1 C3b -([])-> Bb" index="8">
+				<listOfReactants>
+					<speciesReference species="C3b" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="Bb" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="generation_of_factor_B" enzyme_symbol="[]" formatted_raw_string="generation_of_factor_B: compartment: C1 [] -([])-> factor_B" index="9">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="factor_B" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="generation_of_factor_D" enzyme_symbol="[]" formatted_raw_string="generation_of_factor_D: compartment: C1 [] -([])-> factor_D" index="10">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="factor_D" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="conversion_of_factor_B" enzyme_symbol="factor_D" formatted_raw_string="conversion_of_factor_B: compartment: C1 factor_B -(factor_D)-> Ba+Bb" index="11">
+				<listOfReactants>
+					<speciesReference species="factor_B" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="Ba" stoichiometry="1.0"/>
+					<speciesReference species="Bb" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="generation_of_properdin" enzyme_symbol="[]" formatted_raw_string="generation_of_properdin: compartment: C1 [] -([])-> properdin" index="12">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="properdin" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="generation_of_C3bBb" enzyme_symbol="properdin" formatted_raw_string="generation_of_C3bBb: compartment: C1 Bb -(properdin)-> C3bBb" index="13">
+				<listOfReactants>
+					<speciesReference species="Bb" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="C3bBb" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="generation_of_C4b2a" enzyme_symbol="C1a" formatted_raw_string="generation_of_C4b2a: compartment: C1 C4b2 -(C1a)-> 1.0*C2b+1.0*C4b2a" index="14">
+				<listOfReactants>
+					<speciesReference species="C4b2" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="C2b" stoichiometry="1.0"/>
+					<speciesReference species="C4b2a" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="cleavage_of_C3" enzyme_symbol="C4b2a" formatted_raw_string="cleavage_of_C3: compartment: C1 C3 -(C4b2a)-> C3a+C3b" index="15">
+				<listOfReactants>
+					<speciesReference species="C3" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="C3a" stoichiometry="1.0"/>
+					<speciesReference species="C3b" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="cleavage_of_C3_alt" enzyme_symbol="C3bBb" formatted_raw_string="cleavage_of_C3_alt: compartment: C1 C3 -(C3bBb)-> C3a+C3b" index="16">
+				<listOfReactants>
+					<speciesReference species="C3" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="C3a" stoichiometry="1.0"/>
+					<speciesReference species="C3b" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="C3b_activation_way1" enzyme_symbol="[]" formatted_raw_string="C3b_activation_way1: compartment: C1 C3b -([])-> C4b2a3b" index="17">
+				<listOfReactants>
+					<speciesReference species="C3b" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="C4b2a3b" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="C3b_activation_way2" enzyme_symbol="[]" formatted_raw_string="C3b_activation_way2: compartment: C1 C3b -([])-> C3bBb3b" index="18">
+				<listOfReactants>
+					<speciesReference species="C3b" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="C3bBb3b" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="C5_generation_way1" enzyme_symbol="C4b2a3b" formatted_raw_string="C5_generation_way1: compartment: C1 [] -(C4b2a3b)-> C5" index="19">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="C5" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="C5_generation_way2" enzyme_symbol="C4bBb3b" formatted_raw_string="C5_generation_way2: compartment: C1 [] -(C4bBb3b)-> C5" index="20">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="C5" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="C5_cleavage" enzyme_symbol="[]" formatted_raw_string="C5_cleavage: compartment: C1 C5 -([])-> 1.0*C5a+1.0*C5b" index="21">
+				<listOfReactants>
+					<speciesReference species="C5" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="C5a" stoichiometry="1.0"/>
+					<speciesReference species="C5b" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="C5b_to_MAC" enzyme_symbol="C6_C9" formatted_raw_string="C5b_to_MAC: compartment: C1 C5b -(C6_C9)-> MAC" index="22">
+				<listOfReactants>
+					<speciesReference species="C5b" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="MAC" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+		</location>
+		<location compartment="C2">
+		</location>
+	</listOfReactions>
+
+	<listOfBiochemistryControlTerms>
+	</listOfBiochemistryControlTerms>
+
+	<listOfSpeciesRules>
+	</listOfSpeciesRules>
+
+</PBPKModel>

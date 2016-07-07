@@ -1,0 +1,362 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<PBPKModel>
+	<listOfCompartments>
+		<compartment index="1" symbol="compartment_1" initial_volume="1.0"/>
+		<compartment index="2" symbol="compartment_2" initial_volume="1.0"/>
+		<compartment index="3" symbol="compartment_3" initial_volume="1.0"/>
+		<compartment index="4" symbol="compartment_4" initial_volume="1.0"/>
+		<compartment index="5" symbol="compartment_5" initial_volume="1.0"/>
+		<compartment index="6" symbol="wound_compartment" initial_volume="1.0"/>
+	</listOfCompartments>
+
+	<listOfCompartmentConnections>
+		<connection index="1" name="C1C2" parameter_value="0.0" start_symbol="compartment_1" end_symbol="compartment_2" />
+		<connection index="2" name="C2C3" parameter_value="0.0" start_symbol="compartment_2" end_symbol="compartment_3" />
+		<connection index="3" name="C3C4" parameter_value="0.0" start_symbol="compartment_3" end_symbol="compartment_4" />
+		<connection index="4" name="C3C5" parameter_value="0.0" start_symbol="compartment_3" end_symbol="compartment_5" />
+		<connection index="5" name="C4C1" parameter_value="0.0" start_symbol="compartment_4" end_symbol="compartment_1" />
+		<connection index="6" name="C5C1" parameter_value="0.0" start_symbol="compartment_5" end_symbol="compartment_1" />
+		<connection index="7" name="C1W" parameter_value="0.0" start_symbol="compartment_1" end_symbol="wound_compartment" />
+		<connection index="8" name="C1W_reverse" parameter_value="0.0" start_symbol="wound_compartment" end_symbol="compartment_1" />
+		<connection index="9" name="Loss_W" parameter_value="0.0" start_symbol="wound_compartment" end_symbol="[]" />
+		<connection index="10" name="addition_of_fluid" parameter_value="0.0" start_symbol="[]" end_symbol="compartment_1" />
+	</listOfCompartmentConnections>
+
+	<listOfSpecies>
+		<species symbol="A" initial_condition="0.0"/>
+		<species symbol="B" initial_condition="0.0"/>
+		<species symbol="E" initial_condition="0.0"/>
+		<species symbol="II" initial_condition="0.0"/>
+		<species symbol="AI" initial_condition="0.0"/>
+	</listOfSpecies>
+
+	<listOfReactions>
+		<location compartment="compartment_1">
+			<reaction name="conversion_of_A_to_B_slow" enzyme_symbol="E" formatted_raw_string="conversion_of_A_to_B_slow: compartment: * A -(E)-> B" index="1">
+				<listOfReactants>
+					<speciesReference species="A" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="B" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="conversion_of_A_to_B" enzyme_symbol="E" formatted_raw_string="conversion_of_A_to_B: compartment: * A -(E)-> B" index="2">
+				<listOfReactants>
+					<speciesReference species="A" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="B" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="generation_of_II" enzyme_symbol="[]" formatted_raw_string="generation_of_II: compartment: * [] -([])-> II" index="3">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="II" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="generation_of_II_reverse" enzyme_symbol="[]" formatted_raw_string="generation_of_II: compartment: * [] -([])-> II" index="4">
+				<listOfReactants>
+					<speciesReference species="II" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="activation_of_I" enzyme_symbol="B" formatted_raw_string="activation_of_I: compartment: * II -(B)-> AI" index="5">
+				<listOfReactants>
+					<speciesReference species="II" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="AI" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+		</location>
+		<location compartment="compartment_2">
+			<reaction name="conversion_of_A_to_B_slow" enzyme_symbol="E" formatted_raw_string="conversion_of_A_to_B_slow: compartment: * A -(E)-> B" index="6">
+				<listOfReactants>
+					<speciesReference species="A" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="B" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="conversion_of_A_to_B" enzyme_symbol="E" formatted_raw_string="conversion_of_A_to_B: compartment: * A -(E)-> B" index="7">
+				<listOfReactants>
+					<speciesReference species="A" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="B" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="generation_of_II" enzyme_symbol="[]" formatted_raw_string="generation_of_II: compartment: * [] -([])-> II" index="8">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="II" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="generation_of_II_reverse" enzyme_symbol="[]" formatted_raw_string="generation_of_II: compartment: * [] -([])-> II" index="9">
+				<listOfReactants>
+					<speciesReference species="II" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="activation_of_I" enzyme_symbol="B" formatted_raw_string="activation_of_I: compartment: * II -(B)-> AI" index="10">
+				<listOfReactants>
+					<speciesReference species="II" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="AI" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+		</location>
+		<location compartment="compartment_3">
+			<reaction name="conversion_of_A_to_B_slow" enzyme_symbol="E" formatted_raw_string="conversion_of_A_to_B_slow: compartment: * A -(E)-> B" index="11">
+				<listOfReactants>
+					<speciesReference species="A" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="B" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="conversion_of_A_to_B" enzyme_symbol="E" formatted_raw_string="conversion_of_A_to_B: compartment: * A -(E)-> B" index="12">
+				<listOfReactants>
+					<speciesReference species="A" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="B" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="generation_of_II" enzyme_symbol="[]" formatted_raw_string="generation_of_II: compartment: * [] -([])-> II" index="13">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="II" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="generation_of_II_reverse" enzyme_symbol="[]" formatted_raw_string="generation_of_II: compartment: * [] -([])-> II" index="14">
+				<listOfReactants>
+					<speciesReference species="II" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="activation_of_I" enzyme_symbol="B" formatted_raw_string="activation_of_I: compartment: * II -(B)-> AI" index="15">
+				<listOfReactants>
+					<speciesReference species="II" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="AI" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+		</location>
+		<location compartment="compartment_4">
+			<reaction name="conversion_of_A_to_B_slow" enzyme_symbol="E" formatted_raw_string="conversion_of_A_to_B_slow: compartment: * A -(E)-> B" index="16">
+				<listOfReactants>
+					<speciesReference species="A" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="B" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="conversion_of_A_to_B" enzyme_symbol="E" formatted_raw_string="conversion_of_A_to_B: compartment: * A -(E)-> B" index="17">
+				<listOfReactants>
+					<speciesReference species="A" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="B" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="generation_of_II" enzyme_symbol="[]" formatted_raw_string="generation_of_II: compartment: * [] -([])-> II" index="18">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="II" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="generation_of_II_reverse" enzyme_symbol="[]" formatted_raw_string="generation_of_II: compartment: * [] -([])-> II" index="19">
+				<listOfReactants>
+					<speciesReference species="II" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="clearance_of_A" enzyme_symbol="[]" formatted_raw_string="clearance_of_A: compartment: compartment_4 A -([])-> []" index="20">
+				<listOfReactants>
+					<speciesReference species="A" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="clearance_of_B" enzyme_symbol="[]" formatted_raw_string="clearance_of_B: compartment: compartment_4 B -([])-> []" index="21">
+				<listOfReactants>
+					<speciesReference species="B" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="clearance_of_AI" enzyme_symbol="[]" formatted_raw_string="clearance_of_AI: compartment: compartment_4 AI -([])-> []" index="22">
+				<listOfReactants>
+					<speciesReference species="AI" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="activation_of_I" enzyme_symbol="B" formatted_raw_string="activation_of_I: compartment: * II -(B)-> AI" index="23">
+				<listOfReactants>
+					<speciesReference species="II" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="AI" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+		</location>
+		<location compartment="compartment_5">
+			<reaction name="conversion_of_A_to_B_slow" enzyme_symbol="E" formatted_raw_string="conversion_of_A_to_B_slow: compartment: * A -(E)-> B" index="24">
+				<listOfReactants>
+					<speciesReference species="A" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="B" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="conversion_of_A_to_B" enzyme_symbol="E" formatted_raw_string="conversion_of_A_to_B: compartment: * A -(E)-> B" index="25">
+				<listOfReactants>
+					<speciesReference species="A" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="B" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="generation_of_A" enzyme_symbol="[]" formatted_raw_string="generation_of_A: compartment: compartment_5 [] -([])-> A" index="26">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="A" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="generation_of_II" enzyme_symbol="[]" formatted_raw_string="generation_of_II: compartment: * [] -([])-> II" index="27">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="II" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="generation_of_II_reverse" enzyme_symbol="[]" formatted_raw_string="generation_of_II: compartment: * [] -([])-> II" index="28">
+				<listOfReactants>
+					<speciesReference species="II" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="activation_of_I" enzyme_symbol="B" formatted_raw_string="activation_of_I: compartment: * II -(B)-> AI" index="29">
+				<listOfReactants>
+					<speciesReference species="II" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="AI" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+		</location>
+		<location compartment="wound_compartment">
+			<reaction name="conversion_of_A_to_B_slow" enzyme_symbol="E" formatted_raw_string="conversion_of_A_to_B_slow: compartment: * A -(E)-> B" index="30">
+				<listOfReactants>
+					<speciesReference species="A" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="B" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="conversion_of_A_to_B" enzyme_symbol="E" formatted_raw_string="conversion_of_A_to_B: compartment: * A -(E)-> B" index="31">
+				<listOfReactants>
+					<speciesReference species="A" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="B" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="generation_of_II" enzyme_symbol="[]" formatted_raw_string="generation_of_II: compartment: * [] -([])-> II" index="32">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="II" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="generation_of_II_reverse" enzyme_symbol="[]" formatted_raw_string="generation_of_II: compartment: * [] -([])-> II" index="33">
+				<listOfReactants>
+					<speciesReference species="II" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="generation_of_E" enzyme_symbol="[]" formatted_raw_string="generation_of_E: compartment: wound_compartment [] -([])-> E" index="34">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="E" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="generation_of_E_reverse" enzyme_symbol="[]" formatted_raw_string="generation_of_E: compartment: wound_compartment [] -([])-> E" index="35">
+				<listOfReactants>
+					<speciesReference species="E" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="activation_of_I" enzyme_symbol="B" formatted_raw_string="activation_of_I: compartment: * II -(B)-> AI" index="36">
+				<listOfReactants>
+					<speciesReference species="II" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="AI" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+		</location>
+	</listOfReactions>
+
+	<listOfBiochemistryControlTerms>
+		<control name="activation_of_B_by_B_B_compartment_1" actor="B" target="conversion_of_A_to_B" type="activation" compartment="compartment_1"/>
+		<control name="activation_of_B_by_B_B_compartment_2" actor="B" target="conversion_of_A_to_B" type="activation" compartment="compartment_2"/>
+		<control name="activation_of_B_by_B_B_compartment_3" actor="B" target="conversion_of_A_to_B" type="activation" compartment="compartment_3"/>
+		<control name="activation_of_B_by_B_B_compartment_4" actor="B" target="conversion_of_A_to_B" type="activation" compartment="compartment_4"/>
+		<control name="activation_of_B_by_B_B_compartment_5" actor="B" target="conversion_of_A_to_B" type="activation" compartment="compartment_5"/>
+		<control name="activation_of_B_by_B_B_wound_compartment" actor="B" target="conversion_of_A_to_B" type="activation" compartment="wound_compartment"/>
+		<control name="deactivation_of_B_Gen_AI_compartment_1" actor="AI" target="conversion_of_A_to_B" type="inhibition" compartment="compartment_1"/>
+		<control name="deactivation_of_B_Gen_AI_compartment_2" actor="AI" target="conversion_of_A_to_B" type="inhibition" compartment="compartment_2"/>
+		<control name="deactivation_of_B_Gen_AI_compartment_3" actor="AI" target="conversion_of_A_to_B" type="inhibition" compartment="compartment_3"/>
+		<control name="deactivation_of_B_Gen_AI_compartment_4" actor="AI" target="conversion_of_A_to_B" type="inhibition" compartment="compartment_4"/>
+		<control name="deactivation_of_B_Gen_AI_compartment_5" actor="AI" target="conversion_of_A_to_B" type="inhibition" compartment="compartment_5"/>
+		<control name="deactivation_of_B_Gen_AI_wound_compartment" actor="AI" target="conversion_of_A_to_B" type="inhibition" compartment="wound_compartment"/>
+		<control name="deactivation_of_B_Gen_AI_slow_compartment_1" actor="AI" target="conversion_of_A_to_B_slow" type="inhibition" compartment="compartment_1"/>
+		<control name="deactivation_of_B_Gen_AI_slow_compartment_2" actor="AI" target="conversion_of_A_to_B_slow" type="inhibition" compartment="compartment_2"/>
+		<control name="deactivation_of_B_Gen_AI_slow_compartment_3" actor="AI" target="conversion_of_A_to_B_slow" type="inhibition" compartment="compartment_3"/>
+		<control name="deactivation_of_B_Gen_AI_slow_compartment_4" actor="AI" target="conversion_of_A_to_B_slow" type="inhibition" compartment="compartment_4"/>
+		<control name="deactivation_of_B_Gen_AI_slow_compartment_5" actor="AI" target="conversion_of_A_to_B_slow" type="inhibition" compartment="compartment_5"/>
+		<control name="deactivation_of_B_Gen_AI_slow_wound_compartment" actor="AI" target="conversion_of_A_to_B_slow" type="inhibition" compartment="wound_compartment"/>
+	</listOfBiochemistryControlTerms>
+
+	<listOfSpeciesRules>
+		<speciesRule species="E" type="fixed"/>
+		<speciesRule species="II" type="fixed"/>
+	</listOfSpeciesRules>
+
+</PBPKModel>

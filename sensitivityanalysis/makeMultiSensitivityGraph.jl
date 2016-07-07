@@ -23,6 +23,9 @@ function makeMultiSensitivityGraph()
 	cluster1extsens = [0.0530599843,0.0141198572,0.0001702913,3.9085363074,0.0156756212]
 	cluster1extsensStDevs = [0.1700221129,0.0174122978,0.0002004598,2.102214676,0.022229131]
 
+	cluster2extsens = [0.1902080409,0.0171401267,0.0004667665,2.9584366977,0.0031292916]
+	cluster2extsensStDevs =[0.2241124061,0.0227180787,0.0004507436,1.5371694223,0.0038091545]
+
 	@show adjusterstdevc1
 	PyCall.PyDict(matplotlib["rcParams"])["font.sans-serif"] = ["Helvetica"]
 
@@ -31,11 +34,12 @@ function makeMultiSensitivityGraph()
 	@show  xplot2
 	fig = figure()
 	hold("on")
-	semilogy(xplot,cluster1[:mean], "kx")
+	semilogy(xplot,cluster1[:mean], "kD")
 	#errorbar(xplot,cluster1[:mean], yerr=cluster1[:stdev], color = "black", linestyle="None") #yerr=adjusterstdevc1
-	semilogy(xplot,cluster2[:mean], color = ".5", "x")
+	semilogy(xplot,cluster2[:mean], color = ".5", markeredgecolor =".5", "D")
 	#errorbar(xplot,cluster2[:mean], yerr=cluster2[:stdev], color = ".5", linestyle="None")
-	semilogy(xplot2, cluster1extsens, "k*")
+	semilogy(xplot2, cluster1extsens, "kd")
+	semilogy(xplot2, cluster2extsens, color = ".5", markeredgecolor =".5","d")
 	yscale("log")#, nonposy = "clip")
 	ax = gca()
 	plt[:xticks](collect(1:15))

@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<PBPKModel>
+	<listOfCompartments>
+		<compartment index="1" symbol="vein" initial_volume="1.0"/>
+		<compartment index="2" symbol="lungs" initial_volume="1.0"/>
+		<compartment index="3" symbol="artery" initial_volume="1.0"/>
+		<compartment index="4" symbol="heart" initial_volume="1.0"/>
+		<compartment index="5" symbol="kidney" initial_volume="1.0"/>
+		<compartment index="6" symbol="wound" initial_volume="1.0"/>
+	</listOfCompartments>
+
+	<listOfCompartmentConnections>
+		<connection index="1" name="vein_to_lungs" parameter_value="0.0" start_symbol="vein" end_symbol="lungs" />
+		<connection index="2" name="lungs_to_artery" parameter_value="0.0" start_symbol="lungs" end_symbol="artery" />
+		<connection index="3" name="artery_to_heart" parameter_value="0.0" start_symbol="artery" end_symbol="heart" />
+		<connection index="4" name="heart_to_veins" parameter_value="0.0" start_symbol="heart" end_symbol="vein" />
+		<connection index="5" name="artery_to_kidney" parameter_value="0.0" start_symbol="artery" end_symbol="kidney" />
+		<connection index="6" name="kideny_to_vein" parameter_value="0.0" start_symbol="kidney" end_symbol="vein" />
+		<connection index="7" name="artery_to_wound" parameter_value="0.0" start_symbol="artery" end_symbol="wound" />
+		<connection index="8" name="artery_to_wound_reverse" parameter_value="0.0" start_symbol="wound" end_symbol="artery" />
+		<connection index="9" name="artery_to_degredation" parameter_value="0.0" start_symbol="artery" end_symbol="[]" />
+	</listOfCompartmentConnections>
+
+	<listOfSpecies>
+		<species symbol="Z1" initial_condition="0.0"/>
+		<species symbol="E1" initial_condition="0.0"/>
+		<species symbol="D1" initial_condition="0.0"/>
+		<species symbol="Z2" initial_condition="0.0"/>
+		<species symbol="E2" initial_condition="0.0"/>
+		<species symbol="D2" initial_condition="0.0"/>
+		<species symbol="E3" initial_condition="0.0"/>
+		<species symbol="E4" initial_condition="0.0"/>
+		<species symbol="D3" initial_condition="0.0"/>
+		<species symbol="Z4" initial_condition="0.0"/>
+		<species symbol="D4" initial_condition="0.0"/>
+	</listOfSpecies>
+
+	<listOfReactions>
+		<location compartment="vein">
+		</location>
+		<location compartment="lungs">
+			<reaction name="generation_of_Z1" enzyme_symbol="[]" formatted_raw_string="generation_of_Z1: compartment: lungs [] -([])-> Z1" index="1">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="Z1" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="generation_of_Z2" enzyme_symbol="[]" formatted_raw_string="generation_of_Z2: compartment: lungs [] -([])-> Z2" index="2">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="Z2" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+		</location>
+		<location compartment="artery">
+		</location>
+		<location compartment="heart">
+		</location>
+		<location compartment="kidney">
+			<reaction name="degredation_of_Z1" enzyme_symbol="[]" formatted_raw_string="degredation_of_Z1: compartment: kidney Z1 -([])-> []" index="3">
+				<listOfReactants>
+					<speciesReference species="Z1" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+		</location>
+		<location compartment="wound">
+			<reaction name="conversion_of_Z1_to_E1_fast" enzyme_symbol="E1" formatted_raw_string="conversion_of_Z1_to_E1_fast: compartment: wound Z1 -(E1)-> E1" index="4">
+				<listOfReactants>
+					<speciesReference species="Z1" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="E1" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="degredation_of_E1" enzyme_symbol="[]" formatted_raw_string="degredation_of_E1: compartment: wound E1 -([])-> D1" index="5">
+				<listOfReactants>
+					<speciesReference species="E1" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="D1" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="generation_of_E2" enzyme_symbol="E1" formatted_raw_string="generation_of_E2: compartment: wound Z2 -(E1)-> E2" index="6">
+				<listOfReactants>
+					<speciesReference species="Z2" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="E2" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="E2_cataylzed_conversion_of_Z1_to_E1" enzyme_symbol="E2" formatted_raw_string="E2_cataylzed_conversion_of_Z1_to_E1: compartment: wound Z1 -(E2)-> E1" index="7">
+				<listOfReactants>
+					<speciesReference species="Z1" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="E1" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="E2_degregation" enzyme_symbol="[]" formatted_raw_string="E2_degregation: compartment: wound E2 -([])-> D2" index="8">
+				<listOfReactants>
+					<speciesReference species="E2" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="D2" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="production_of_E3" enzyme_symbol="E4" formatted_raw_string="production_of_E3: compartment: wound E2 -(E4)-> E3" index="9">
+				<listOfReactants>
+					<speciesReference species="E2" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="E3" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="degredation_of_E3" enzyme_symbol="[]" formatted_raw_string="degredation_of_E3: compartment: wound E3 -([])-> D3" index="10">
+				<listOfReactants>
+					<speciesReference species="E3" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="D3" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="production_of_E4" enzyme_symbol="E3" formatted_raw_string="production_of_E4: compartment: wound Z4 -(E3)-> E4" index="11">
+				<listOfReactants>
+					<speciesReference species="Z4" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="E4" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="degreation_of_E4" enzyme_symbol="[]" formatted_raw_string="degreation_of_E4: compartment: wound E4 -([])-> D4" index="12">
+				<listOfReactants>
+					<speciesReference species="E4" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="D4" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="long_range_production_of_E1" enzyme_symbol="E4" formatted_raw_string="long_range_production_of_E1: compartment: wound Z1 -(E4)-> E1" index="13">
+				<listOfReactants>
+					<speciesReference species="Z1" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="E1" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+		</location>
+	</listOfReactions>
+
+	<listOfBiochemistryControlTerms>
+	</listOfBiochemistryControlTerms>
+
+	<listOfSpeciesRules>
+	</listOfSpeciesRules>
+
+</PBPKModel>

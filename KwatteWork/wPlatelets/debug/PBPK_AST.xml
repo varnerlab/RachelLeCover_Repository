@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<PBPKModel>
+	<listOfCompartments>
+		<compartment index="1" symbol="C1" initial_volume="1.0"/>
+	</listOfCompartments>
+
+	<listOfCompartmentConnections>
+		<connection index="1" name="C1IN" parameter_value="0.0" start_symbol="[]" end_symbol="C1" />
+		<connection index="2" name="C1OUT" parameter_value="0.0" start_symbol="C1" end_symbol="[]" />
+	</listOfCompartmentConnections>
+
+	<listOfSpecies>
+		<species symbol="inactive_initiator" initial_condition="0.0"/>
+		<species symbol="active_initiator" initial_condition="0.0"/>
+		<species symbol="trigger" initial_condition="0.0"/>
+		<species symbol="FII" initial_condition="0.0"/>
+		<species symbol="FIIa" initial_condition="0.0"/>
+		<species symbol="PL" initial_condition="0.0"/>
+		<species symbol="PLa" initial_condition="0.0"/>
+		<species symbol="PC" initial_condition="0.0"/>
+		<species symbol="APC" initial_condition="0.0"/>
+		<species symbol="ATIII" initial_condition="0.0"/>
+		<species symbol="TFPI" initial_condition="0.0"/>
+		<species symbol="Fibrinogen" initial_condition="0.0"/>
+		<species symbol="Fibrin_monomer" initial_condition="0.0"/>
+		<species symbol="Protofibril" initial_condition="0.0"/>
+		<species symbol="Fibrin" initial_condition="0.0"/>
+		<species symbol="D_dimer" initial_condition="0.0"/>
+		<species symbol="Plasmin" initial_condition="0.0"/>
+		<species symbol="Plasminogen" initial_condition="0.0"/>
+		<species symbol="tPA" initial_condition="0.0"/>
+		<species symbol="uPA" initial_condition="0.0"/>
+		<species symbol="antiplasmin" initial_condition="0.0"/>
+		<species symbol="TAFI" initial_condition="0.0"/>
+		<species symbol="PAI_1" initial_condition="0.0"/>
+		<species symbol="fXIII" initial_condition="0.0"/>
+	</listOfSpecies>
+
+	<listOfReactions>
+		<location compartment="C1">
+			<reaction name="activation_initiator" enzyme_symbol="trigger" formatted_raw_string="activation_initiator: compartment: C1 inactive_initiator -(trigger)-> active_initiator" index="1">
+				<listOfReactants>
+					<speciesReference species="inactive_initiator" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="active_initiator" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="slow_thrombin_generation" enzyme_symbol="active_initiator" formatted_raw_string="slow_thrombin_generation: compartment: C1 FII -(active_initiator)-> FIIa" index="2">
+				<listOfReactants>
+					<speciesReference species="FII" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="FIIa" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="platelet_activation" enzyme_symbol="FIIa" formatted_raw_string="platelet_activation: compartment: C1 PL -(FIIa)-> PLa" index="3">
+				<listOfReactants>
+					<speciesReference species="PL" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="PLa" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="fast_thrombin_generation" enzyme_symbol="PLa" formatted_raw_string="fast_thrombin_generation: compartment: C1 FII -(PLa)-> FIIa" index="4">
+				<listOfReactants>
+					<speciesReference species="FII" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="FIIa" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="activation_of_APC" enzyme_symbol="FIIa" formatted_raw_string="activation_of_APC: compartment: C1 PC -(FIIa)-> APC" index="5">
+				<listOfReactants>
+					<speciesReference species="PC" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="APC" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="deactivation_of_FIIa_by_ATIII" enzyme_symbol="[]" formatted_raw_string="deactivation_of_FIIa_by_ATIII: compartment: C1 FIIa+ATIII -([])-> []" index="6">
+				<listOfReactants>
+					<speciesReference species="FIIa" stoichiometry="1.0"/>
+					<speciesReference species="ATIII" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="deactivation_by_TFPI" enzyme_symbol="[]" formatted_raw_string="deactivation_by_TFPI: compartment: C1 TFPI+active_initiator -([])-> []" index="7">
+				<listOfReactants>
+					<speciesReference species="TFPI" stoichiometry="1.0"/>
+					<speciesReference species="active_initiator" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="fibrin_monomer_formation" enzyme_symbol="FIIa" formatted_raw_string="fibrin_monomer_formation: compartment: C1 Fibrinogen -(FIIa)-> Fibrin_monomer" index="8">
+				<listOfReactants>
+					<speciesReference species="Fibrinogen" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="Fibrin_monomer" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="protofibril_formation" enzyme_symbol="[]" formatted_raw_string="protofibril_formation: compartment: C1 Fibrin_monomer -([])-> Protofibril" index="9">
+				<listOfReactants>
+					<speciesReference species="Fibrin_monomer" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="Protofibril" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="protofibril_formation_reverse" enzyme_symbol="[]" formatted_raw_string="protofibril_formation_reverse: compartment: C1 Protofibril -([])-> Fibrin" index="10">
+				<listOfReactants>
+					<speciesReference species="Protofibril" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="Fibrin" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="fibrin_degradation_FDPs_Ddimer" enzyme_symbol="Plasmin" formatted_raw_string="fibrin_degradation_FDPs_Ddimer: compartment: C1 Fibrin -(Plasmin)-> D_dimer" index="11">
+				<listOfReactants>
+					<speciesReference species="Fibrin" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="D_dimer" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="plasmin_generation_tPA" enzyme_symbol="tPA" formatted_raw_string="plasmin_generation_tPA: compartment: C1 Plasminogen -(tPA)-> Plasmin" index="12">
+				<listOfReactants>
+					<speciesReference species="Plasminogen" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="Plasmin" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="plasmin_generation_uPA" enzyme_symbol="uPA" formatted_raw_string="plasmin_generation_uPA: compartment: C1 Plasminogen -(uPA)-> Plasmin" index="13">
+				<listOfReactants>
+					<speciesReference species="Plasminogen" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="Plasmin" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+		</location>
+	</listOfReactions>
+
+	<listOfBiochemistryControlTerms>
+		<control name="deactive_by_APC_C1" actor="APC" target="fast_thrombin_generation" type="inhibition" compartment="C1"/>
+		<control name="plasmin_inhibition_C1" actor="antiplasmin" target="plasmin_generation_tPA" type="inhibition" compartment="C1"/>
+		<control name="plasmin_inhibition_C1" actor="antiplasmin" target="plasmin_generation_uPA" type="inhibition" compartment="C1"/>
+		<control name="plasminogen_activation_inhibition_C1" actor="TAFI" target="plasmin_generation_tPA" type="inhibition" compartment="C1"/>
+		<control name="plasminogen_activation_inhibition_C1" actor="TAFI" target="plasmin_generation_uPA" type="inhibition" compartment="C1"/>
+		<control name="tPA-inhibition_C1" actor="PAI_1" target="plasmin_generation_tPA" type="inhibition" compartment="C1"/>
+		<control name="uPA-inhibition_C1" actor="PAI_1" target="plasmin_generation_uPA" type="inhibition" compartment="C1"/>
+		<control name="activation_plasmin_tPA_APC_C1" actor="APC" target="plasmin_generation_tPA" type="activation" compartment="C1"/>
+		<control name="activation_plasmin_uPA_APC_C1" actor="APC" target="plasmin_generation_uPA" type="activation" compartment="C1"/>
+		<control name="fibrinolysis_inhibition_by_fXIII_C1" actor="fXIII" target="fibrin_degradation_FDPs_Ddimer" type="inhibition" compartment="C1"/>
+	</listOfBiochemistryControlTerms>
+
+	<listOfSpeciesRules>
+		<speciesRule species="trigger" type="fixed"/>
+		<speciesRule species="PC" type="fixed"/>
+	</listOfSpeciesRules>
+
+</PBPKModel>

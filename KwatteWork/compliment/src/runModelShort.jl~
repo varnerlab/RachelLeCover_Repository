@@ -1,0 +1,90 @@
+include("SolveBalances.jl")
+include("DataFile.jl")
+using PyPlot;
+
+function runModel()
+	close("all");
+	tstart = 0;
+	tend = .5;
+	step = .02
+	data_dict = DataFile(tstart, tend, step)
+	t, x = SolveBalances(tstart, tend, step, data_dict)
+	# Alias the species vector - 
+	MBL_C1 = x[:,1];
+	MASP1_2_C1 = x[:,2];
+	C1_a_similar_C1 = x[:,3];
+	C4_C1 = x[:,4];
+	C4a_C1 = x[:,5];
+	C4b_C1 = x[:,6];
+	C4b2_C1 = x[:,7];
+	C2_C1 = x[:,8];
+	C2b_C1 = x[:,9];
+	C4b2a_C1 = x[:,10];
+	C1a_C1 = x[:,11];
+	C3_C1 = x[:,12];
+	C3a_C1 = x[:,13];
+	C3b_C1 = x[:,14];
+	C4b2a3b_C1 = x[:,15];
+	C3bBb3b_C1 = x[:,16];
+	C5_C1 = x[:,17];
+	C5a_C1 = x[:,18];
+	C5b_C1 = x[:,19];
+	MAC_C1 = x[:,20];
+	C6_C9_C1 = x[:,21];
+
+	
+	figure(figsize=(15,20))
+	PyPlot.hold(true)
+	plt[:subplot](441)
+	plot(t, MBL_C1)
+	title("MBL_C1")
+	plt[:subplot](442)
+	plot(t, MASP1_2_C1)
+	title("MASP1_2_C1")
+	plt[:subplot](443)
+	plot(t, C1_a_similar_C1)
+	title("C1_a_similar_C1")
+	plt[:subplot](444)
+	plot(t, C4_C1)
+	title("C4_C1")
+	plt[:subplot](445)
+	plot(t, C4b_C1)
+	title("C4b_C1")
+	plt[:subplot](446)
+	plot(t, C4b2_C1)
+	title("C4b2_C1")
+	plt[:subplot](447)
+	plot(t, C1a_C1)
+	title("C1a_C1")
+	plt[:subplot](448)
+	plot(t, C3_C1)
+	title("C3_C1")
+	plt[:subplot](449)
+	plot(t, C3a_C1)
+	title("C3a_C1")
+	plt[:subplot](4,4,10)
+	plot(t, C3b_C1)
+	title("C3b_C1")
+	plt[:subplot](4,4,11)
+	plot(t, C4b2a3b_C1)
+	title("C4b2a3b_C1")
+	plt[:subplot](4,4,12)
+	plot(t, C3bBb3b_C1)
+	title("C3bBb3b_C1")
+	plt[:subplot](4,4,13)
+	plot(t, C5_C1)
+	title("C5_C1")
+	plt[:subplot](4,4,14)
+	plot(t, C5a_C1)
+	title("C5a_C1")
+	plt[:subplot](4,4,15)
+	plot(t, C5b_C1)
+	title("C5b_C1")
+	
+
+
+	
+	end
+
+
+runModel()

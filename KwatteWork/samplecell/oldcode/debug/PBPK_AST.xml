@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<PBPKModel>
+	<listOfCompartments>
+		<compartment index="1" symbol="cell" initial_volume="1.0"/>
+		<compartment index="2" symbol="outside" initial_volume="1.0"/>
+	</listOfCompartments>
+
+	<listOfCompartmentConnections>
+		<connection index="1" name="cell_to_outside" parameter_value="0.0" start_symbol="cell" end_symbol="outside" />
+		<connection index="2" name="cell_to_outside_reverse" parameter_value="0.0" start_symbol="outside" end_symbol="cell" />
+	</listOfCompartmentConnections>
+
+	<listOfSpecies>
+		<species symbol="A" initial_condition="0.0"/>
+		<species symbol="B" initial_condition="0.0"/>
+		<species symbol="E1" initial_condition="0.0"/>
+		<species symbol="E4" initial_condition="0.0"/>
+		<species symbol="C" initial_condition="0.0"/>
+		<species symbol="E2" initial_condition="0.0"/>
+		<species symbol="E3" initial_condition="0.0"/>
+		<species symbol="G" initial_condition="0.0"/>
+	</listOfSpecies>
+
+	<listOfReactions>
+		<location compartment="cell">
+			<reaction name="conversion_of_A_to_B" enzyme_symbol="E1" formatted_raw_string="conversion_of_A_to_B: compartment: cell A -(E1)-> B" index="1">
+				<listOfReactants>
+					<speciesReference species="A" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="B" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="conversion_of_B_to_A" enzyme_symbol="E4" formatted_raw_string="conversion_of_B_to_A: compartment: cell B -(E4)-> A" index="2">
+				<listOfReactants>
+					<speciesReference species="B" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="A" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="conversion_of_A_to_C" enzyme_symbol="E2" formatted_raw_string="conversion_of_A_to_C: compartment: cell A -(E2)-> C" index="3">
+				<listOfReactants>
+					<speciesReference species="A" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="C" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="conversion_of_C_to_B" enzyme_symbol="E3" formatted_raw_string="conversion_of_C_to_B: compartment: cell C -(E3)-> B" index="4">
+				<listOfReactants>
+					<speciesReference species="C" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="B" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="growth" enzyme_symbol="[]" formatted_raw_string="growth: compartment: cell A+B+C -([])-> G" index="5">
+				<listOfReactants>
+					<speciesReference species="A" stoichiometry="1.0"/>
+					<speciesReference species="B" stoichiometry="1.0"/>
+					<speciesReference species="C" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="G" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="production_of_E1" enzyme_symbol="[]" formatted_raw_string="production_of_E1: compartment: cell [] -([])-> E1" index="6">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="E1" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="production_of_E2" enzyme_symbol="[]" formatted_raw_string="production_of_E2: compartment: cell [] -([])-> E2" index="7">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="E2" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="production_of_E3" enzyme_symbol="[]" formatted_raw_string="production_of_E3: compartment: cell [] -([])-> E3" index="8">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="E3" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="production_of_E4" enzyme_symbol="[]" formatted_raw_string="production_of_E4: compartment: cell [] -([])-> E4" index="9">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="E4" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="destruction_of_E1" enzyme_symbol="[]" formatted_raw_string="destruction_of_E1: compartment: cell E1 -([])-> []" index="10">
+				<listOfReactants>
+					<speciesReference species="E1" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="destruction_of_E2" enzyme_symbol="[]" formatted_raw_string="destruction_of_E2: compartment: cell E2 -([])-> []" index="11">
+				<listOfReactants>
+					<speciesReference species="E2" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="destruction_of_E3" enzyme_symbol="[]" formatted_raw_string="destruction_of_E3: compartment: cell E3 -([])-> []" index="12">
+				<listOfReactants>
+					<speciesReference species="E3" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="destruction_of_E4" enzyme_symbol="[]" formatted_raw_string="destruction_of_E4: compartment: cell E4 -([])-> []" index="13">
+				<listOfReactants>
+					<speciesReference species="E4" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+		</location>
+		<location compartment="outside">
+		</location>
+	</listOfReactions>
+
+	<listOfBiochemistryControlTerms>
+		<control name="activation_of_B_by_B_B_cell" actor="B" target="conversion_of_A_to_B" type="activation" compartment="cell"/>
+	</listOfBiochemistryControlTerms>
+
+	<listOfSpeciesRules>
+		<speciesRule species="E1" type="fixed"/>
+		<speciesRule species="E2" type="fixed"/>
+		<speciesRule species="E3" type="fixed"/>
+		<speciesRule species="E4" type="fixed"/>
+		<speciesRule species="G" type="fixed"/>
+	</listOfSpeciesRules>
+
+</PBPKModel>

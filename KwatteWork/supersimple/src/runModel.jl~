@@ -1,0 +1,46 @@
+include("SolveBalances.jl")
+include("DataFile.jl")
+using PyPlot;
+
+function runModel()
+	close("all");
+	tstart = 0.0;
+	tend = 1.0;
+	step = .02;
+	data_dict = DataFile(tstart, tend, step)
+	t, x = SolveBalances(tstart, tend, step, data_dict)
+	# Alias the species vector - 
+	A_cell = x[:,1];
+	B_cell = x[:,2];
+	E1_cell = x[:,3];
+
+	# outside
+	A_outside = x[:,4];
+	B_outside = x[:,5];
+	E1_outside = x[:,6];
+
+	volume_cell = x[:,7];
+	volume_outside = x[:,8];
+
+	
+	figure(figsize=(15,20))
+	PyPlot.hold(true)
+	plt[:subplot](331)
+	plot(t, A_cell)
+	title("A_cell")
+	plt[:subplot](332)
+	plot(t, B_cell)
+	title("B_cell")
+	plt[:subplot](333)
+	plot(t, E1_cell)
+	title("E1_cell")
+
+	plt[:subplot](334)
+	plot(t, volume_cell)
+	title("volume_cell")
+	
+	
+	end
+
+
+runModel()

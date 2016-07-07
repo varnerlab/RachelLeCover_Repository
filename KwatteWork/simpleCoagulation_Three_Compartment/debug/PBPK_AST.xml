@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<PBPKModel>
+	<listOfCompartments>
+		<compartment index="1" symbol="supply" initial_volume="1.0"/>
+		<compartment index="2" symbol="C1" initial_volume="1.0"/>
+		<compartment index="3" symbol="wound" initial_volume="1.0"/>
+		<compartment index="4" symbol="C2" initial_volume="1.0"/>
+	</listOfCompartments>
+
+	<listOfCompartmentConnections>
+		<connection index="1" name="supply_to_C1" parameter_value="0.0" start_symbol="supply" end_symbol="C1" />
+		<connection index="2" name="C1_to_wound" parameter_value="0.0" start_symbol="C1" end_symbol="wound" />
+		<connection index="3" name="wound_to_C2" parameter_value="0.0" start_symbol="wound" end_symbol="C2" />
+		<connection index="4" name="C2_to_C1" parameter_value="0.0" start_symbol="C2" end_symbol="C1" />
+		<connection index="5" name="C2_to_clearance" parameter_value="0.0" start_symbol="C2" end_symbol="[]" />
+		<connection index="6" name="bleed_out" parameter_value="0.0" start_symbol="wound" end_symbol="[]" />
+	</listOfCompartmentConnections>
+
+	<listOfSpecies>
+		<species symbol="Z1" initial_condition="0.0"/>
+		<species symbol="E1" initial_condition="0.0"/>
+		<species symbol="E0" initial_condition="0.0"/>
+		<species symbol="Z2" initial_condition="0.0"/>
+		<species symbol="E2" initial_condition="0.0"/>
+		<species symbol="D1" initial_condition="0.0"/>
+		<species symbol="D2" initial_condition="0.0"/>
+	</listOfSpecies>
+
+	<listOfReactions>
+		<location compartment="supply">
+			<reaction name="conversion_of_Z1_to_E1_slow" enzyme_symbol="E0" formatted_raw_string="conversion_of_Z1_to_E1_slow: compartment: * Z1 -(E0)-> E1" index="1">
+				<listOfReactants>
+					<speciesReference species="Z1" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="E1" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="conversion_of_Z1_to_E1_fast" enzyme_symbol="E1" formatted_raw_string="conversion_of_Z1_to_E1_fast: compartment: * Z1 -(E1)-> E1" index="2">
+				<listOfReactants>
+					<speciesReference species="Z1" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="E1" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="conversion_of_Z2_to_E2" enzyme_symbol="E1" formatted_raw_string="conversion_of_Z2_to_E2: compartment: * Z2 -(E1)-> E2" index="3">
+				<listOfReactants>
+					<speciesReference species="Z2" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="E2" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="degredation_of_E1" enzyme_symbol="[]" formatted_raw_string="degredation_of_E1: compartment: * E1 -([])-> D1" index="4">
+				<listOfReactants>
+					<speciesReference species="E1" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="D1" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="degredation_of_E2" enzyme_symbol="[]" formatted_raw_string="degredation_of_E2: compartment: * E2 -([])-> D2" index="5">
+				<listOfReactants>
+					<speciesReference species="E2" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="D2" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+		</location>
+		<location compartment="C1">
+			<reaction name="conversion_of_Z1_to_E1_slow" enzyme_symbol="E0" formatted_raw_string="conversion_of_Z1_to_E1_slow: compartment: * Z1 -(E0)-> E1" index="6">
+				<listOfReactants>
+					<speciesReference species="Z1" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="E1" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="conversion_of_Z1_to_E1_fast" enzyme_symbol="E1" formatted_raw_string="conversion_of_Z1_to_E1_fast: compartment: * Z1 -(E1)-> E1" index="7">
+				<listOfReactants>
+					<speciesReference species="Z1" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="E1" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="conversion_of_Z2_to_E2" enzyme_symbol="E1" formatted_raw_string="conversion_of_Z2_to_E2: compartment: * Z2 -(E1)-> E2" index="8">
+				<listOfReactants>
+					<speciesReference species="Z2" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="E2" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="degredation_of_E1" enzyme_symbol="[]" formatted_raw_string="degredation_of_E1: compartment: * E1 -([])-> D1" index="9">
+				<listOfReactants>
+					<speciesReference species="E1" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="D1" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="degredation_of_E2" enzyme_symbol="[]" formatted_raw_string="degredation_of_E2: compartment: * E2 -([])-> D2" index="10">
+				<listOfReactants>
+					<speciesReference species="E2" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="D2" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+		</location>
+		<location compartment="wound">
+			<reaction name="conversion_of_Z1_to_E1_slow" enzyme_symbol="E0" formatted_raw_string="conversion_of_Z1_to_E1_slow: compartment: * Z1 -(E0)-> E1" index="11">
+				<listOfReactants>
+					<speciesReference species="Z1" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="E1" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="conversion_of_Z1_to_E1_fast" enzyme_symbol="E1" formatted_raw_string="conversion_of_Z1_to_E1_fast: compartment: * Z1 -(E1)-> E1" index="12">
+				<listOfReactants>
+					<speciesReference species="Z1" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="E1" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="conversion_of_Z2_to_E2" enzyme_symbol="E1" formatted_raw_string="conversion_of_Z2_to_E2: compartment: * Z2 -(E1)-> E2" index="13">
+				<listOfReactants>
+					<speciesReference species="Z2" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="E2" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="degredation_of_E1" enzyme_symbol="[]" formatted_raw_string="degredation_of_E1: compartment: * E1 -([])-> D1" index="14">
+				<listOfReactants>
+					<speciesReference species="E1" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="D1" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="degredation_of_E2" enzyme_symbol="[]" formatted_raw_string="degredation_of_E2: compartment: * E2 -([])-> D2" index="15">
+				<listOfReactants>
+					<speciesReference species="E2" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="D2" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="degreation_of_E0" enzyme_symbol="[]" formatted_raw_string="degreation_of_E0: compartment: wound E0 -([])-> []" index="16">
+				<listOfReactants>
+					<speciesReference species="E0" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+		</location>
+		<location compartment="C2">
+			<reaction name="conversion_of_Z1_to_E1_slow" enzyme_symbol="E0" formatted_raw_string="conversion_of_Z1_to_E1_slow: compartment: * Z1 -(E0)-> E1" index="17">
+				<listOfReactants>
+					<speciesReference species="Z1" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="E1" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="conversion_of_Z1_to_E1_fast" enzyme_symbol="E1" formatted_raw_string="conversion_of_Z1_to_E1_fast: compartment: * Z1 -(E1)-> E1" index="18">
+				<listOfReactants>
+					<speciesReference species="Z1" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="E1" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="conversion_of_Z2_to_E2" enzyme_symbol="E1" formatted_raw_string="conversion_of_Z2_to_E2: compartment: * Z2 -(E1)-> E2" index="19">
+				<listOfReactants>
+					<speciesReference species="Z2" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="E2" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="degredation_of_E1" enzyme_symbol="[]" formatted_raw_string="degredation_of_E1: compartment: * E1 -([])-> D1" index="20">
+				<listOfReactants>
+					<speciesReference species="E1" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="D1" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="degredation_of_E2" enzyme_symbol="[]" formatted_raw_string="degredation_of_E2: compartment: * E2 -([])-> D2" index="21">
+				<listOfReactants>
+					<speciesReference species="E2" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="D2" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="generation_of_Z1" enzyme_symbol="[]" formatted_raw_string="generation_of_Z1: compartment: C2 [] -([])-> Z1" index="22">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="Z1" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="generation_of_Z2" enzyme_symbol="[]" formatted_raw_string="generation_of_Z2: compartment: C2 [] -([])-> Z2" index="23">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="Z2" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="generation_of_E1" enzyme_symbol="[]" formatted_raw_string="generation_of_E1: compartment: C2 [] -([])-> E1" index="24">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="E1" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="generation_of_E2" enzyme_symbol="[]" formatted_raw_string="generation_of_E2: compartment: C2 [] -([])-> E2" index="25">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="E2" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+		</location>
+	</listOfReactions>
+
+	<listOfBiochemistryControlTerms>
+		<control name="activation_of_E1_by_E1_supply" actor="E1" target="conversion_of_Z1_to_E1_fast" type="activation" compartment="supply"/>
+		<control name="activation_of_E1_by_E1_C1" actor="E1" target="conversion_of_Z1_to_E1_fast" type="activation" compartment="C1"/>
+		<control name="activation_of_E1_by_E1_wound" actor="E1" target="conversion_of_Z1_to_E1_fast" type="activation" compartment="wound"/>
+		<control name="activation_of_E1_by_E1_C2" actor="E1" target="conversion_of_Z1_to_E1_fast" type="activation" compartment="C2"/>
+		<control name="activation_of_E2_by_E1_supply" actor="E2" target="conversion_of_Z2_to_E2" type="activation" compartment="supply"/>
+		<control name="activation_of_E2_by_E1_C1" actor="E2" target="conversion_of_Z2_to_E2" type="activation" compartment="C1"/>
+		<control name="activation_of_E2_by_E1_wound" actor="E2" target="conversion_of_Z2_to_E2" type="activation" compartment="wound"/>
+		<control name="activation_of_E2_by_E1_C2" actor="E2" target="conversion_of_Z2_to_E2" type="activation" compartment="C2"/>
+	</listOfBiochemistryControlTerms>
+
+	<listOfSpeciesRules>
+		<speciesRule species="E0" type="fixed"/>
+	</listOfSpeciesRules>
+
+</PBPKModel>

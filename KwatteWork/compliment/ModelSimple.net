@@ -1,0 +1,48 @@
+// ============================================================ //
+// Test model file for the Kwatee PBPK plugin
+// Author: Rachel LeCover
+// Version: 1.0
+// ============================================================ //
+
+// ======================================================================== //
+// Compartment connections -
+#pragma handler_class = VLCGPBPKCompartmentConnectionParserDelegate
+// ======================================================================== //
+
+// Main compartments -
+C1_C2,C1,C2,-inf,inf;
+
+// ======================================================================== //
+// Compartment biochemistry -
+#pragma handler_class = VLCGPBPKCompartmentBiochemistryParserDelegate
+// ======================================================================== //
+generation_of_C1q,C1,[],[],C1q,0,inf;
+generation_of_MBL,C1,[],[],MBL,0,inf;
+generation_of_C3-C3H2O,C1,[],[],C3-C3H2O,0,inf;
+
+conversion_of_C1q_to_C3,C1,C3_convertase,C1q,C3,0,inf;
+conversion_of_MBL_to_C3,C1,C3_convertase,MBL,C3,0,inf;
+conversion_of_C3-C3H2O_to_C3,C1,C3_convertase,C3-C3H2O,C3,0,inf;
+
+cleavage_of_C3,C1,[],C3,C3a+C3b,0,inf;
+
+conversion_of_C2b_to_C5,C1,C3_convertase,C3b,C5,0,inf;
+clevage_of_C5,C1,[],C5,C5a+C5b,0,inf;
+
+activation_of_platelets_by_C3a,C1,C3a,platelet,activated_platelet,0,inf;
+activation_of_platelets_by_C5b,C1,C5b,platelet,activated_platelet,0,inf;
+
+platelet_synthesis,C2,[],[],platelet,0,inf;
+generation_of_C1q_by_activated_platelets,C1,activated_platelet,[],C1q,0,inf;
+
+// ======================================================================== //
+// Compartment biochemistry control
+#pragma handler_class = VLCGPBPKCompartmentBiochemistryControlParserDelegate
+// ======================================================================== //
+activation_of_B_by_B_B,cell,B,conversion_of_A_to_B, activation;
+
+// ======================================================================== //
+// Compartment biochemistry control
+#pragma handler_class = VLCGPBPKSpeciesRulesParserDelegate
+// ======================================================================== //
+C1q,fixed;

@@ -1,0 +1,58 @@
+// ============================================================ //
+// Test model file for the Kwatee PBPK plugin
+// Author: Rachel LeCover
+// Version: 1.0
+// ============================================================ //
+
+// ======================================================================== //
+// Compartment connections -
+#pragma handler_class = VLCGPBPKCompartmentConnectionParserDelegate
+// ======================================================================== //
+
+// Main compartments -
+C1_C2,C1,C2,-inf,inf;
+
+// ======================================================================== //
+// Compartment biochemistry -
+#pragma handler_class = VLCGPBPKCompartmentBiochemistryParserDelegate
+// ======================================================================== //
+
+//lectin pathway
+generation_of_MBL,C1,MASP1_2,[],MBL,0,inf;
+generation_of_C1_a_similar,C1,MBL,[],C1_a_similar,0,inf;
+cleavage_of_C4,C1,C1_a_similar,C4,1.0*C4a+1.0*C4b,0,inf;
+generation_of_C4b2,C1,C2,C4b,C4b2,0,inf;
+//classical pathway
+generation_of_C1,C1,[],[],C1,0,inf;
+generation_of_C1a,C1,Ag_Ab,C1,C1a,0,inf;
+
+//alternative pathway
+cleavage_of_C3_alt,C1,microbes,C3,C3a+C3b,0,inf;
+conversion_of_C3_to_Bb,C1,[],C3b,Bb,0,inf;
+generation_of_factor_B,C1,[],[],factor_B,0,inf;
+generation_of_factor_D,C1,[],[],factor_D,0,inf;
+conversion_of_factor_B,C1,factor_D,factor_B,Ba+Bb,0,inf;
+generation_of_properdin,C1,[],[],properdin,0,inf;
+generation_of_C3bBb,C1,properdin,Bb,C3bBb,0,inf;
+
+generation_of_C4b2a,C1,C1a,C4b2,1.0*C2b+1.0*C4b2a,0,inf;
+cleavage_of_C3,C1,C4b2a,C3,C3a+C3b,0,inf;
+cleavage_of_C3_alt,C1,C3bBb,C3,C3a+C3b,0,inf;
+C3b_activation_way1,C1,[],C3b,C4b2a3b,0,inf;
+C3b_activation_way2,C1,[],C3b,C3bBb3b,0,inf;
+C5_generation_way1,C1,C4b2a3b,[],C5,0,inf;
+C5_generation_way2,C1,C4bBb3b,[],C5,0,inf;
+C5_cleavage,C1,[],C5,1.0*C5a+1.0*C5b,0,inf;
+C5b_to_MAC,C1,C6_C9,C5b,MAC,0,inf;
+
+// ======================================================================== //
+// Compartment biochemistry control
+#pragma handler_class = VLCGPBPKCompartmentBiochemistryControlParserDelegate
+// ======================================================================== //
+
+
+// ======================================================================== //
+// Compartment biochemistry control
+#pragma handler_class = VLCGPBPKSpeciesRulesParserDelegate
+// ======================================================================== //
+

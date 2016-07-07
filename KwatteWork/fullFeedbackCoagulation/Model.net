@@ -1,0 +1,61 @@
+// ============================================================ //
+// Test model file for the Kwatee PBPK plugin
+// Author: Rachel LeCover
+// Version: 1.0
+// ============================================================ //
+
+// ======================================================================== //
+// Compartment connections -
+#pragma handler_class = VLCGPBPKCompartmentConnectionParserDelegate
+// ======================================================================== //
+
+// Main compartments -
+vein_to_lungs,vein,lungs,0,inf;
+lungs_to_artery,lungs,artery,0,inf;
+artery_to_heart,artery,heart,0,inf;
+heart_to_veins,heart,vein,0,inf;
+artery_to_kidney,artery,kidney,0,inf;
+kideny_to_vein,kidney,vein,0,inf;
+
+//wound connects to artery
+artery_to_wound,artery,wound,-inf,inf;
+//clearance out of artery
+artery_to_degredation,artery,[],0,inf;
+
+// ======================================================================== //
+// Compartment biochemistry -
+#pragma handler_class = VLCGPBPKCompartmentBiochemistryParserDelegate
+// ======================================================================== //
+//conversion_of_Z1_to_E1_slow,wound,E0,Z1,E1,0,inf;
+conversion_of_Z1_to_E1_fast,wound,E1,Z1,E1,0,inf;
+//generation_of_E0,wound,[],[],E0,0,inf;
+degredation_of_E1,wound,[],E1,D1,0,inf;
+generation_of_Z1,lungs,[],[],Z1,0,inf;
+//degredation_of_E0,wound,[],E0,[],0,inf;
+degredation_of_Z1,kidney,[],Z1,[],0,inf;
+//degredation_of_E0,kidney,[],E0,[],0,inf;
+
+generation_of_E2,wound,E1,Z2,E2,0,inf;
+generation_of_Z2,lungs,[],[],Z2,0,inf;
+E2_cataylzed_conversion_of_Z1_to_E1,wound,E2,Z1,E1,0,inf;
+E2_degregation,wound,[],E2,D2,0,inf;
+
+production_of_E3,wound,E4,E2,E3,0,inf;
+degredation_of_E3,wound,[],E3,D3,0,inf;
+
+production_of_E4,wound,E3,Z4,E4,0,inf;
+degreation_of_E4,wound,[],E4,D4,0,inf;
+
+long_range_production_of_E1,wound,E4,Z1,E1,0,inf;
+
+// ======================================================================== //
+// Compartment biochemistry control
+#pragma handler_class = VLCGPBPKCompartmentBiochemistryControlParserDelegate
+// ======================================================================== //
+//activation_of_E1_by_E1,wound,E1,conversion_of_Z1_to_E1_fast,activation;
+// ======================================================================== //
+// Compartment biochemistry control
+#pragma handler_class = VLCGPBPKSpeciesRulesParserDelegate
+// ======================================================================== //
+//Z1,fixed;
+

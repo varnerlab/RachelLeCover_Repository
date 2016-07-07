@@ -1,0 +1,37 @@
+// ============================================================ //
+// Test model file for the Kwatee PBPK plugin
+// Author: Rachel LeCover
+// Version: 1.0
+// ============================================================ //
+
+// ======================================================================== //
+// Compartment connections -
+#pragma handler_class = VLCGPBPKCompartmentConnectionParserDelegate
+// ======================================================================== //
+
+// Main compartments -
+wound_to_C1,wound,compartment_1,-inf,inf;
+
+// ======================================================================== //
+// Compartment biochemistry -
+#pragma handler_class = VLCGPBPKCompartmentBiochemistryParserDelegate
+// ======================================================================== //
+conversion_of_Z1_to_E1_slow,wound,E0,Z1,E1,0,inf;
+conversion_of_Z1_to_E1_fast,wound,E1,Z1,E1,0,inf;
+generation_of_E0,wound,[],[],E0,0,inf;
+degredation_of_E1,wound,[],E1,D1,0,inf;
+//generation_of_Z1,wound,[],[],Z1,0,inf;
+degreation_of_E0,wound,[],E0,[],0,inf;
+
+
+// ======================================================================== //
+// Compartment biochemistry control
+#pragma handler_class = VLCGPBPKCompartmentBiochemistryControlParserDelegate
+// ======================================================================== //
+//activation_of_E1_by_E1,wound,E1,conversion_of_Z1_to_E1_fast,activation;
+// ======================================================================== //
+// Compartment biochemistry control
+#pragma handler_class = VLCGPBPKSpeciesRulesParserDelegate
+// ======================================================================== //
+
+

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<PBPKModel>
+	<listOfCompartments>
+		<compartment index="1" symbol="wound" initial_volume="1.0"/>
+		<compartment index="2" symbol="compartment_1" initial_volume="1.0"/>
+	</listOfCompartments>
+
+	<listOfCompartmentConnections>
+		<connection index="1" name="wound_to_C1" parameter_value="0.0" start_symbol="wound" end_symbol="compartment_1" />
+		<connection index="2" name="wound_to_C1_reverse" parameter_value="0.0" start_symbol="compartment_1" end_symbol="wound" />
+	</listOfCompartmentConnections>
+
+	<listOfSpecies>
+		<species symbol="Z1" initial_condition="0.0"/>
+		<species symbol="E1" initial_condition="0.0"/>
+		<species symbol="E0" initial_condition="0.0"/>
+		<species symbol="D1" initial_condition="0.0"/>
+	</listOfSpecies>
+
+	<listOfReactions>
+		<location compartment="wound">
+			<reaction name="conversion_of_Z1_to_E1_slow" enzyme_symbol="E0" formatted_raw_string="conversion_of_Z1_to_E1_slow: compartment: wound Z1 -(E0)-> E1" index="1">
+				<listOfReactants>
+					<speciesReference species="Z1" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="E1" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="conversion_of_Z1_to_E1_fast" enzyme_symbol="E1" formatted_raw_string="conversion_of_Z1_to_E1_fast: compartment: wound Z1 -(E1)-> E1" index="2">
+				<listOfReactants>
+					<speciesReference species="Z1" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="E1" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="generation_of_E0" enzyme_symbol="[]" formatted_raw_string="generation_of_E0: compartment: wound [] -([])-> E0" index="3">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="E0" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="degredation_of_E1" enzyme_symbol="[]" formatted_raw_string="degredation_of_E1: compartment: wound E1 -([])-> D1" index="4">
+				<listOfReactants>
+					<speciesReference species="E1" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="D1" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="degreation_of_E0" enzyme_symbol="[]" formatted_raw_string="degreation_of_E0: compartment: wound E0 -([])-> []" index="5">
+				<listOfReactants>
+					<speciesReference species="E0" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+		</location>
+		<location compartment="compartment_1">
+		</location>
+	</listOfReactions>
+
+	<listOfBiochemistryControlTerms>
+	</listOfBiochemistryControlTerms>
+
+	<listOfSpeciesRules>
+	</listOfSpeciesRules>
+
+</PBPKModel>

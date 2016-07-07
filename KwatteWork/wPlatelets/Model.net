@@ -1,0 +1,92 @@
+// ======================================================================== //
+// Test model file for the Kwatee PBPK plugin
+// Author: J. Varner
+// Version: 1.0
+//
+// Description:
+// Single comparment coagulation model with input and ouput flows.
+// ======================================================================== //
+// ======================================================================== //
+// Compartment connections -
+#pragma handler_class = VLCGPBPKCompartmentConnectionParserDelegate
+//
+// Record template:
+// name (unique),compartment_from,compartment_to,reverse,forward;
+//
+// Notes:
+// [] = SYSTEM (we don't track)
+// ======================================================================== //
+// Main compartments -
+C1IN,[],C1,0,inf;
+C1OUT,C1,[],0,inf;
+// ======================================================================== //
+// Compartment biochemistry -
+#pragma handler_class = VLCGPBPKCompartmentBiochemistryParserDelegate
+//
+// Record template:
+// name (unique),compartment,enzyme,reactants,products,reverse,forward;
+//
+// Notes:
+// [] in enzyme field => will generate a Vmax
+// ======================================================================== //
+// Initiation -
+activation_initiator,C1,trigger,inactive_initiator,active_initiator,0,inf;
+slow_thrombin_generation,C1,active_initiator,FII,FIIa,0,inf;
+platelet_activation,C1,FIIa,PL,PLa,0,inf;
+// Amplification -
+fast_thrombin_generation,C1,PLa,FII,FIIa,0,inf;
+// activation of APC -
+activation_of_APC,C1,FIIa,PC,APC,0,inf;
+// Deactivation of FIIa by ATIII -
+deactivation_of_FIIa_by_ATIII,C1,[],FIIa+ATIII,[],0,inf;
+// Deactivation by TFPI -
+deactivation_by_TFPI,C1,[],TFPI+active_initiator,[],0,inf;
+// Fibrinogenesis or Fibrin formation -
+fibrin_monomer_formation,C1,FIIa,Fibrinogen,Fibrin_monomer,0,inf;
+protofibril_formation,C1,[],Fibrin_monomer,Protofibril,0,inf;
+protofibril_formation_reverse,C1,[],Protofibril,Fibrin,0,inf;
+// Fibrin degradation
+fibrin_degradation_FDPs_Ddimer,C1,Plasmin,Fibrin,D_dimer,0,inf;
+// Plasmin activation from plasminogen -
+plasmin_generation_tPA,C1,tPA,Plasminogen,Plasmin,0,inf;
+plasmin_generation_uPA,C1,uPA,Plasminogen,Plasmin,0,inf;
+// APC and PAI_1 -
+// inhibition_of_PA1_1_by_APC,C1,[],APC+PAI_1,[],0,inf;
+// ======================================================================== //
+// Compartment biochemistry control
+#pragma handler_class = VLCGPBPKCompartmentBiochemistryControlParserDelegate
+//
+// Record template:
+// name (unique),compartment,actor,target,control_type;
+//
+// Notes:
+// control_type = {activation | inhibition}
+// ======================================================================== //
+deactive_by_APC,C1,APC,fast_thrombin_generation,inhibition;
+// Plasmin inhibition by antiplasmin
+plasmin_inhibition,C1,antiplasmin,plasmin_generation_tPA,inhibition;
+plasmin_inhibition,C1,antiplasmin,plasmin_generation_uPA,inhibition;
+// Inhibition of plasminogen activation through TAFI
+plasminogen_activation_inhibition,C1,TAFI,plasmin_generation_tPA,inhibition;
+plasminogen_activation_inhibition,C1,TAFI,plasmin_generation_uPA,inhibition;
+// Inhibition of tPA through PAI-1
+tPA-inhibition,C1,PAI_1,plasmin_generation_tPA,inhibition;
+// Inhibition of uPA through PAI-1
+uPA-inhibition,C1,PAI_1,plasmin_generation_uPA,inhibition;
+// Activation of plasmin generation through inhibition of PAI-1 by APC
+activation_plasmin_tPA_APC,C1,APC,plasmin_generation_tPA,activation;
+activation_plasmin_uPA_APC,C1,APC,plasmin_generation_uPA,activation;
+// Inhibition of fibrinolysis through fXIII
+fibrinolysis_inhibition_by_fXIII,C1,fXIII,fibrin_degradation_FDPs_Ddimer,inhibition;
+// ======================================================================== //
+// Compartment biochemistry control
+#pragma handler_class = VLCGPBPKSpeciesRulesParserDelegate
+//
+// Record template:
+// actor,rule;
+//
+// Notes:
+// rule = {fixed}
+// ======================================================================== //
+trigger,fixed;
+PC,fixed;

@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<PBPKModel>
+	<listOfCompartments>
+		<compartment index="1" symbol="cell" initial_volume="1.0"/>
+	</listOfCompartments>
+
+	<listOfCompartmentConnections>
+		<connection index="1" name="cell" parameter_value="0.0" start_symbol="cell" end_symbol="cell" />
+	</listOfCompartmentConnections>
+
+	<listOfSpecies>
+		<species symbol="A" initial_condition="0.0"/>
+		<species symbol="ATP" initial_condition="0.0"/>
+		<species symbol="B" initial_condition="0.0"/>
+		<species symbol="NADH" initial_condition="0.0"/>
+		<species symbol="C" initial_condition="0.0"/>
+		<species symbol="F" initial_condition="0.0"/>
+		<species symbol="G" initial_condition="0.0"/>
+		<species symbol="D" initial_condition="0.0"/>
+		<species symbol="E" initial_condition="0.0"/>
+		<species symbol="H" initial_condition="0.0"/>
+		<species symbol="O2" initial_condition="0.0"/>
+		<species symbol="Carbon1" initial_condition="0.0"/>
+		<species symbol="Carbon2" initial_condition="0.0"/>
+		<species symbol="Fext" initial_condition="0.0"/>
+		<species symbol="Dext" initial_condition="0.0"/>
+		<species symbol="Ext" initial_condition="0.0"/>
+		<species symbol="Hext" initial_condition="0.0"/>
+		<species symbol="Oxygen" initial_condition="0.0"/>
+		<species symbol="biomass" initial_condition="0.0"/>
+	</listOfSpecies>
+
+	<listOfReactions>
+		<location compartment="cell">
+			<reaction name="R1" enzyme_symbol="[]" formatted_raw_string="R1: compartment: cell A+ATP -([])-> B" index="1">
+				<listOfReactants>
+					<speciesReference species="A" stoichiometry="1.0"/>
+					<speciesReference species="ATP" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="B" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="R2a" enzyme_symbol="[]" formatted_raw_string="R2a: compartment: cell B -([])-> 2*ATP+2*NADH+C" index="2">
+				<listOfReactants>
+					<speciesReference species="B" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="ATP" stoichiometry="2"/>
+					<speciesReference species="NADH" stoichiometry="2"/>
+					<speciesReference species="C" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="R2b" enzyme_symbol="[]" formatted_raw_string="R2b: compartment: cell C+2*ATP+2*NADH -([])-> B" index="3">
+				<listOfReactants>
+					<speciesReference species="C" stoichiometry="1.0"/>
+					<speciesReference species="ATP" stoichiometry="2"/>
+					<speciesReference species="NADH" stoichiometry="2"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="B" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="R3" enzyme_symbol="[]" formatted_raw_string="R3: compartment: cell B -([])-> F" index="4">
+				<listOfReactants>
+					<speciesReference species="B" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="F" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="R4" enzyme_symbol="[]" formatted_raw_string="R4: compartment: cell C -([])-> G" index="5">
+				<listOfReactants>
+					<speciesReference species="C" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="G" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="R5a" enzyme_symbol="[]" formatted_raw_string="R5a: compartment: cell G -([])-> .8*C+2*NADH" index="6">
+				<listOfReactants>
+					<speciesReference species="G" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="C" stoichiometry=".8"/>
+					<speciesReference species="NADH" stoichiometry="2"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="R5b" enzyme_symbol="[]" formatted_raw_string="R5b: compartment: cell G -([])-> .8*C+2*NADH" index="7">
+				<listOfReactants>
+					<speciesReference species="G" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="C" stoichiometry=".8"/>
+					<speciesReference species="NADH" stoichiometry="2"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="R6" enzyme_symbol="[]" formatted_raw_string="R6: compartment: cell C -([])-> 2*ATP+3*D" index="8">
+				<listOfReactants>
+					<speciesReference species="C" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="ATP" stoichiometry="2"/>
+					<speciesReference species="D" stoichiometry="3"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="R7" enzyme_symbol="[]" formatted_raw_string="R7: compartment: cell C+4*NADH -([])-> E" index="9">
+				<listOfReactants>
+					<speciesReference species="C" stoichiometry="1.0"/>
+					<speciesReference species="NADH" stoichiometry="4"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="E" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="R8a" enzyme_symbol="[]" formatted_raw_string="R8a: compartment: cell G+ATP+2*NADH -([])-> H" index="10">
+				<listOfReactants>
+					<speciesReference species="G" stoichiometry="1.0"/>
+					<speciesReference species="ATP" stoichiometry="1.0"/>
+					<speciesReference species="NADH" stoichiometry="2"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="H" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="R8b" enzyme_symbol="[]" formatted_raw_string="R8b: compartment: cell H -([])-> G+ATP+2*NADH" index="11">
+				<listOfReactants>
+					<speciesReference species="H" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="G" stoichiometry="1.0"/>
+					<speciesReference species="ATP" stoichiometry="1.0"/>
+					<speciesReference species="NADH" stoichiometry="2"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="Rres" enzyme_symbol="[]" formatted_raw_string="Rres: compartment: cell NADH+O2 -([])-> ATP" index="12">
+				<listOfReactants>
+					<speciesReference species="NADH" stoichiometry="1.0"/>
+					<speciesReference species="O2" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="ATP" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="Tc1" enzyme_symbol="[]" formatted_raw_string="Tc1: compartment: cell Carbon1 -([])-> A" index="13">
+				<listOfReactants>
+					<speciesReference species="Carbon1" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="A" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="Tc2" enzyme_symbol="[]" formatted_raw_string="Tc2: compartment: cell Carbon2 -([])-> A" index="14">
+				<listOfReactants>
+					<speciesReference species="Carbon2" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="A" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="Tf" enzyme_symbol="[]" formatted_raw_string="Tf: compartment: cell Fext -([])-> F" index="15">
+				<listOfReactants>
+					<speciesReference species="Fext" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="F" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="Td" enzyme_symbol="[]" formatted_raw_string="Td: compartment: cell D -([])-> Dext" index="16">
+				<listOfReactants>
+					<speciesReference species="D" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="Dext" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="Te" enzyme_symbol="[]" formatted_raw_string="Te: compartment: cell E -([])-> Ext" index="17">
+				<listOfReactants>
+					<speciesReference species="E" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="Ext" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="Th" enzyme_symbol="[]" formatted_raw_string="Th: compartment: cell Hext -([])-> H" index="18">
+				<listOfReactants>
+					<speciesReference species="Hext" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="H" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="TO2" enzyme_symbol="[]" formatted_raw_string="TO2: compartment: cell Oxygen -([])-> O2" index="19">
+				<listOfReactants>
+					<speciesReference species="Oxygen" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="O2" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="growth" enzyme_symbol="[]" formatted_raw_string="growth: compartment: cell C+F+H+10*ATP -([])-> biomass" index="20">
+				<listOfReactants>
+					<speciesReference species="C" stoichiometry="1.0"/>
+					<speciesReference species="F" stoichiometry="1.0"/>
+					<speciesReference species="H" stoichiometry="1.0"/>
+					<speciesReference species="ATP" stoichiometry="10"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="biomass" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+		</location>
+	</listOfReactions>
+
+	<listOfBiochemistryControlTerms>
+	</listOfBiochemistryControlTerms>
+
+	<listOfSpeciesRules>
+	</listOfSpeciesRules>
+
+</PBPKModel>

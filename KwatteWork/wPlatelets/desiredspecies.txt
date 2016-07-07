@@ -1,0 +1,16 @@
+inactive_initiator_C1
+active_initiator_C1
+trigger_C1
+FII_C1
+FIIa_C1
+PL_C1
+PLa_C1
+PC_C1
+APC_C1
+ATIII_C1
+TFPI_C1
+Fibrinogen_C1
+Fibrin_monomer_C1
+Protofibril_C1
+Fibrin_C1
+

@@ -1,0 +1,393 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<PBPKModel>
+	<listOfCompartments>
+		<compartment index="1" symbol="vein" initial_volume="1.0"/>
+		<compartment index="2" symbol="lungs" initial_volume="1.0"/>
+		<compartment index="3" symbol="artery" initial_volume="1.0"/>
+		<compartment index="4" symbol="heart" initial_volume="1.0"/>
+		<compartment index="5" symbol="kidney" initial_volume="1.0"/>
+		<compartment index="6" symbol="wound" initial_volume="1.0"/>
+	</listOfCompartments>
+
+	<listOfCompartmentConnections>
+		<connection index="1" name="vein_to_lungs" parameter_value="0.0" start_symbol="vein" end_symbol="lungs" />
+		<connection index="2" name="lungs_to_artery" parameter_value="0.0" start_symbol="lungs" end_symbol="artery" />
+		<connection index="3" name="artery_to_heart" parameter_value="0.0" start_symbol="artery" end_symbol="heart" />
+		<connection index="4" name="heart_to_veins" parameter_value="0.0" start_symbol="heart" end_symbol="vein" />
+		<connection index="5" name="artery_to_kidney" parameter_value="0.0" start_symbol="artery" end_symbol="kidney" />
+		<connection index="6" name="kidney_to_vein" parameter_value="0.0" start_symbol="kidney" end_symbol="vein" />
+		<connection index="7" name="artery_to_wound" parameter_value="0.0" start_symbol="artery" end_symbol="wound" />
+		<connection index="8" name="artery_to_wound_reverse" parameter_value="0.0" start_symbol="wound" end_symbol="artery" />
+		<connection index="9" name="wound_to_degredation" parameter_value="0.0" start_symbol="wound" end_symbol="[]" />
+	</listOfCompartmentConnections>
+
+	<listOfSpecies>
+		<species symbol="FII" initial_condition="0.0"/>
+		<species symbol="FIIa" initial_condition="0.0"/>
+		<species symbol="PC" initial_condition="0.0"/>
+		<species symbol="APC" initial_condition="0.0"/>
+		<species symbol="ATIII" initial_condition="0.0"/>
+		<species symbol="TM" initial_condition="0.0"/>
+		<species symbol="TRIGGER" initial_condition="0.0"/>
+	</listOfSpecies>
+
+	<listOfReactions>
+		<location compartment="vein">
+			<reaction name="reaction1" enzyme_symbol="[]" formatted_raw_string="reaction1: compartment: * [] -([])-> FII" index="1">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="FII" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="reaction2" enzyme_symbol="[]" formatted_raw_string="reaction2: compartment: * [] -([])-> FIIa" index="2">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="FIIa" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="reaction3" enzyme_symbol="[]" formatted_raw_string="reaction3: compartment: * [] -([])-> PC" index="3">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="PC" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="reaction4" enzyme_symbol="[]" formatted_raw_string="reaction4: compartment: * [] -([])-> APC" index="4">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="APC" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="reaction5" enzyme_symbol="[]" formatted_raw_string="reaction5: compartment: * [] -([])-> ATIII" index="5">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="ATIII" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="reaction6" enzyme_symbol="[]" formatted_raw_string="reaction6: compartment: * [] -([])-> TM" index="6">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="TM" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="reaction7" enzyme_symbol="[]" formatted_raw_string="reaction7: compartment: * [] -([])-> TRIGGER" index="7">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="TRIGGER" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+		</location>
+		<location compartment="lungs">
+			<reaction name="reaction1" enzyme_symbol="[]" formatted_raw_string="reaction1: compartment: * [] -([])-> FII" index="8">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="FII" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="reaction2" enzyme_symbol="[]" formatted_raw_string="reaction2: compartment: * [] -([])-> FIIa" index="9">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="FIIa" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="reaction3" enzyme_symbol="[]" formatted_raw_string="reaction3: compartment: * [] -([])-> PC" index="10">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="PC" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="reaction4" enzyme_symbol="[]" formatted_raw_string="reaction4: compartment: * [] -([])-> APC" index="11">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="APC" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="reaction5" enzyme_symbol="[]" formatted_raw_string="reaction5: compartment: * [] -([])-> ATIII" index="12">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="ATIII" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="reaction6" enzyme_symbol="[]" formatted_raw_string="reaction6: compartment: * [] -([])-> TM" index="13">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="TM" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="reaction7" enzyme_symbol="[]" formatted_raw_string="reaction7: compartment: * [] -([])-> TRIGGER" index="14">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="TRIGGER" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+		</location>
+		<location compartment="artery">
+			<reaction name="reaction1" enzyme_symbol="[]" formatted_raw_string="reaction1: compartment: * [] -([])-> FII" index="15">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="FII" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="reaction2" enzyme_symbol="[]" formatted_raw_string="reaction2: compartment: * [] -([])-> FIIa" index="16">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="FIIa" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="reaction3" enzyme_symbol="[]" formatted_raw_string="reaction3: compartment: * [] -([])-> PC" index="17">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="PC" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="reaction4" enzyme_symbol="[]" formatted_raw_string="reaction4: compartment: * [] -([])-> APC" index="18">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="APC" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="reaction5" enzyme_symbol="[]" formatted_raw_string="reaction5: compartment: * [] -([])-> ATIII" index="19">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="ATIII" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="reaction6" enzyme_symbol="[]" formatted_raw_string="reaction6: compartment: * [] -([])-> TM" index="20">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="TM" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="reaction7" enzyme_symbol="[]" formatted_raw_string="reaction7: compartment: * [] -([])-> TRIGGER" index="21">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="TRIGGER" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+		</location>
+		<location compartment="heart">
+			<reaction name="reaction1" enzyme_symbol="[]" formatted_raw_string="reaction1: compartment: * [] -([])-> FII" index="22">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="FII" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="reaction2" enzyme_symbol="[]" formatted_raw_string="reaction2: compartment: * [] -([])-> FIIa" index="23">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="FIIa" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="reaction3" enzyme_symbol="[]" formatted_raw_string="reaction3: compartment: * [] -([])-> PC" index="24">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="PC" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="reaction4" enzyme_symbol="[]" formatted_raw_string="reaction4: compartment: * [] -([])-> APC" index="25">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="APC" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="reaction5" enzyme_symbol="[]" formatted_raw_string="reaction5: compartment: * [] -([])-> ATIII" index="26">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="ATIII" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="reaction6" enzyme_symbol="[]" formatted_raw_string="reaction6: compartment: * [] -([])-> TM" index="27">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="TM" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="reaction7" enzyme_symbol="[]" formatted_raw_string="reaction7: compartment: * [] -([])-> TRIGGER" index="28">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="TRIGGER" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+		</location>
+		<location compartment="kidney">
+			<reaction name="reaction1" enzyme_symbol="[]" formatted_raw_string="reaction1: compartment: * [] -([])-> FII" index="29">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="FII" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="reaction2" enzyme_symbol="[]" formatted_raw_string="reaction2: compartment: * [] -([])-> FIIa" index="30">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="FIIa" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="reaction3" enzyme_symbol="[]" formatted_raw_string="reaction3: compartment: * [] -([])-> PC" index="31">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="PC" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="reaction4" enzyme_symbol="[]" formatted_raw_string="reaction4: compartment: * [] -([])-> APC" index="32">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="APC" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="reaction5" enzyme_symbol="[]" formatted_raw_string="reaction5: compartment: * [] -([])-> ATIII" index="33">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="ATIII" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="reaction6" enzyme_symbol="[]" formatted_raw_string="reaction6: compartment: * [] -([])-> TM" index="34">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="TM" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="reaction7" enzyme_symbol="[]" formatted_raw_string="reaction7: compartment: * [] -([])-> TRIGGER" index="35">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="TRIGGER" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+		</location>
+		<location compartment="wound">
+			<reaction name="reaction1" enzyme_symbol="[]" formatted_raw_string="reaction1: compartment: * [] -([])-> FII" index="36">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="FII" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="reaction2" enzyme_symbol="[]" formatted_raw_string="reaction2: compartment: * [] -([])-> FIIa" index="37">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="FIIa" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="reaction3" enzyme_symbol="[]" formatted_raw_string="reaction3: compartment: * [] -([])-> PC" index="38">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="PC" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="reaction4" enzyme_symbol="[]" formatted_raw_string="reaction4: compartment: * [] -([])-> APC" index="39">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="APC" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="reaction5" enzyme_symbol="[]" formatted_raw_string="reaction5: compartment: * [] -([])-> ATIII" index="40">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="ATIII" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="reaction6" enzyme_symbol="[]" formatted_raw_string="reaction6: compartment: * [] -([])-> TM" index="41">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="TM" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="reaction7" enzyme_symbol="[]" formatted_raw_string="reaction7: compartment: * [] -([])-> TRIGGER" index="42">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="TRIGGER" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+		</location>
+	</listOfReactions>
+
+	<listOfBiochemistryControlTerms>
+	</listOfBiochemistryControlTerms>
+
+	<listOfSpeciesRules>
+		<speciesRule species="TM" type="fixed"/>
+		<speciesRule species="TRIGGER" type="fixed"/>
+	</listOfSpeciesRules>
+
+</PBPKModel>

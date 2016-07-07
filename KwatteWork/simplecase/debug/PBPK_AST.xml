@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<PBPKModel>
+	<listOfCompartments>
+		<compartment index="1" symbol="compartment_1" initial_volume="1.0"/>
+		<compartment index="2" symbol="compartment_2" initial_volume="1.0"/>
+		<compartment index="3" symbol="compartment_3" initial_volume="1.0"/>
+	</listOfCompartments>
+
+	<listOfCompartmentConnections>
+		<connection index="1" name="C1C2" parameter_value="0.0" start_symbol="compartment_1" end_symbol="compartment_2" />
+		<connection index="2" name="C1C2_reverse" parameter_value="0.0" start_symbol="compartment_2" end_symbol="compartment_1" />
+		<connection index="3" name="C2C3" parameter_value="0.0" start_symbol="compartment_2" end_symbol="compartment_3" />
+		<connection index="4" name="C2C3_reverse" parameter_value="0.0" start_symbol="compartment_3" end_symbol="compartment_2" />
+	</listOfCompartmentConnections>
+
+	<listOfSpecies>
+		<species symbol="A" initial_condition="0.0"/>
+		<species symbol="B" initial_condition="0.0"/>
+		<species symbol="E" initial_condition="0.0"/>
+	</listOfSpecies>
+
+	<listOfReactions>
+		<location compartment="compartment_1">
+			<reaction name="conversion_of_A_to_B_with_E" enzyme_symbol="E" formatted_raw_string="conversion_of_A_to_B_with_E: compartment: * A -(E)-> B" index="1">
+				<listOfReactants>
+					<speciesReference species="A" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="B" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="conversion_of_B_to_A" enzyme_symbol="[]" formatted_raw_string="conversion_of_B_to_A: compartment: * B -([])-> A" index="2">
+				<listOfReactants>
+					<speciesReference species="B" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="A" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+		</location>
+		<location compartment="compartment_2">
+			<reaction name="conversion_of_A_to_B_with_E" enzyme_symbol="E" formatted_raw_string="conversion_of_A_to_B_with_E: compartment: * A -(E)-> B" index="3">
+				<listOfReactants>
+					<speciesReference species="A" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="B" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="conversion_of_B_to_A" enzyme_symbol="[]" formatted_raw_string="conversion_of_B_to_A: compartment: * B -([])-> A" index="4">
+				<listOfReactants>
+					<speciesReference species="B" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="A" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="generation_of_E" enzyme_symbol="[]" formatted_raw_string="generation_of_E: compartment: compartment_2 [] -([])-> E" index="5">
+				<listOfReactants>
+					<speciesReference species="[]" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="E" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+		</location>
+		<location compartment="compartment_3">
+			<reaction name="conversion_of_A_to_B_with_E" enzyme_symbol="E" formatted_raw_string="conversion_of_A_to_B_with_E: compartment: * A -(E)-> B" index="6">
+				<listOfReactants>
+					<speciesReference species="A" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="B" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+			<reaction name="conversion_of_B_to_A" enzyme_symbol="[]" formatted_raw_string="conversion_of_B_to_A: compartment: * B -([])-> A" index="7">
+				<listOfReactants>
+					<speciesReference species="B" stoichiometry="1.0"/>
+				</listOfReactants>
+				<listOfProducts>
+					<speciesReference species="A" stoichiometry="1.0"/>
+				</listOfProducts>
+			</reaction>
+		</location>
+	</listOfReactions>
+
+	<listOfBiochemistryControlTerms>
+		<control name="activation_of_B_by_B_B_compartment_1" actor="B" target="conversion_of_A_to_B_with_E" type="activation" compartment="compartment_1"/>
+		<control name="activation_of_B_by_B_B_compartment_2" actor="B" target="conversion_of_A_to_B_with_E" type="activation" compartment="compartment_2"/>
+		<control name="activation_of_B_by_B_B_compartment_3" actor="B" target="conversion_of_A_to_B_with_E" type="activation" compartment="compartment_3"/>
+	</listOfBiochemistryControlTerms>
+
+	<listOfSpeciesRules>
+		<speciesRule species="E" type="fixed"/>
+	</listOfSpeciesRules>
+
+</PBPKModel>

@@ -1,0 +1,54 @@
+// ============================================================ //
+// Test model file for the Kwatee PBPK plugin
+// Author: Rachel LeCover
+// Version: 1.0
+// ============================================================ //
+
+// ======================================================================== //
+// Compartment connections -
+#pragma handler_class = VLCGPBPKCompartmentConnectionParserDelegate
+// ======================================================================== //
+
+// Main compartments -
+//wound_to_C1,wound,compartment_1,-inf,inf;
+supply_to_C1,supply,C1,0,inf;
+C1_to_wound,C1,wound,0,inf;
+wound_to_C2,wound,C2,0,inf;
+C2_to_C1,C2,C1,0,inf;
+C2_to_clearance,C2,[],0,inf;
+bleed_out,wound,[],0,inf;
+
+// ======================================================================== //
+// Compartment biochemistry -
+#pragma handler_class = VLCGPBPKCompartmentBiochemistryParserDelegate
+// ======================================================================== //
+conversion_of_Z1_to_E1_slow,*,E0,Z1,E1,0,inf;
+conversion_of_Z1_to_E1_fast,*,E1,Z1,E1,0,inf;
+conversion_of_Z2_to_E2,*,E1,Z2,E2,0,inf;
+degredation_of_E1,*,[],E1,D1,0,inf;
+degredation_of_E2,*,[],E2,D2,0,inf;
+degreation_of_E0,wound,[],E0,[],0,inf;
+
+//synthesis of precursors
+generation_of_Z1,C2,[],[],Z1,0,inf;
+generation_of_Z2,C2,[],[],Z2,0,inf;
+//generation_of_E0,C2,[],[],E0,0,inf;
+
+//synthesis of enzymes
+//generation_of_E0,C2,[],[],E0,0,inf;
+generation_of_E1,C2,[],[],E1,0,inf;
+generation_of_E2,C2,[],[],E2,0,inf;
+
+
+// ======================================================================== //
+// Compartment biochemistry control
+#pragma handler_class = VLCGPBPKCompartmentBiochemistryControlParserDelegate
+// ======================================================================== //
+activation_of_E1_by_E1,wound,E1,conversion_of_Z1_to_E1_fast,activation;
+activation_of_E2_by_E1,wound,E2,conversion_of_Z2_to_E2,activation;
+// ======================================================================== //
+// Compartment biochemistry control
+#pragma handler_class = VLCGPBPKSpeciesRulesParserDelegate
+// ======================================================================== //
+E0,fixed;
+

@@ -1,0 +1,28 @@
+[kwatee.metabolic.reaction.handler]
+//metabolic reactions
+R1,A+ATP,B,0,inf;
+R2a,B,2*ATP+2*NADH+C,0,inf;
+R2b,C+2*ATP+2*NADH,B,0,inf;
+R3,B,F,0,inf;
+R4,C,G,0,inf;
+R5a,G,.8*C+2*NADH,0,inf;
+R5b,G,.8*C+2*NADH,0,inf;
+R6,C,2*ATP+3*D,0,inf;
+R7,C+4*NADH,E,0,inf;
+R8a,G+ATP+2*NADH,H,0,inf;
+R8b,H,G+ATP+2*NADH,0,inf;
+Rres,NADH+O2,ATP,0,inf;
+
+//trasport processes
+Tc1,Carbon1,A,0,inf;
+Tc2,Carbon2,A,0,inf;
+Tf,Fext,F,0,inf;
+Td,D,Dext,0,inf;
+Te,E,Ext,0,inf;
+Th,Hext,H,0,inf;
+TO2,Oxygen,O2,0,inf;
+
+//maintanance and growth
+growth,C+F+H+10*ATP,biomass,0,inf;
+
+
