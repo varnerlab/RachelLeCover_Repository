@@ -13,7 +13,7 @@ function plotcomparison(savestr)
 	figure(figsize=(30,20))
 	PyPlot.hold(true)
 	@show size(alldata)
-	figure(figsize=(20,20))
+	figure(figsize=(30,20))
 	colorcounter = 1.0
 	numDataSets = length(alldata)+0.0
 	

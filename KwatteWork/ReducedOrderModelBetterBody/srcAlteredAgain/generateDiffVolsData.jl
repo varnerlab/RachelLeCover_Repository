@@ -517,86 +517,169 @@ function plotMean(inputstr, n)
 	#push!(alldata, constP)
 	#push!(alldata, varryingP)
 	for j in collect(1:n)
-    data = readdlm(string(inputstr,j,".csv"))
-    push!(alldata,data)
-  end
-	@show size(alldata)
-	#figure(figsize=(20,20))
-	colorcounter = 1.0
-	numDataSets = length(alldata)+0.0
-  #@show alldata
-  forsummary = Array[]
-	for x in alldata
-    for j in collect(1:size(x,2))
-      push!(forsummary,x[:,j])
-    end
+	    data = readdlm(string(inputstr,j,".csv"))
+	    push!(alldata,data)
+	  end
+		@show size(alldata)
+		#figure(figsize=(20,20))
+		colorcounter = 1.0
+		numDataSets = length(alldata)+0.0
+	  #@show alldata
+	  forsummary = Array[]
+		for x in alldata
+	  	  for j in collect(1:size(x,2))
+	    		  push!(forsummary,x[:,j])
+	   	 end
 
-    @show size(x)
-		colorstr = ".2"
-		#@show colorstr
+	   		 @show size(x)
+			colorstr = ".2"
+			#@show colorstr
+		end
+
+	  @show size(forsummary)
+	  means = Array[]
+	  stdevs = Array[]
+	  @show size(forsummary)
+	  speciesofinterest = 1
+	  numthings = 65
+	  k = 2
+		#arrange data into a form that I can use
+	  while (k<=numthings)
+	    usefulindexes = Int[]
+	    for j in collect(1:size(forsummary,1))
+		 if(mod(j,numthings)==k)
+		   push!(usefulindexes,j)
+		 end
+	       end
+	      # currstuff = Array{Array}(size(forsummary[1],1))
+	      currstuff = fill(1.0, size(forsummary[1],1),1)
+	       for idx in usefulindexes
+		 currstuff=hcat(currstuff,forsummary[idx])
+	       end
+	       currmean = mean(currstuff[:,2:end],2)
+	       currstd = std(currstuff[:,2:end],2)
+	       push!(means,currmean)
+	       push!(stdevs, currstd)
+	       k = k+1
+	  end
 
 
+	  #get volume_wound
+		#vol_wound_mean = Array[]
+		#vol_wound_std = Array[]
+		usefulindexes = Int[]
+	 for j in collect(1:size(forsummary,1))
+		 if(mod(j,numthings)==0)
+		   push!(usefulindexes,j)
+		 end
+	end
+	      @show usefulindexes
+	      currstuff = fill(1.0, size(forsummary[1],1),1)
+	       @show size(currstuff)
+	       #@show usefulindexes
+	       for idx in usefulindexes
+		 currstuff=hcat(currstuff,forsummary[idx])
+	       end
+	       #@show (currstuff)
+	       currmean = mean(currstuff[:,2:end],2)
+	       currstd = std(currstuff[:,2:end],2)
+	      # @show (currmean)
+	       vol_wound_mean=currmean
+	       vol_wound_std=currstd
+	 
 
+	figure(figsize=(30,20))
+	t = forsummary[1]
+	colorstr = ".9"
+	 PyPlot.hold(true)
+	 plt[:tight_layout]() 	 #to prevent plots from overlapping
+
+		volumecounter = 1
+		volumeoffset = 56
+		plotcounter = 1
+		j=1
+		upperlim = 64
+	@show vol_wound_mean
+	while(plotcounter<=upperlim)
+		if(mod(plotcounter,8)==0)
+		
+			plt[:subplot](8,8,plotcounter)
+			currindex = volumeoffset+volumecounter
+			@show currindex
+			
+
+			  plt[:tick_params](axis="both", which="major", labelsize=7)
+			  plt[:tick_params](axis="both", which="minor", labelsize=7)
+			  plt[:ticklabel_format](axis="y", useOffset=false)
+			  postive95conf = means[currindex]+1.96.*stdevs[currindex]
+			  negative95conf = means[currindex]-1.96.*stdevs[currindex]
+			#  @show means[currindex]
+			  plot(t,means[currindex] ,linewidth=2.0,color = "k")
+			  fill_between((t), squeeze(negative95conf,2), squeeze(postive95conf,2), color = ".75")
+			  ax[:set_xlim]([0,14])
+#			ax[:set_xticklabels]([])
+#			ax[:set_yticklabels]([])
+#			println("Removed numbering")
+	
+			
+			  plotcounter = plotcounter+1
+			volumecounter = volumecounter+1
+		end
+		 @show j
+		@show plotcounter
+		if(plotcounter==upperlim+1) #since it gets incrimented by 1 in previous loop
+ 				println("got here")
+				plt[:subplot](8,8,upperlim)
+				plt[:tick_params](axis="both", which="major", labelsize=7)
+				  plt[:tick_params](axis="both", which="minor", labelsize=7)
+				  plt[:ticklabel_format](axis="y", useOffset=false)
+				  postive95conf = vol_wound_mean+1.96.*vol_wound_std
+				  negative95conf = vol_wound_mean-1.96.*vol_wound_std
+				#@show size(t), size(vol_wound_mean), size(vol_wound_std)
+				  plot(t,vol_wound_mean ,linewidth=2.0,color = "k")
+				  fill_between((t), squeeze(negative95conf,2), squeeze(postive95conf,2), color = ".75")
+				  ax[:set_xlim]([0,14])
+#				ax[:set_xticklabels]([])
+#				ax[:set_yticklabels]([])
+				println("plotted volume wound")
+				break
+		end
+
+		if(plotcounter>upperlim)
+			break
+		end
+		plt[:subplot](8,8,plotcounter)
+		  plt[:tick_params](axis="both", which="major", labelsize=7)
+		  plt[:tick_params](axis="both", which="minor", labelsize=7)
+		  plt[:ticklabel_format](axis="y", useOffset=false)
+		  postive95conf = means[j]+1.96.*stdevs[j]
+		  negative95conf = means[j]-1.96.*stdevs[j]
+		  plot(t,means[j] ,linewidth=2.0,color = "k")
+		  fill_between((t), squeeze(negative95conf,2), squeeze(postive95conf,2), color = ".75")
+		  ax = gca()
+	
+		  ax[:set_xlim]([0,14])
+#		ax[:set_xticklabels]([])
+#		ax[:set_yticklabels]([])
+		plotcounter = plotcounter+1
+		j = j+1
 	end
 
-  @show size(forsummary)
-  means = Array[]
-  stdevs = Array[]
-  @show size(forsummary)
-  speciesofinterest = 1
-  numthings = 65
-  k = 2
-  while (k<numthings)
-    usefulindexes = Int[]
-    for j in collect(1:size(forsummary,1))
-         if(mod(j,numthings)==k)
-           push!(usefulindexes,j)
-         end
-       end
-      # currstuff = Array{Array}(size(forsummary[1],1))
-      currstuff = fill(1.0, size(forsummary[1],1),1)
-       @show size(currstuff)
-       @show usefulindexes
-       for idx in usefulindexes
-         currstuff=hcat(currstuff,forsummary[idx])
-       end
-       @show size(currstuff)
-       currmean = mean(currstuff[:,2:end],2)
-       currstd = std(currstuff[:,2:end],2)
-       @show size(currmean)
-       push!(means,currmean)
-       push!(stdevs, currstd)
-       k = k+1
-  end
-  #@show size(means)
-figure(figsize=(20,20))
-t = forsummary[1]
-colorstr = ".9"
- PyPlot.hold(true)
- plt[:tight_layout]() 	 #to prevent plots from overlapping
- PyPlot.hold(true)
-plt[:tight_layout]() 	 #to prevent plots from overlapping
-for j in collect(1:56)
-  plt[:subplot](8,7,j)
-  plt[:tick_params](axis="both", which="major", labelsize=7)
-  plt[:tick_params](axis="both", which="minor", labelsize=7)
-  plt[:ticklabel_format](axis="y", useOffset=false)
-  postive95conf = means[j]+1.96.*stdevs[j]
-  negative95conf = means[j]-1.96.*stdevs[j]
-  @show size(t), size(postive95conf)
-  plot(t,means[j] ,linewidth=2.0,color = "k")
-  fill_between((t), squeeze(negative95conf,2), squeeze(postive95conf,2), color = ".75")
-  ax = gca()
-  ax[:set_xlim]([0,14])
-end
+	#remove numbering
+	for j in collect(1:upperlim)
+		plt[:subplot](8,8,j)
+		ax = gca()
+		ax[:set_xticklabels]([])
+		ax[:set_yticklabels]([])
+	end
 
-savefig("DiffereingInitialConcentrationsPretty.pdf")
-  #return forsummary
+	savefig("output/DifferingInitialVolumesPretty.pdf")
+	  #return forsummary
 
 end
 
 function generateAndPlot()
-  inputstr = "output/perturbIC"
+  inputstr = "output/perturbVols"
   generateDiffVolsData(inputstr,100)
   plotcomparison(inputstr,100)
   plotMean(inputstr, 100)

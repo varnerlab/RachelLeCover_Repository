@@ -5,9 +5,9 @@ using DataFrames
 
 function eqns(t,y,PTframe)
 	ydot = Float64[]
-	if(mod(t,.05)==0)
+	#if(mod(t,.05)==0)
 		@show t
-	end
+	#end
 	cnor =y[1]
 	cach = y[2]
 	n1 = y[3]
@@ -296,7 +296,7 @@ function calculateHeartRateHigherFdata(data,lowfdata,params,savestr)
 
 	initialconditions = [(1-N/M)/(1+beta*N/M), N/M,0.0,0.0,90.0]
 	fedeqns(lowFreqt,y) = eqns(lowFreqt,y,data)
-	tout,res = ODE.ode45(fedeqns, initialconditions, lowFreqt, reltol = 1E-2, abstol =1E-2, points=:specified)
+	tout,res = ODE.ode45(fedeqns, initialconditions, lowFreqt, reltol = 6E-2, abstol =1E-3, points=:specified)
 
 
 	Cnor = [a[1] for a in res]

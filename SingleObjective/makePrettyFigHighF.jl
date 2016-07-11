@@ -267,6 +267,8 @@ function makeGraphSingle(data,times, MIMICdata,savestr)
 	xlabel("Time in Seconds", fontsize=18)
 	ylabel("Heart Rate, in BPM", fontsize=18)
 	#legend([p1,p2,p3],["Actual Data", "Using Original Parameters", "Using Optimized Parameters"])
+	ax = gca()
+	ax[:set_ylim]([0,220])
 	savefig(savestr)
 end
 
@@ -356,11 +358,11 @@ function mainforSingleObjectiveHighF()
 	end
 	close(f)
 
-	shuffle!(allpatients)
+	#shuffle!(allpatients)
 	for patientID in allpatients
 		close("all")
 		@show patientID
-		mainoutputdir = "/home/rachel/Documents/optimization/SingleObjective/highFreqFigures/"
+		mainoutputdir = "/home/rachel/Documents/optimization/SingleObjective/highFreqFiguresJul11lowtol/"
 		MIMICdata = generateDataSingleObjHighF(patientID,mainoutputdir)
 		curroutput = string(mainoutputdir, patientID, ".txt")
 		times =getTimes(curroutput)
