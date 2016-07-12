@@ -4,18 +4,20 @@ using DataFrames
 
 function nervous_system(t,y,fsym,fpar)
 	#H0 = 1.67 #beats/sec
-	H0=2.17 #beats/sec, corresponds to resting HR of 80 bpm
+#	H0=2.17 #beats/sec, corresponds to resting HR of 80 bpm
 	#H0 =100.0
-	taunor = .5
-	tauach = .5
-	Mach = .7
-	Mnor = .96
-	#from third line in 2012 paper
-#	taunor =.558
-#	tauach= .509
-#	Mach = .699
-#	Mnor =.963
-#	
+#	taunor = .5
+#	tauach = .5
+#	Mach = .7
+#	Mnor = .96
+	taunor = 8.156
+	tauach=8.156
+	H0 = 1.474
+	Mach = 5.20E-2
+	Mnor = .165
+	
+
+	
 	cnor = y[1]
 	cach = y[2]
 	phi = y[3]
@@ -23,13 +25,6 @@ function nervous_system(t,y,fsym,fpar)
 	dcachdt =(fpar-cach)/tauach
 	dphidt = 1/H0*(1+Mnor*cnor-Mach*cach)
 
-	#heart beat logic
-#	if(phi>1-tol && phi<1+tol)
-#		println("got here")
-#		phi = 0.0
-#		#dphidt = 0.0
-#	end
-	
 	ydot = [dcnordt, dcachdt, dphidt]
 	return ydot
 end
@@ -40,16 +35,15 @@ function baroreflex(t,y,currP)
 	n2=y[2]
 	pbar=y[3]
 	#constants, as givien by Olufsen 2011 in healthy young
-	k1 = 1.5
-	k2 = 1.5
-	tau1 = .5
-	tau2 = 250
-	#from third line in 2012 paper
-#	k1 =.945
-#	k2 = 1.5
-#	tau1 = .896
-#	tau2 = 229
-	
+#	k1 = 1.5
+#	k2 = .5
+#	tau1 = .5
+#	tau2 = 250
+	k1 = 41.139
+	k2 = .5
+	tau1 = 14.062
+	tau2 = 202.925
+
 
 	dpbardt = alpha*(currP-pbar)
 	n = n1+n2+N
@@ -121,9 +115,9 @@ function calculateHR(phiTS, times)
 end
 
 function calculateHR2012(cnor, cach)
-	h0 = 2.17*60;
-	Mach = .7
-	Mnor = .96
+	h0 = 1.474*60;
+	Mach = 5.20E-2
+	Mnor = .165
 	h = h0*(1+Mnor*cnor-Mach*cach)
 	return h
 end

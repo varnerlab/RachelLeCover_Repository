@@ -679,7 +679,7 @@ function plotMean(inputstr, n)
 end
 
 function generateAndPlot()
-  inputstr = "output/perturbVols"
+  inputstr = "output/perturbIC"
   generateDiffVolsData(inputstr,100)
   plotcomparison(inputstr,100)
   plotMean(inputstr, 100)

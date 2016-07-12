@@ -5,7 +5,17 @@ function BalanceEquations(t,x,PROBLEM_DICTIONARY)
     # initialize -
     dxdt_total = ones(1,7)
     
-    # Alias the species -
+
+	for j = 1:length(x)
+		if(isnan(x[j]) || !isfinite(x[j]))
+			println("Found NAN at x $j")
+			@show rate_vector
+			@show kinetic_parameter_vector
+			@show x
+			x[j] = 0.0
+		end
+	end
+	 # Alias the species -
     FII     = x[1]
     FIIa    = x[2]
     PC      = x[3]
@@ -23,33 +33,33 @@ function BalanceEquations(t,x,PROBLEM_DICTIONARY)
 #@show typeof(kinetic_parameter_vector)
 
     # Alias the qualitative factors -
-    TFPI = qualitative_factor_level_vector[1]
-    FV = qualitative_factor_level_vector[2]
-    FVIII = qualitative_factor_level_vector[3]
-    FIX = qualitative_factor_level_vector[4]
-    FX = qualitative_factor_level_vector[5]
-    PL = qualitative_factor_level_vector[6]
+    TFPI = qualitative_factor_level_vector[1]+0.0
+    FV = qualitative_factor_level_vector[2]+0.0
+    FVIII = qualitative_factor_level_vector[3]+0.0
+    FIX = qualitative_factor_level_vector[4]+0.0
+    FX = qualitative_factor_level_vector[5]+0.0
+    PL = qualitative_factor_level_vector[6]+0.0
 
     # Calculate the control vector -
     # Trigger -
-    alpha_trigger_activation = control_parameter_vector[1]
-    order_trigger_activation = control_parameter_vector[2]
-    alpha_trigger_inhibition_APC = control_parameter_vector[3]
-    order_trigger_inhibition_APC = control_parameter_vector[4]
-    alpha_trigger_inhibition_TFPI = control_parameter_vector[5]
-    order_trigger_inhibition_TFPI = control_parameter_vector[6]
+    alpha_trigger_activation = control_parameter_vector[1]+0.0
+    order_trigger_activation = control_parameter_vector[2]+0.0
+    alpha_trigger_inhibition_APC = control_parameter_vector[3]+0.0
+    order_trigger_inhibition_APC = control_parameter_vector[4]+0.0
+    alpha_trigger_inhibition_TFPI = control_parameter_vector[5]+0.0
+    order_trigger_inhibition_TFPI = control_parameter_vector[6]+0.0
     
     # Amplification -
-    alpha_amplification_FIIa = control_parameter_vector[7]
-    order_amplification_FIIa = control_parameter_vector[8]
-    alpha_amplification_APC = control_parameter_vector[9]
-    order_amplification_APC = control_parameter_vector[10]
-    alpha_amplification_TFPI = control_parameter_vector[11]
-    order_amplification_TFPI = control_parameter_vector[12]
+    alpha_amplification_FIIa = control_parameter_vector[7]+0.0
+    order_amplification_FIIa = control_parameter_vector[8]+0.0
+    alpha_amplification_APC = control_parameter_vector[9]+0.0
+    order_amplification_APC = control_parameter_vector[10]+0.0
+    alpha_amplification_TFPI = control_parameter_vector[11]+0.0
+    order_amplification_TFPI = control_parameter_vector[12]+0.0
     
     # APC generation -
-    alpha_shutdown_APC = control_parameter_vector[13]
-    order_shutdown_APC = control_parameter_vector[14]
+    alpha_shutdown_APC = control_parameter_vector[13]+0.0
+    order_shutdown_APC = control_parameter_vector[14]+0.0
     
     # Initiation model -
     initiation_trigger_term = ((alpha_trigger_activation*TRIGGER)^order_trigger_activation)/(1 + ((alpha_trigger_activation*TRIGGER)^order_trigger_activation))
