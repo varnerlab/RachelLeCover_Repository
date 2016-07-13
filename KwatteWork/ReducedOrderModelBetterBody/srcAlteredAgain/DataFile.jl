@@ -151,7 +151,7 @@ push!(initial_condition_array,(1.0/characteristic_concentration)*PC_inital);	#	5
 push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	53	wound APC
 push!(initial_condition_array,(1.0/characteristic_concentration)*ATIII_inital);	#	54	wound ATIII
 push!(initial_condition_array,(1.0/characteristic_concentration)*TM_inital);	#	55	wound TM
-push!(initial_condition_array,(1.0/characteristic_concentration)*0.5);	#	56	wound TRIGGER
+push!(initial_condition_array,(1.0/characteristic_concentration)*0.005);	#	56	wound TRIGGER
 
 #volumes of blood from "Suggested Reference Values For Regional Blood Volumes in Humans"
 #

@@ -9,10 +9,10 @@ function changeVolume(t,Cach,Cnor,V0,compartment_name)
 
 	normalNor = 1075.2*10.0^-15 #mol/L
 	
-	upperBoundAch = .8
-	upperBoundNor = 10E-8
-	lowerBoundAch =.45
-	lowerBoundNor = 5E-8
+	upperBoundAch = .7
+	upperBoundNor = 9E-8
+	lowerBoundAch =.4
+	lowerBoundNor = 6E-8
 
 	norPresent = (Cnor-lowerBoundNor)*normalNor/(10E-116)
 

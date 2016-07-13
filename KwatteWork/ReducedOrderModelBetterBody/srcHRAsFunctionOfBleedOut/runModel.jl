@@ -32,7 +32,7 @@ function runModel()
 	 step=0.02
 	 data_dict = DataFile(tstart, tend, step)
 	 t, x = SolveBalances(tstart, tend, step, data_dict)
-	savestr = "output/HRfofbleedout"
+	savestr = "output/HRfofbleedouttesting"
 	 #Alias the species vector
 	FIIa_vein = x[:, 2]
 	APC_heart = x[:, 11]
@@ -108,67 +108,157 @@ function runModel()
 	 plotcounter = 1
 	 j=1
 	 upperlim = 64
+	offset = 8
+#	while(j<=upperlim)
+#		@show plotcounter
+#		plotcounter = mod(plotcounter,upperlim)
+#		adjustedplotcounter = plotcounter -1
+#		if(mod(plotcounter,8)==0)
+#			plt[:subplot](8,8,plotcounter)
+#			currindex = volumeoffset+volumecounter
 
-	while(plotcounter<=upperlim)
-		adjustedplotcounter = plotcounter -1
-		if(mod(plotcounter,8)==0)
-			plt[:subplot](8,8,plotcounter)
-			currindex = volumeoffset+volumecounter
+#			plt[:tick_params](axis="both", which="major", labelsize=7)
+#			plt[:tick_params](axis="both", which="minor", labelsize=7)
+#			plt[:ticklabel_format](axis="y", useOffset=false)
 
-			plt[:tick_params](axis="both", which="major", labelsize=7)
-			plt[:tick_params](axis="both", which="minor", labelsize=7)
-			plt[:ticklabel_format](axis="y", useOffset=false)
+#			plot(t,x[:,currindex] ,linewidth=2.0,color = "k")
+#			plotcounter = plotcounter+offset
+#			volumecounter = volumecounter+1
+#			adjustedplotcounter = plotcounter -1
+#		end
+#		if(plotcounter>upperlim)
+#			break
+#		end
 
-			plot(t,x[:,currindex] ,linewidth=2.0,color = "k")
-			plotcounter = plotcounter+1
-			volumecounter = volumecounter+1
-			adjustedplotcounter = plotcounter -1
-		end
-		if(plotcounter>upperlim)
+#		plt[:subplot](8,8,plotcounter)
+#		plt[:tick_params](axis="both", which="major", labelsize=7)
+#		plt[:tick_params](axis="both", which="minor", labelsize=7)
+#		plt[:ticklabel_format](axis="y", useOffset=false)
+#		plot(t,x[:,j] ,linewidth=2.0,color = "k")
+#		
+#		plotcounter = plotcounter+offset
+#		j=j+1
+#	end	 
+#	
+#	#make y-axis same for each component 
+#	components = 8
+#	for j in collect(1:64)
+#		plt[:subplot](8,8,j)
+#		ax = gca()
+#		correctedindex = j-1
+##		if(mod(correctedindex,components)==0)
+##			ax[:set_ylim]([0,1400])
+##		elseif(mod(correctedindex,components)==1)
+##			ax[:set_ylim]([0,250])
+##		elseif(mod(correctedindex,components)==2)
+##			ax[:set_ylim]([0,60])
+##		elseif(mod(correctedindex,components)==3)
+##			ax[:set_ylim]([0,20])
+##		elseif(mod(correctedindex,components)==4)
+##			ax[:set_ylim]([0,5000])
+##		elseif(mod(correctedindex,components)==5)
+##			ax[:set_ylim]([10, 60])
+##		elseif(mod(correctedindex,components)==6)
+##			ax[:set_ylim]([0,.2])
+##		elseif(mod(correctedindex,components)==8)
+##			ax[:set_ylim]([0,.2])
+##		end
+
+#		#plt[:subplot](8,8,j)
+#		#ax = gca()
+#		#ax[:set_xticklabels]([])
+#		#ax[:set_yticklabels]([])
+#	end
+	#plot so that factors are rows, organs are columns
+	PyCall.PyDict(matplotlib["rcParams"])["font.sans-serif"] = ["Helvetica"]
+	colnum = 1
+	upperlim = 57
+	while(j<=upperlim)
+		if(colnum >8)
 			break
 		end
 
+		ax = gca()
+			@show plotcounter,colnum
 		plt[:subplot](8,8,plotcounter)
 		plt[:tick_params](axis="both", which="major", labelsize=7)
 		plt[:tick_params](axis="both", which="minor", labelsize=7)
 		plt[:ticklabel_format](axis="y", useOffset=false)
 		plot(t,x[:,j] ,linewidth=2.0,color = "k")
-		
-		plotcounter = plotcounter+1
+
+		#remove axis numbering for columns other than first
+		if(colnum !=1)
+			ax[:set_yticklabels]([])
+		end
+		ax[:set_xticklabels]([])
+		plotcounter = plotcounter+offset
 		j=j+1
-	end	 
-	
-	#make y-axis same for each component 
-	components = 8
+		if(plotcounter>=57)
+			colnum = colnum+1
+			plotcounter = colnum
+		end
+	end
+	plt[:subplot](8,8,56)
+	ax = gca()
+	ax[:set_yticklabels]([])
+	ax[:set_xticklabels]([])	
+
+	plt[:subplot](8,8,49)
+	ax = gca()
+	ax[:set_yticklabels]([collect(-.05:.05:.2)])
+
+	for k in collect(57:64)
+		plt[:subplot](8,8,k)
+		plt[:tick_params](axis="both", which="major", labelsize=7)
+		plt[:tick_params](axis="both", which="minor", labelsize=7)
+		#plt[:ticklabel_format](axis="y", useOffset=false)
+		plot(t,x[:,k] ,linewidth=2.0,color = "k")
+		ax = gca()
+		#ax[:set_xticklabels](collect(0:t[end]))
+
+		if(k >57)
+			ax[:set_yticklabels]([])
+		end
+	end
+
+	#make axis all the same
 	for j in collect(1:64)
 		plt[:subplot](8,8,j)
 		ax = gca()
-		correctedindex = j-1
-		if(mod(correctedindex,components)==0)
+		if j in collect(1:8)
 			ax[:set_ylim]([0,1400])
-		elseif(mod(correctedindex,components)==1)
+		elseif j in collect(9:16)
 			ax[:set_ylim]([0,250])
-		elseif(mod(correctedindex,components)==2)
+		elseif j in collect(17:24)
 			ax[:set_ylim]([0,60])
-		elseif(mod(correctedindex,components)==3)
+		elseif j in collect(25:32)
 			ax[:set_ylim]([0,20])
-		elseif(mod(correctedindex,components)==4)
+		elseif j in collect(33:40)
 			ax[:set_ylim]([0,5000])
-		elseif(mod(correctedindex,components)==5)
+		elseif j in collect(41:48)
 			ax[:set_ylim]([10, 60])
-		elseif(mod(correctedindex,components)==6)
-			ax[:set_ylim]([0,.2])
-		elseif(mod(correctedindex,components)==8)
-			ax[:set_ylim]([0,.2])
+		elseif j in collect(49:56)
+			ax[:set_ylim]([-.05,.2])
+		elseif j in collect(57:64)
+			ax[:set_ylim]([0,3])
 		end
-
-		#plt[:subplot](8,8,j)
-		#ax = gca()
-		#ax[:set_xticklabels]([])
-		#ax[:set_yticklabels]([])
+	end
+	#label colums
+	compartments = ["Veins", "Heart","Lungs", "Arteries", "Kidneys", "Liver","Bulk", "Wound"]
+	for j in collect(1:8)
+		plt[:subplot](8,8,j)
+		title(compartments[j], fontsize=18)
 	end
 
-	savefig(string(savestr,".pdf"))
+	#label rows
+	speciesnames = ["FII", "FIIa", "Protein C", "APC", "ATIII", "TM", "Trigger", "Volume"]
+	counter = 1
+	for j in collect(8:8:64)
+		plt[:subplot](8,8,j)
+		annotate(speciesnames[counter], xy = [1;1], xytext = [1.02,.8], xycoords = "axes fraction", textcoords = "axes fraction", rotation = "vertical", fontsize = 18)
+		counter=counter+1
+	end
+	savefig(string(savestr,".pdf"),bbox_inches="tight")
 
 	 #code to plot compartment volumes, using subplots
 	 figure(figsize=(20,20))
@@ -198,7 +288,7 @@ function runModel()
 	 plot(t, volume_liver)
 	 plt[:ticklabel_format](axis="y", useOffset=false)
 	 #title("volume_liver")
-	 plt[:subplot](3.0,3.0,components)
+	 plt[:subplot](3.0,3.0,7)
 	 plot(t, volume_bulk)
 	 plt[:ticklabel_format](axis="y", useOffset=false)
 	 #title("volume_bulk")

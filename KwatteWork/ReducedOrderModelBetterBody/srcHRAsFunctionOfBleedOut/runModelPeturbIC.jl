@@ -30,7 +30,7 @@ function runModel(savestr)
 	 close("all") #close already open windows
 	#set start time, stop time and step sizes
 	 tstart=0
-	 tend=14
+	 tend=45
 	 step=0.02
 	 data_dict = DataFile(tstart, tend, step)
 	 data_dict["INITIAL_CONDITION_ARRAY"]=perturbInitialConditions(data_dict["INITIAL_CONDITION_ARRAY"],.25)#perturb initial conditions by up 25 percent

@@ -684,3 +684,5 @@ function generateAndPlot()
   plotcomparison(inputstr,100)
   plotMean(inputstr, 100)
 end
+
+generateAndPlot()
