@@ -125,6 +125,6 @@ function plotcomparison(savestr)
 		annotate(speciesnames[counter], xy = [1;1], xytext = [1.02,.8], xycoords = "axes fraction", textcoords = "axes fraction", rotation = "vertical", fontsize = 18)
 		counter=counter+1
 	end
-	savefig(string(savestr,"ComparisonGreyConstHRBlackVarryingPPatient" ,".pdf"))
+	savefig(string(savestr,"ComparisonGreyConstHRBlackVarryingPPatient" ,".pdf"),bbox_inches="tight")
 end
 
