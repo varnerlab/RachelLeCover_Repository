@@ -143,6 +143,8 @@ tdata = fill(1.0,1,2)
 if(t <=0.0+tol)
 	nsprev = [(1-N/M)/(1+beta*N/M), N/M, 0.0];
 	bfprev = [0.0,0.0,90.0];
+	Cnor = .4
+	Cach = 23E-100
 end
 #nextP = P+10^15*eps()
 #Pdata = [P, nextP]
@@ -167,13 +169,13 @@ end
 #end
 bleed_out_rate = data_dictionary["FLOW_PARAMETER_ARRAY"][13]*stroke_volume*beats_per_minute
 beats_per_minute=changeHRBasedOnBleedOut(t,bleed_out_rate)
-
-@show beats_per_minute
+Cnor = changeNorBasedOnHR(t,beats_per_minute)
+Cach = 23E-100
+@show beats_per_minute, Cnor
 
 # Update the stroke volume - 
 stroke_volume = stroke_volume;
-Cnor = .4
-Cach = 23E-100
+
 
 return (beats_per_minute,stroke_volume,Cnor,Cach);
 end;

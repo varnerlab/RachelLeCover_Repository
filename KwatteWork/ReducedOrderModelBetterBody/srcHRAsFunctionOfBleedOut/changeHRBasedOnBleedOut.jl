@@ -19,3 +19,17 @@ function changeHRBasedOnBleedOut(t,bleedoutrate)
 	return HR
 
 end
+
+function changeNorBasedOnHR(t,HR)
+	if HR > 120
+		Cnor = .5+(t-20)/20
+	else
+		Cnor = .5
+	end
+
+	return Cnor
+end
+
+function changeBPBasedOnBleedOut(t,bleed_out_rate)
+	
+end

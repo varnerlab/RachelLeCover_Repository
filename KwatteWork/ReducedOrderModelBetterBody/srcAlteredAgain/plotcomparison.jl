@@ -108,10 +108,10 @@ function plotcomparison()
 		ax = gca()
 			@show plotcounter,colnum
 		plt[:subplot](8,8,plotcounter)
-		plt[:tick_params](axis="both", which="major", labelsize=12)
-		plt[:tick_params](axis="both", which="minor", labelsize=12)
+		plt[:tick_params](axis="both", which="major", labelsize=14)
+		plt[:tick_params](axis="both", which="minor", labelsize=14)
 		#plt[:ticklabel_format](axis="y", useOffset=false)
-		plot(t,x[:,j] ,linewidth=2.0,color = colorstr)
+		plot(t,x[:,j] ,linewidth=.8,color = colorstr)
 
 		#remove axis numbering for columns other than first
 		if(colnum !=1)
@@ -136,12 +136,12 @@ function plotcomparison()
 
 	for k in collect(57:64)
 		plt[:subplot](8,8,k)
-		plt[:tick_params](axis="both", which="major", labelsize=12)
-		plt[:tick_params](axis="both", which="minor", labelsize=12)
+		plt[:tick_params](axis="both", which="major", labelsize=14)
+		plt[:tick_params](axis="both", which="minor", labelsize=14)
 		#plt[:ticklabel_format](axis="y", useOffset=false)
-		plot(t,x[:,k] ,linewidth=2.0,color = colorstr)
+		plot(t,x[:,k] ,linewidth=.8,color = colorstr)
 		ax = gca()
-		#ax[:set_xticklabels](collect(0:t[end]))
+		#ax[:set_xticklabels](collect(0:4:t[end]))
 
 		if(k >57)
 			ax[:set_yticklabels]([])
@@ -160,13 +160,13 @@ function plotcomparison()
 		elseif j in collect(9:16)
 			ax[:set_ylim]([0,600])
 		elseif j in collect(17:24)
-			ax[:set_ylim]([0,60])
+			ax[:set_ylim]([20,60])
 		elseif j in collect(25:32)
-			ax[:set_ylim]([0,20])
+			ax[:set_ylim]([0,10])
 		elseif j in collect(33:40)
-			ax[:set_ylim]([0,5000])
+			ax[:set_ylim]([2000,5000])
 		elseif j in collect(41:48)
-			ax[:set_ylim]([10, 20])
+			ax[:set_ylim]([11, 13])
 		elseif j in collect(49:56)
 			ax[:set_ylim]([-.05,.2])
 		elseif j in collect(57:64)
@@ -180,7 +180,7 @@ function plotcomparison()
 	compartments = ["Veins", "Heart","Lungs", "Arteries", "Kidneys", "Liver","Bulk", "Wound"]
 	for j in collect(1:8)
 		plt[:subplot](8,8,j)
-		title(compartments[j], fontsize=18)
+		title(compartments[j], fontsize=24)
 	end
 
 	#label rows
@@ -188,11 +188,17 @@ function plotcomparison()
 	counter = 1
 	for j in collect(8:8:64)
 		plt[:subplot](8,8,j)
-		annotate(speciesnames[counter], xy = [1;1], xytext = [1.02,.8], xycoords = "axes fraction", textcoords = "axes fraction", rotation = "vertical", fontsize = 18)
+		annotate(speciesnames[counter], xy = [1;1], xytext = [1.02,.8], xycoords = "axes fraction", textcoords = "axes fraction", rotation = "vertical", fontsize = 22)
 		counter=counter+1
 	end
 
-	savefig("ComparisonofTriggerValuesNewLayout.pdf",bbox_inches="tight")
+	for k in collect(1:64)
+		plt[:subplot](8,8,k)
+		PyPlot.locator_params(axis="y",nbins=4 ) #reduce number of ticks
+		#PyPlot.locator_params(axis="x",nbins=5 ) #reduce number of ticks
+	end
+
+	savefig("ComparisonofTriggerValuesNewLayoutBetter.pdf",bbox_inches="tight")
 end
 
 plotcomparison()
