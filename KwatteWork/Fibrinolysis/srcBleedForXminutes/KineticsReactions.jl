@@ -1,6 +1,6 @@
 function KineticsReactions(t,x,data_dictionary)
 
-  # Get the parameters from the data dictionary -
+ # Get the parameters from the data dictionary -
   parameter_array = data_dictionary["kinetic_parameter_array"]
   number_of_rates = data_dictionary["number_of_rates"]
 
@@ -93,6 +93,7 @@ function KineticsReactions(t,x,data_dictionary)
   rate_array[2]   =   k_amplification*FIIa*(FII/(K_FII_amplification + FII));
   rate_array[3]   =   k_APC_formation*TM*(PC/(K_PC_formation + PC));
   rate_array[4]   =   k_inhibition_ATIII*(ATIII)*(FIIa^1.26);
+		#@show k_inhibition_ATIII, ATIII, FIIa
   rate_array[5]   =   (FIIa*k_cat_Fibrinogen*Fibrinogen)/(Km_Fibrinogen+Fibrinogen)                             # Cleavage of fibrinopeptides A and/or B to form fibrin monomer
   rate_array[6]   =   k_fibrin_monomer_association*(Fibrin_monomer^2);                                          # Protofibril formation through association of fibrin monomers
   rate_array[7]   =   k_protofibril_association*(Protofibril^2);                                                # Association of protofibril-protofibril to form fibers

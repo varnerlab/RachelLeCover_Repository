@@ -10,11 +10,11 @@ function Balances(t,x,data_dictionary)
 
   # Call my kinetics function -
   rate_array = KineticsReactions(t,x,data_dictionary)
-  # @show rate_array #currently all zero-why?
+   @show rate_array #currently all zero-why?
 
   # Call my control function -
   control_array = ControlReactions(t,x,data_dictionary)
-	#@show control_array #fine, nonzero
+	@show control_array #fine, nonzero
   # Compute the modified rate -
   rate_array = rate_array.*control_array;
 
@@ -23,6 +23,7 @@ function Balances(t,x,data_dictionary)
   # define the balance equations -
   dxdt_array[1]  = -rate_array[2]-rate_array[1]                    # 1 Prothrombin FII
   dxdt_array[2]  = rate_array[2]+rate_array[1]-rate_array[4]       # 2 thrombin FIIa
+#	@show rate_array[2]+rate_array[1], rate_array[4]
   dxdt_array[3]  = -rate_array[3]                                  # 3 PC
   dxdt_array[4]  = rate_array[3]-rate_array[14]                    # 4 APC
   dxdt_array[5]  = -rate_array[4]                                  # 5 ATIII
@@ -40,5 +41,6 @@ function Balances(t,x,data_dictionary)
   dxdt_array[17] = -rate_array[14]-rate_array[15]-rate_array[16]   # 17 PAI_1
   dxdt_array[18] = 1.0*(rate_array[7]-rate_array[9]-rate_array[17])# 18 Fibers
 
+	@show dxdt_array
   return dxdt_array
 end

@@ -82,24 +82,52 @@ C = float(open(readdlm,"/home/rachel/Desktop/KWateeServer-v1.0/Fibrinolysis/netw
 # Formulate the initial condition array - 
 initial_condition_array = Float64[]
 # ------------------------------------------------------------------------------------------------ #
-FII_initial = 1400.0
-FIIa_initial=0.0
-PC_initial=0.0
-APC_initial = 0.0
-ATIII_initial = 3400.0
-TM_initial = 1.0
-TRIGGER_initial = .5
-Fibrin_initial = 0.0
-Plasmin_initial = 0.0
-Fibrinogen_initial =10000.0
-Plasminogen_initial = 2000.0
-tPA_initial = 8.0
-uPA_initial = 0.0
-Fibrin_monomer_initial = 0.0
-Protofibril_initial = 0.0
-antiplasmin_initial = 1180.0
-PAI_1_initial = .56
-Fiber_initial = 0.0
+#FII_initial = 1400.0
+#FIIa_initial=0.0
+#PC_initial=0.0
+#APC_initial = 0.0
+#ATIII_initial = 3400.0
+#TM_initial = 1.0
+#TRIGGER_initial = .5
+#Fibrin_initial = 0.0
+#Plasmin_initial = 0.0
+#Fibrinogen_initial =10000.0
+#Plasminogen_initial = 2000.0
+#tPA_initial = 8.0
+#uPA_initial = 0.0
+#Fibrin_monomer_initial = 0.0
+#Protofibril_initial = 0.0
+#antiplasmin_initial = 1180.0
+#PAI_1_initial = .56
+#Fiber_initial = 0.0
+dilution_factor = .93
+
+tpa_level = 10.0
+
+FII_initial= 1.4*1000*dilution_factor       # Prothrombin
+FIIa_initial= 0.0*dilution_factor              # Thrombin
+PC_initial= 0.0*1000*dilution_factor       # PC
+APC_initial = 0.0*dilution_factor            # APC
+ATIII_initial= 3.4*1000*dilution_factor       # ATIII
+TM_initial= 0.001*1000*dilution_factor     # TM
+TRIGGER_initial= 0.005*1000*dilution_factor    # Trigger
+
+Fibrin_initial= 0*dilution_factor              # Fibrin
+Plasmin_initial = 0*dilution_factor              # Plasmin
+Fibrinogen_initial= 10.00*1000*dilution_factor    # Fibrinogen
+
+  # Add some error to Plasminogen -
+  plasminogen_mean_level = 1.46
+  #plasminogen_mean_level = sample_gaussian_with_parameters(plasminogen_mean_level,0.1*plasminogen_mean_level)
+
+Plasminogen_initial= plasminogen_mean_level*1000*dilution_factor      # Plasminogen is 2uM plasma level
+tPA_initial = tpa_level*dilution_factor     # tPA
+uPA_initial = 0*dilution_factor             # uPA
+Fibrin_monomer_initial= 0*dilution_factor             # Fibrin monomer
+Protofibril_initial= 0*dilution_factor             # Protofibril
+antiplasmin_initial= 1.18*1000*dilution_factor     # antiplasmin
+PAI_1_initial = 0.00056*1000*dilution_factor  # PAI_1
+Fiber_initial = 0*dilution_factor             # Fiber
 
 push!(initial_condition_array,(1.0/characteristic_concentration)*FII_initial)	#	1	vein FII
 push!(initial_condition_array,(1.0/characteristic_concentration)*FIIa_initial)	#	2	vein FIIa
