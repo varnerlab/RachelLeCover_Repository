@@ -1,0 +1,66 @@
+// ============================================================ //
+// Test model file for the Kwatee PBPK plugin
+// Author: Rachel LeCover
+// Version: 1.0
+// ============================================================ //
+
+// ======================================================================== //
+// Compartment connections -
+#pragma handler_class = VLCGPBPKCompartmentConnectionParserDelegate
+// ======================================================================== //
+
+// Main compartments -
+vein_to_heart,vein,heart,0,inf;
+heart_to_lungs,heart,lungs,0,inf;
+lungs_to_heart,lungs,heart,0,inf;
+heart_to_artery,heart,artery,0,inf;
+
+artery_to_kidney,artery,kidney,0,inf;
+kidney_to_vein,kidney,vein,0,inf;
+
+artery_to_liver,artery,liver,0,inf;
+liver_to_vein,liver,vein,0,inf;
+
+artery_to_bulk,artery,bulk,0,inf;
+bulk_to_vein,bulk,vein,0,inf;
+
+//wound connects to artery
+artery_to_wound,artery,wound,-inf,inf;
+//clearance out of wound
+wound_to_degredation,wound,[],0,inf;
+
+// ======================================================================== //
+// Compartment biochemistry -
+#pragma handler_class = VLCGPBPKCompartmentBiochemistryParserDelegate
+// ======================================================================== //
+//filler reactions
+reaction1,*,[],[],FII,0,inf;
+reaction2,*,[],[],FIIa,0,inf;
+reaction3,*,[],[],PC,0,inf;
+reaction4,*,[],[],APC,0,inf;
+reaction5,*,[],[],ATIII,0,inf;
+reaction6,*,[],[],TM,0,inf;
+reaction7,*,[],[],TRIGGER,0,inf;
+reaction8,*,[],[],Fibrin,0,inf;
+reaction9,*,[],[],Plasmin,0,inf;
+reaction10,*,[],[],Fibrinogen,0,inf;
+reaction11,*,[],[],Plasminogen,0,inf;
+reaction12,*,[],[],tPA,0,inf;
+reaction13,*,[],[],uPA,0,inf;
+reaction14,*,[],[],Fibrin_monomer,0,inf;
+reaction15,*,[],[],Protofibril,0,inf;
+reaction16,*,[],[],antiplasmin,0,inf;
+reaction17,*,[],[],PAI_1,0,inf;
+reaction18,*,[],[],Fiber,0,inf;
+// ======================================================================== //
+// Compartment biochemistry control
+#pragma handler_class = VLCGPBPKCompartmentBiochemistryControlParserDelegate
+// ======================================================================== //
+//activation_of_E1_by_E1,wound,E1,conversion_of_Z1_to_E1_fast,activation;
+// ======================================================================== //
+// Compartment biochemistry control
+#pragma handler_class = VLCGPBPKSpeciesRulesParserDelegate
+// ======================================================================== //
+TM,fixed;
+TRIGGER,fixed;
+

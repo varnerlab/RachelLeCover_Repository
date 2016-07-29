@@ -29,7 +29,7 @@ function Flow(t,x,data_dictionary)
 # Username: rachellecover
 # Type: PBPK-JULIA
 # Version: 1.0
-# Generation timestamp: 05-25-2016 18:14:50
+# Generation timestamp: 07-12-2016 13:08:55
 # 
 # Arguments: 
 # t  - current time 
@@ -131,10 +131,10 @@ default_stroke_volume = data_dictionary["DEFAULT_STROKE_VOLUME"];
 default_flow_parameter_array = data_dictionary["FLOW_PARAMETER_ARRAY"];
 
 # Update the heart rate, and stroke volume - 
-(bpm,stroke_volume,Cnor,Cach) = HeartRate(t,x,default_bpm,default_stroke_volume,data_dictionary);
+(bpm,stroke_volume) = HeartRate(t,x,default_bpm,default_stroke_volume,data_dictionary);
 
 # Update the fraction of cardiac output going to each organ - 
-(flow_parameter_array) = CardiacDistribution(t,x,default_flow_parameter_array,data_dictionary,Cnor,Cach);
+(flow_parameter_array) = CardiacDistribution(t,x,default_flow_parameter_array,data_dictionary);
 
 # Calculate the q_vector - 
 q_vector = Float64[];

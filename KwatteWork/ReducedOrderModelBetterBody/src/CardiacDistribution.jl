@@ -1,5 +1,3 @@
-include("changeVolume.jl")
-
 # ----------------------------------------------------------------------------------- #
 # Copyright (c) 2016 Varnerlab
 # School of Chemical Engineering Purdue University
@@ -23,13 +21,13 @@ include("changeVolume.jl")
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 # ----------------------------------------------------------------------------------- #
-function CardiacDistribution(t,x,default_flow_parameter_array,data_dictionary,Cnor,Cach)
+function CardiacDistribution(t,x,default_flow_parameter_array,data_dictionary)
 # ---------------------------------------------------------------------- #
 # CardiacDistribution.jl was generated using the Kwatee code generation system.
 # Username: rachellecover
 # Type: PBPK-JULIA
 # Version: 1.0
-# Generation timestamp: 05-25-2016 16:51:18
+# Generation timestamp: 07-12-2016 13:08:55
 # 
 # Arguments: 
 # t  - current time 
@@ -110,18 +108,14 @@ APC_wound = x[53];
 ATIII_wound = x[54];
 TM_wound = x[55];
 TRIGGER_wound = x[56];
-
-volume_vein = changeVolume(t,Cach,Cnor,x[57],"volume_vein");
-x[57]=volume_vein;
+volume_vein = x[57];
 volume_heart = x[58];
 volume_lungs = x[59];
-volume_artery =changeVolume(t,Cach,Cnor,x[60],"volume_artery");
-x[60]=volume_artery
+volume_artery = x[60];
 volume_kidney = x[61];
 volume_liver = x[62];
 volume_bulk = x[63];
-volume_wound = changeVolume(t,Cach,Cnor,x[64],"volume_wound");
-x[64]=volume_wound;
+volume_wound = x[64];
 
 # Update the flow parameter array - 
 flow_parameter_array = default_flow_parameter_array

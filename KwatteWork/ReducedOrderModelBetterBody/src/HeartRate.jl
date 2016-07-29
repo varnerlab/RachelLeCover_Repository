@@ -20,8 +20,6 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
-include("OlufsenModel2011calcHR.jl")
-include("helpersToReadData.jl")
 # ----------------------------------------------------------------------------------- #
 function HeartRate(t,x,beats_per_minute,stroke_volume,data_dictionary)
 # ---------------------------------------------------------------------- #
@@ -29,7 +27,7 @@ function HeartRate(t,x,beats_per_minute,stroke_volume,data_dictionary)
 # Username: rachellecover
 # Type: PBPK-JULIA
 # Version: 1.0
-# Generation timestamp: 05-25-2016 16:51:18
+# Generation timestamp: 07-12-2016 13:08:55
 # 
 # Arguments: 
 # t  - current time 
@@ -38,8 +36,7 @@ function HeartRate(t,x,beats_per_minute,stroke_volume,data_dictionary)
 # stoke_volume - stroke volume per beat
 # data_dictionary  - Data dictionary instance (holds model parameters) 
 # ---------------------------------------------------------------------- #
-adjustedt = t*60+180; #need to convert from minutes to seconds
-adjustedtnoshift = t*60.0
+
 # Alias the species vector - 
 # vein
 FII_vein = x[1];
@@ -121,57 +118,11 @@ volume_liver = x[62];
 volume_bulk = x[63];
 volume_wound = x[64];
 
-#filename = "/home/rachel/Documents/modelingHR/LinkedRecordsTimeData10min/s01004-2531-07-20-08-50n"
-#data=getUsefulData(filename)
-#P=getPressureAtSelectedTime(adjustedtnoshift,data)
-#nextP =getPressureAtSelectedTime(adjustedtnoshift+10^15*eps(),data)
-
-
-## Update the beats_per_minute -
-#N = 75.0
-#M = 120.0 
-#beta = 6.0
-
-#tol = 1E-5
-#P0 = 100;
-#nsprev= collect(fill(1.0,1,3))
-#bfprev = collect(fill(1.0,1,3))
-#Pdata = fill(1.0,1,2)
-#tdata = fill(1.0,1,2)
-
-#if(t <=0.0+tol)
-#	nsprev = [(1-N/M)/(1+beta*N/M), N/M, 0.0];
-#	bfprev = [0.0,0.0,90.0];
-#end
-##nextP = P+10^15*eps()
-#Pdata = [P, nextP]
-#tdata = [adjustedt, adjustedt+10^15*eps()]
-
-#@show Pdata, tdata
-
-#beats_per_minute, nsprev[1], nsprev[2], nsprev[3], bfprev[1],bfprev[2],bfprev[3] = calculateHeartRate(Pdata,tdata,nsprev, bfprev)
-#Cnor = nsprev[1]
-#Cach = nsprev[2]
-##@show Cnor, Cach
-##beats_per_minute= beats_per_minute	
-#if(beats_per_minute<0)
-#	println("Something went really wrong-the predicted heart rate was negative.")
-#	quit()
-#end
-
-
-#if(beats_per_minute> 220)
-#	println("Heart rate exceeded maximum. Patient is probably dead.")
-#	beats_per_minute = 220
-#end
-beats_per_minute=100.0;
-
-@show beats_per_minute
+# Update the beats_per_minute - 
+beats_per_minute = beats_per_minute;
 
 # Update the stroke volume - 
 stroke_volume = stroke_volume;
-Cnor = .4
-Cach = 23E-100
 
-return (beats_per_minute,stroke_volume,Cnor,Cach);
+return (beats_per_minute,stroke_volume);
 end;

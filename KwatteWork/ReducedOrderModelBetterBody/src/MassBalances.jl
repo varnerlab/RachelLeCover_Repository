@@ -2,9 +2,6 @@ include("Kinetics.jl");
 include("Control.jl");
 include("Flow.jl");
 include("Dilution.jl");
-#added to run Adis model
-include("BalanceEquations.jl")
-include("CoagulationModelFactory.jl")
 
 # ----------------------------------------------------------------------------------- #
 # Copyright (c) 2016 Varnerlab
@@ -35,7 +32,7 @@ function MassBalances(t,x,dxdt_vector,data_dictionary)
 # Username: rachellecover
 # Type: PBPK-JULIA
 # Version: 1.0
-# Generation timestamp: 05-25-2016 16:51:18
+# Generation timestamp: 07-12-2016 13:08:55
 # 
 # Arguments: 
 # t  - current time 
@@ -54,31 +51,7 @@ idx = find(x->(x<0),x);
 x[idx] = 0.0;
 
 # Call the kinetics function - 
-(calc_rate_vector) = Kinetics(t,x,data_dictionary);
-rate_vector = Float64[]
-number_of_compartments = size(C, 1)
-number_of_species = 7;
-#@show number_of_compartments
-#@show size(calc_rate_vector)
-#to used Adis Model
-for j = 1:number_of_compartments
-	ReducedDict = Dict()
-	upper_index = number_of_species*j
-	lower_index = upper_index-6
-	currx = x[lower_index:upper_index]
-	if (j ==9)
-		#in wound
-		ReducedDict = buildCoagulationModelDictionary(1)
-	else
-		ReducedDict = buildCoagulationModelDictionary(0)
-	end
-	rate_vector_curr = BalanceEquations(t,currx,ReducedDict)
-	#@show rate_vector_curr[3]
-	for item in rate_vector_curr
-		push!(rate_vector, item)
-	end
-end
-
+(rate_vector) = Kinetics(t,x,data_dictionary);
 
 # Call the control function - 
 (rate_vector) = Control(t,x,rate_vector,data_dictionary);

@@ -9,12 +9,12 @@ function changeVolume(t,Cach,Cnor,V0,compartment_name)
 
 	normalNor = 1075.2*10.0^-15 #mol/L
 	
-	upperBoundAch = .62
-	upperBoundNor = 8E-8
-	lowerBoundAch =.61
-	lowerBoundNor = 7E-8
+	upperBoundAch = .8
+	upperBoundNor = 25E-100
+	lowerBoundAch =.45
+	lowerBoundNor = 1e-103
 
-	norPresent = (Cnor-lowerBoundNor)*normalNor/(50E-22)
+	norPresent = (Cnor-lowerBoundNor)*normalNor/(10E-116)
 
 	bloodvolume= 6.234 #in L, from Total blood volume in healthy young and older men
 
@@ -46,19 +46,19 @@ function changeVolume(t,Cach,Cnor,V0,compartment_name)
 		#vasodiliate
 		logCach = log10((Cach-lowerBoundAch)*normalAchPresentMolar)
 		r = S50*logCach+dr
-		println("Vasodilating")
+		#println("Vasodilating")
 	end
 
 	if(Cach<lowerBoundAch)
 		#logCach = log10((Cach-lowerBoundAch)*normalAchPresentMolar)
 		r = dr
 		#r = dr
-		println("vasoconstricting for lack of Ach")
+		#println("vasoconstricting for lack of Ach")
 	end
 
 	if(Cnor >upperBoundNor)
 		#vasoconstrict
-		@show r, norPresent
+		
 		if(contains(compartment_name, "vein"))
 			r = -14.08/(norPresent)+dr
 		elseif(contains(compartment_name, "artery"))
@@ -67,9 +67,7 @@ function changeVolume(t,Cach,Cnor,V0,compartment_name)
 		#use some averaged slope
 			r = -9.25/norPresent+dr
 		end
-		println("Vasoconstricting")
-		@show r
-		
+		#println("Vasoconstricting")
 	end
 
 	if(Cnor < lowerBoundNor)
@@ -84,7 +82,7 @@ function changeVolume(t,Cach,Cnor,V0,compartment_name)
 			r = 9.25/norPresent+dr
 			#r = dr
 		end
-		println("vasodilating for lack of nor")
+		#println("vasodilating for lack of nor")
 		
 	end
 	
@@ -92,7 +90,7 @@ function changeVolume(t,Cach,Cnor,V0,compartment_name)
 		r = dr
 	end
 		V = AcrossSectional*r
-	@show(compartment_name,V0,V,r)
+	#@show(compartment_name,V0,V,r)
 
 	if(V>Vmax)
 		V = Vmax

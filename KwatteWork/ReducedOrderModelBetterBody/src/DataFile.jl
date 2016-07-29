@@ -28,7 +28,7 @@ function DataFile(TSTART,TSTOP,Ts)
 # Username: rachellecover
 # Type: PBPK-JULIA
 # Version: 1.0
-# Generation timestamp: 05-25-2016 18:14:50
+# Generation timestamp: 07-12-2016 13:08:55
 # 
 # Input arguments: 
 # TSTART  - Time start 
@@ -44,19 +44,19 @@ default_beats_per_minute = 100.0;
 default_stroke_volume = 70*(1/1000);
 flow_parameter_array = Float64[]
 # ------------------------------------------------------------------------------------------------ #
-push!(flow_parameter_array,1.0);	# 1	vein_to_heart: vein -> heart
-push!(flow_parameter_array,1.0);	# 2	heart_to_lungs: heart -> lungs
-push!(flow_parameter_array,1.0);	# 3	lungs_to_heart: lungs -> heart
-push!(flow_parameter_array,1.0);	# 4	heart_to_artery: heart -> artery
-push!(flow_parameter_array,0.175);	# 5	artery_to_kidney: artery -> kidney
-push!(flow_parameter_array,0.175);	# 6	kidney_to_vein: kidney -> vein
-push!(flow_parameter_array,0.227);	# 7	artery_to_liver: artery -> liver
-push!(flow_parameter_array,0.227);	# 8	liver_to_vein: artery -> vein
-push!(flow_parameter_array,0.597);	# 9	artery_to_bulk: artery -> bulk
-push!(flow_parameter_array,0.597);	# 10	bulk_to_vein: bulk -> vein
-push!(flow_parameter_array,0.001);	# 11	artery_to_wound: artery -> wound
-push!(flow_parameter_array,0.001);	# 12	artery_to_wound_reverse: wound -> artery
-push!(flow_parameter_array,0.0005);	# 13	wound_to_degredation: wound -> []
+push!(flow_parameter_array,0.0);	# 1	vein_to_heart: vein -> heart
+push!(flow_parameter_array,0.0);	# 2	heart_to_lungs: heart -> lungs
+push!(flow_parameter_array,0.0);	# 3	lungs_to_heart: lungs -> heart
+push!(flow_parameter_array,0.0);	# 4	heart_to_artery: heart -> artery
+push!(flow_parameter_array,0.0);	# 5	artery_to_kidney: artery -> kidney
+push!(flow_parameter_array,0.0);	# 6	kidney_to_vein: kidney -> vein
+push!(flow_parameter_array,0.0);	# 7	artery_to_liver: artery -> liver
+push!(flow_parameter_array,0.0);	# 8	liver_to_vein: liver -> vein
+push!(flow_parameter_array,0.0);	# 9	artery_to_bulk: artery -> bulk
+push!(flow_parameter_array,0.0);	# 10	bulk_to_vein: bulk -> vein
+push!(flow_parameter_array,0.0);	# 11	artery_to_wound: artery -> wound
+push!(flow_parameter_array,0.0);	# 12	artery_to_wound_reverse: wound -> artery
+push!(flow_parameter_array,0.0);	# 13	wound_to_degredation: wound -> []
 # ------------------------------------------------------------------------------------------------ #
 
 # Characteristic variables array - 
@@ -82,86 +82,78 @@ C = float(open(readdlm,"/home/rachel/Desktop/KWateeServer-v1.0/ReducedOrderModel
 # Formulate the initial condition array - 
 initial_condition_array = Float64[];
 # ------------------------------------------------------------------------------------------------ #
-fIIa_inital = 1400
-PC_inital = 60
-ATIII_inital = 5000
-TM_inital=12
-
-push!(initial_condition_array,(1.0/characteristic_concentration)*fIIa_inital);	#	1	vein FII
+push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	1	vein FII
 push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	2	vein FIIa
-push!(initial_condition_array,(1.0/characteristic_concentration)*PC_inital);	#	3	vein PC
+push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	3	vein PC
 push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	4	vein APC
-push!(initial_condition_array,(1.0/characteristic_concentration)*ATIII_inital);	#	5	vein ATIII
-push!(initial_condition_array,(1.0/characteristic_concentration)*TM_inital);	#	6	vein TM
+push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	5	vein ATIII
+push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	6	vein TM
 push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	7	vein TRIGGER
 
-push!(initial_condition_array,(1.0/characteristic_concentration)*fIIa_inital);	#	8	heart FII
+push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	8	heart FII
 push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	9	heart FIIa
-push!(initial_condition_array,(1.0/characteristic_concentration)*PC_inital);	#	10	heart PC
+push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	10	heart PC
 push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	11	heart APC
 push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	12	heart ATIII
 push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	13	heart TM
 push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	14	heart TRIGGER
 
-push!(initial_condition_array,(1.0/characteristic_concentration)*fIIa_inital);	#	15	lungs FII
+push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	15	lungs FII
 push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	16	lungs FIIa
-push!(initial_condition_array,(1.0/characteristic_concentration)*PC_inital);	#	17	lungs PC
+push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	17	lungs PC
 push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	18	lungs APC
 push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	19	lungs ATIII
 push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	20	lungs TM
 push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	21	lungs TRIGGER
 
-push!(initial_condition_array,(1.0/characteristic_concentration)*fIIa_inital);	#	22	artery FII
+push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	22	artery FII
 push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	23	artery FIIa
-push!(initial_condition_array,(1.0/characteristic_concentration)*PC_inital);	#	24	artery PC
+push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	24	artery PC
 push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	25	artery APC
-push!(initial_condition_array,(1.0/characteristic_concentration)*ATIII_inital);	#	26	artery ATIII
-push!(initial_condition_array,(1.0/characteristic_concentration)*TM_inital);	#	27	artery TM
+push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	26	artery ATIII
+push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	27	artery TM
 push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	28	artery TRIGGER
 
-push!(initial_condition_array,(1.0/characteristic_concentration)*fIIa_inital);	#	29	kidney FII
+push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	29	kidney FII
 push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	30	kidney FIIa
-push!(initial_condition_array,(1.0/characteristic_concentration)*PC_inital);	#	31	kidney PC
+push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	31	kidney PC
 push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	32	kidney APC
 push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	33	kidney ATIII
 push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	34	kidney TM
 push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	35	kidney TRIGGER
 
-push!(initial_condition_array,(1.0/characteristic_concentration)*fIIa_inital);	#	36	liver FII
+push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	36	liver FII
 push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	37	liver FIIa
-push!(initial_condition_array,(1.0/characteristic_concentration)*PC_inital);	#	38	liver PC
+push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	38	liver PC
 push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	39	liver APC
 push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	40	liver ATIII
 push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	41	liver TM
 push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	42	liver TRIGGER
 
-push!(initial_condition_array,(1.0/characteristic_concentration)*fIIa_inital);	#	43	bulk FII
+push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	43	bulk FII
 push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	44	bulk FIIa
-push!(initial_condition_array,(1.0/characteristic_concentration)*PC_inital);	#	45	bulk PC
+push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	45	bulk PC
 push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	46	bulk APC
 push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	47	bulk ATIII
 push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	48	bulk TM
 push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	49	bulk TRIGGER
 
-push!(initial_condition_array,(1.0/characteristic_concentration)*fIIa_inital);	#	50	wound FII
+push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	50	wound FII
 push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	51	wound FIIa
-push!(initial_condition_array,(1.0/characteristic_concentration)*PC_inital);	#	52	wound PC
+push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	52	wound PC
 push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	53	wound APC
-push!(initial_condition_array,(1.0/characteristic_concentration)*ATIII_inital);	#	54	wound ATIII
-push!(initial_condition_array,(1.0/characteristic_concentration)*TM_inital);	#	55	wound TM
-push!(initial_condition_array,(1.0/characteristic_concentration)*0.005);	#	56	wound TRIGGER
+push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	54	wound ATIII
+push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	55	wound TM
+push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	56	wound TRIGGER
 
-#volume in L/kg of body weight
-#values for organs from EPA study
-bodymass = 70 #In kg
-push!(initial_condition_array,(1.0/characteristic_volume)*.0514*bodymass);	#	57	vein volume_vein
-push!(initial_condition_array,(1.0/characteristic_volume)*.0047*bodymass/1.03);	#	58	heart volume_heart
-push!(initial_condition_array,(1.0/characteristic_volume)*.0076*bodymass/1.05);	#	59	lungs volume_lungs
-push!(initial_condition_array,(1.0/characteristic_volume)*.0257*bodymass);	#	60	artery volume_artery
-push!(initial_condition_array,(1.0/characteristic_volume)*.0044*bodymass/1.05);	#	61	kidney volume_kidney
-push!(initial_condition_array,(1.0/characteristic_volume)*.0257*bodymass);	#	62	liver volume_liver
-push!(initial_condition_array,(1.0/characteristic_volume)*.88*bodymass);	#	63	bulk volume_bulk
-push!(initial_condition_array,(1.0/characteristic_volume)*.0005*bodymass);	#	64	wound volume_wound
+push!(initial_condition_array,(1.0/characteristic_volume)*1.0);	#	57	vein volume_vein
+push!(initial_condition_array,(1.0/characteristic_volume)*1.0);	#	58	heart volume_heart
+push!(initial_condition_array,(1.0/characteristic_volume)*1.0);	#	59	lungs volume_lungs
+push!(initial_condition_array,(1.0/characteristic_volume)*1.0);	#	60	artery volume_artery
+push!(initial_condition_array,(1.0/characteristic_volume)*1.0);	#	61	kidney volume_kidney
+push!(initial_condition_array,(1.0/characteristic_volume)*1.0);	#	62	liver volume_liver
+push!(initial_condition_array,(1.0/characteristic_volume)*1.0);	#	63	bulk volume_bulk
+push!(initial_condition_array,(1.0/characteristic_volume)*1.0);	#	64	wound volume_wound
 # ------------------------------------------------------------------------------------------------ #
 
 # Formulate the time constant array - 

@@ -351,27 +351,27 @@ push!(species_flow_vector,0.0);
 push!(species_flow_vector,0.0);
 
 # FII_liver ---------- 
-tmp_flow_term = -q_vector[8]*FII_liver+(q_vector[7]*FII_artery);
+tmp_flow_term = -FII_liver+(q_vector[7]*FII_artery);
 push!(species_flow_vector,(1.0/volume_liver)*tmp_flow_term);
 tmp_flow_term = 0;
 
 # FIIa_liver ---------- 
-tmp_flow_term = -q_vector[8]*FIIa_liver+(q_vector[7]*FIIa_artery);
+tmp_flow_term = -FIIa_liver+(q_vector[7]*FIIa_artery);
 push!(species_flow_vector,(1.0/volume_liver)*tmp_flow_term);
 tmp_flow_term = 0;
 
 # PC_liver ---------- 
-tmp_flow_term = -q_vector[8]*PC_liver+(q_vector[7]*PC_artery);
+tmp_flow_term = -PC_liver+(q_vector[7]*PC_artery);
 push!(species_flow_vector,(1.0/volume_liver)*tmp_flow_term);
 tmp_flow_term = 0;
 
 # APC_liver ---------- 
-tmp_flow_term = -q_vector[8]*APC_liver+(q_vector[7]*APC_artery);
+tmp_flow_term = -APC_liver+(q_vector[7]*APC_artery);
 push!(species_flow_vector,(1.0/volume_liver)*tmp_flow_term);
 tmp_flow_term = 0;
 
 # ATIII_liver ---------- 
-tmp_flow_term = -q_vector[8]*ATIII_liver+(q_vector[7]*ATIII_artery);
+tmp_flow_term = -ATIII_liver+(q_vector[7]*ATIII_artery);
 push!(species_flow_vector,(1.0/volume_liver)*tmp_flow_term);
 tmp_flow_term = 0;
 

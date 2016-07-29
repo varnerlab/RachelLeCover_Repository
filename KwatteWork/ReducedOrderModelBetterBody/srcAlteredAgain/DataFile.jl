@@ -5,9 +5,9 @@
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
+# in the Software without restriction, including without limitation the rights 
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
+# copies of the Software, and to permit persons to whom the Software is 
 # furnished to do so, subject to the following conditions:
 #
 # The above copyright notice and this permission notice shall be included in
@@ -24,22 +24,22 @@
 function DataFile(TSTART,TSTOP,Ts)
 # ----------------------------------------------------------------------------------- #
 # DataFile.jl was generated using the Kwatee code generation system.
-# DataFile: Stores model parameters as key - value pairs in a Julia Dict()
+# DataFile: Stores model parameters as key - value pairs in a Julia Dict() 
 # Username: rachellecover
 # Type: PBPK-JULIA
 # Version: 1.0
 # Generation timestamp: 05-25-2016 18:04:41
-#
-# Input arguments:
-# TSTART  - Time start
-# TSTOP  - Time stop
-# Ts - Time step
-#
-# Return arguments:
-# data_dictionary  - Data dictionary instance (holds model parameters)
+# 
+# Input arguments: 
+# TSTART  - Time start 
+# TSTOP  - Time stop 
+# Ts - Time step 
+# 
+# Return arguments: 
+# data_dictionary  - Data dictionary instance (holds model parameters) 
 # ----------------------------------------------------------------------------------- #
 
-# Flow related parameters -
+# Flow related parameters - 
 default_beats_per_minute = 100.0;
 default_stroke_volume = 70*(1/1000);
 flow_parameter_array = Float64[]
@@ -59,7 +59,7 @@ push!(flow_parameter_array,0.0005);	# 12	artery_to_wound_reverse: wound -> arter
 push!(flow_parameter_array,0.0015);	# 13	wound_to_degredation: wound -> []
 # ------------------------------------------------------------------------------------------------ #
 
-# Characteristic variables array -
+# Characteristic variables array - 
 characteristic_variable_array = zeros(4);
 # ------------------------------------------------------------------------------------------------ #
 characteristic_volume = 1.0;
@@ -72,16 +72,14 @@ characteristic_variable_array[3] = characteristic_flow_rate;
 characteristic_variable_array[4] = characteristic_time;
 # ------------------------------------------------------------------------------------------------ #
 
-# Load the stoichiometric matrix -
-#S = float(open(readdlm,"/home/rachel/Desktop/KWateeServer-v1.0/ReducedOrderModelBetterBody/network/Network.dat"));
-S = float(open(readdlm,"../network/Network.dat"));
+# Load the stoichiometric matrix - 
+S = float(open(readdlm,"/home/rachel/Desktop/KWateeServer-v1.0/ReducedOrderModelBetterBody/network/Network.dat"));
 (NSPECIES,NREACTIONS) = size(S);
 
-# Load the stoichiometric matrix -
-#C = float(open(readdlm,"/home/rachel/Desktop/KWateeServer-v1.0/ReducedOrderModelBetterBody/network/Connectivity.dat"));
-C = float(open(readdlm,"../network/Connectivity.dat"));
+# Load the stoichiometric matrix - 
+C = float(open(readdlm,"/home/rachel/Desktop/KWateeServer-v1.0/ReducedOrderModelBetterBody/network/Connectivity.dat"));
 
-# Formulate the initial condition array -
+# Formulate the initial condition array - 
 initial_condition_array = Float64[];
 # ------------------------------------------------------------------------------------------------ #
 fIIa_inital = 1400
@@ -151,7 +149,7 @@ push!(initial_condition_array,(1.0/characteristic_concentration)*PC_inital);	#	5
 push!(initial_condition_array,(1.0/characteristic_concentration)*0.0);	#	53	wound APC
 push!(initial_condition_array,(1.0/characteristic_concentration)*ATIII_inital);	#	54	wound ATIII
 push!(initial_condition_array,(1.0/characteristic_concentration)*TM_inital);	#	55	wound TM
-push!(initial_condition_array,(1.0/characteristic_concentration)*0.005);	#	56	wound TRIGGER
+push!(initial_condition_array,(1.0/characteristic_concentration)*0.5);	#	56	wound TRIGGER
 
 #volumes of blood from "Suggested Reference Values For Regional Blood Volumes in Humans"
 #
@@ -167,7 +165,7 @@ push!(initial_condition_array,(1.0/characteristic_volume)*.41*bloodvolume);	#	63
 push!(initial_condition_array,(1.0/characteristic_volume)*.005*bloodvolume);	#	64	wound volume_wound
 # ------------------------------------------------------------------------------------------------ #
 
-# Formulate the time constant array -
+# Formulate the time constant array - 
 time_constant_array = Float64[];
 # ------------------------------------------------------------------------------------------------ #
 push!(time_constant_array,1.0);	#	1	vein FII
@@ -244,7 +242,7 @@ push!(time_constant_array,1.0);	#	63	bulk volume_bulk
 push!(time_constant_array,1.0);	#	64	wound volume_wound
 # ------------------------------------------------------------------------------------------------ #
 
-# Formulate the rate constant array -
+# Formulate the rate constant array - 
 rate_constant_array = Float64[];
 # ------------------------------------------------------------------------------------------------ #
 # vein
@@ -321,12 +319,12 @@ push!(rate_constant_array,(characteristic_time/characteristic_concentration)*1.0
 
 # ------------------------------------------------------------------------------------------------ #
 
-# Formulate the saturation constant array -
+# Formulate the saturation constant array - 
 saturation_constant_array = zeros(NREACTIONS,NSPECIES);
 # ------------------------------------------------------------------------------------------------ #
 # ------------------------------------------------------------------------------------------------ #
 
-# Formulate control parameter array -
+# Formulate control parameter array - 
 control_parameter_array = zeros(0,2);
 # ------------------------------------------------------------------------------------------------ #
 # vein
@@ -347,7 +345,7 @@ control_parameter_array = zeros(0,2);
 
 # ------------------------------------------------------------------------------------------------ #
 
-# Input concentration array -
+# Input concentration array - 
 input_concentration_array = Float64[]
 # ------------------------------------------------------------------------------------------------ #
 # ------------------------------------------------------------------------------------------------ #

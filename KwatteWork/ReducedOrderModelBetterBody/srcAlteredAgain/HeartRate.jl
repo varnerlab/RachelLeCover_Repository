@@ -164,7 +164,6 @@ end
 #	println("Heart rate exceeded maximum. Patient is probably dead.")
 #	beats_per_minute = 220
 #end
-bleed_out_rate = data_dictionary["FLOW_PARAMETER_ARRAY"][13]
 beats_per_minute=beats_per_minute;
 
 @show beats_per_minute

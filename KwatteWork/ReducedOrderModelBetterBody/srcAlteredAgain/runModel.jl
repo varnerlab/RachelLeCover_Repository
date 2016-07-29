@@ -32,7 +32,7 @@ function runModel()
 	 step=0.02
 	 data_dict = DataFile(tstart, tend, step)
 	 t, x = SolveBalances(tstart, tend, step, data_dict)
-	savestr = "output/constantvolumewound16mintrigerpoint005"
+	savestr = "output/constantvolumewound16mintrigerpoint5"
 	 #Alias the species vector
 	FIIa_vein = x[:, 2]
 	APC_heart = x[:, 11]
