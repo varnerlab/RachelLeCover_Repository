@@ -978,7 +978,7 @@ function plotFractionActiveThrombin(inputstr, n)
 	axis([0,15,0,350])
 	xlabel("Time, in minutes", fontsize = 14)
 	ylabel("Thrombin Concentration in Wound Compartment (nM)", fontsize = 14)
-	savefig("output/ThrombinConcentration15min.pdf", bbox_inches="tight")
+	savefig("output/ThrombinConcentration15min.pdf")
 	
 
 end
