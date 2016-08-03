@@ -40,23 +40,25 @@ function DataFile(TSTART,TSTOP,Ts)
 # ----------------------------------------------------------------------------------- #
 
 # Flow related parameters - 
-default_beats_per_minute = 100.0
+default_beats_per_minute = 100.0/60.0 #actually want beats per second.
 default_stroke_volume = 70*(1/1000)
 flow_parameter_array = Float64[]
 # ------------------------------------------------------------------------------------------------ #
-push!(flow_parameter_array,1.0)	# 1	vein_to_heart: vein -> heart
-push!(flow_parameter_array,1.0)	# 2	heart_to_lungs: heart -> lungs
-push!(flow_parameter_array,1.0)	# 3	lungs_to_heart: lungs -> heart
-push!(flow_parameter_array,1.0)	# 4	heart_to_artery: heart -> artery
+push!(flow_parameter_array,1.0)	 #1	vein_to_heart: vein -> heart
+push!(flow_parameter_array,1.0)	 #2	heart_to_lungs: heart -> lungs
+push!(flow_parameter_array,1.0)	 #3	lungs_to_heart: lungs -> heart
+push!(flow_parameter_array,1.0)	 #4	heart_to_artery: heart -> artery
 push!(flow_parameter_array,0.175)	# 5	artery_to_kidney: artery -> kidney
-push!(flow_parameter_array,0.175)	# 6	kidney_to_vein: kidney -> vein
-push!(flow_parameter_array,0.227)	# 7	artery_to_liver: artery -> liver
-push!(flow_parameter_array,0.227)	# 8	liver_to_vein: artery -> vein
-push!(flow_parameter_array,0.597)	# 9	artery_to_bulk: artery -> bulk
-push!(flow_parameter_array,0.598)	# 10	bulk_to_vein: bulk -> vein
-push!(flow_parameter_array,0.002)	# 11	artery_to_wound: artery -> wound
-push!(flow_parameter_array,0.0005)	# 12	artery_to_wound_reverse: wound -> artery
-push!(flow_parameter_array,0.0015)	# 13	wound_to_degredation: wound -> []
+push!(flow_parameter_array,0.175)	 #6	kidney_to_vein: kidney -> vein
+push!(flow_parameter_array,0.227)	 #7	artery_to_liver: artery -> liver
+push!(flow_parameter_array,0.227)	 #8	liver_to_vein: artery -> vein
+push!(flow_parameter_array,0.597)	 #9	artery_to_bulk: artery -> bulk
+push!(flow_parameter_array,0.598)	 #10	bulk_to_vein: bulk -> vein
+push!(flow_parameter_array,0.002)	 #11	artery_to_wound: artery -> wound
+push!(flow_parameter_array,0.0005)	 #12	artery_to_wound_reverse: wound -> artery
+push!(flow_parameter_array,0.0015)	 #13	wound_to_degredation: wound -> []
+
+#flow_parameter_array = zeros(1,13)
 # ------------------------------------------------------------------------------------------------ #
 
 # Characteristic variables array - 
@@ -84,52 +86,52 @@ C = float(open(readdlm, "/home/rachel/Documents/work/KwatteWork/Fibrinolysis/net
 # Formulate the initial condition array - 
 initial_condition_array = Float64[]
 # ------------------------------------------------------------------------------------------------ #
-#FII_initial = 1400.0
-#FIIa_initial=0.0
-#PC_initial=0.0
-#APC_initial = 0.0
-#ATIII_initial = 3400.0
-#TM_initial = 1.0
-#TRIGGER_initial = .5
-#Fibrin_initial = 0.0
-#Plasmin_initial = 0.0
-#Fibrinogen_initial =10000.0
-#Plasminogen_initial = 2000.0
-#tPA_initial = 8.0
-#uPA_initial = 0.0
-#Fibrin_monomer_initial = 0.0
-#Protofibril_initial = 0.0
-#antiplasmin_initial = 1180.0
-#PAI_1_initial = .56
-#Fiber_initial = 0.0
+FII_initial = 1400.0
+FIIa_initial=0.0
+PC_initial=60.0
+APC_initial = 0.0
+ATIII_initial = 3400.0
+TM_initial = 1.0
+TRIGGER_initial = 5.0
+Fibrin_initial = 0.0
+Plasmin_initial = 0.0
+Fibrinogen_initial =10000.0
+Plasminogen_initial = 2000.0
+tPA_initial = 8.0
+uPA_initial = 0.0
+Fibrin_monomer_initial = 0.0
+Protofibril_initial = 0.0
+antiplasmin_initial = 1180.0
+PAI_1_initial = .56
+Fiber_initial = 0.0
 dilution_factor = .93
 
 tpa_level = 10.0
 
-FII_initial= 1.4*1000*dilution_factor       # Prothrombin
-FIIa_initial= 0.0*dilution_factor              # Thrombin
-PC_initial= 0.0*1000*dilution_factor       # PC
-APC_initial = 0.0*dilution_factor            # APC
-ATIII_initial= 3.4*1000*dilution_factor       # ATIII
-TM_initial= 0.001*1000*dilution_factor     # TM
-TRIGGER_initial= 0.005*1000*dilution_factor    # Trigger
+#FII_initial= 1.4*1000*dilution_factor       # Prothrombin
+#FIIa_initial= 0.0*dilution_factor              # Thrombin
+#PC_initial= 0.0*1000*dilution_factor       # PC
+#APC_initial = 0.0*dilution_factor            # APC
+#ATIII_initial= 3.4*1000*dilution_factor       # ATIII
+#TM_initial= 0.001*1000*dilution_factor     # TM
+#TRIGGER_initial= 0.005*1000*dilution_factor    # Trigger
 
-Fibrin_initial= 0*dilution_factor              # Fibrin
-Plasmin_initial = 0*dilution_factor              # Plasmin
-Fibrinogen_initial= 10.00*1000*dilution_factor    # Fibrinogen
+#Fibrin_initial= 0*dilution_factor              # Fibrin
+#Plasmin_initial = 0*dilution_factor              # Plasmin
+#Fibrinogen_initial= 10.00*1000*dilution_factor    # Fibrinogen
 
-  # Add some error to Plasminogen -
-  plasminogen_mean_level = 1.46
-  #plasminogen_mean_level = sample_gaussian_with_parameters(plasminogen_mean_level,0.1*plasminogen_mean_level)
+#  # Add some error to Plasminogen -
+#  plasminogen_mean_level = 1.46
+#  #plasminogen_mean_level = sample_gaussian_with_parameters(plasminogen_mean_level,0.1*plasminogen_mean_level)
 
-Plasminogen_initial= plasminogen_mean_level*1000*dilution_factor      # Plasminogen is 2uM plasma level
-tPA_initial = tpa_level*dilution_factor     # tPA
-uPA_initial = 0*dilution_factor             # uPA
-Fibrin_monomer_initial= 0*dilution_factor             # Fibrin monomer
-Protofibril_initial= 0*dilution_factor             # Protofibril
-antiplasmin_initial= 1.18*1000*dilution_factor     # antiplasmin
-PAI_1_initial = 0.00056*1000*dilution_factor  # PAI_1
-Fiber_initial = 0*dilution_factor             # Fiber
+#Plasminogen_initial= plasminogen_mean_level*1000*dilution_factor      # Plasminogen is 2uM plasma level
+#tPA_initial = tpa_level*dilution_factor     # tPA
+#uPA_initial = 0*dilution_factor             # uPA
+#Fibrin_monomer_initial= 0*dilution_factor             # Fibrin monomer
+#Protofibril_initial= 0*dilution_factor             # Protofibril
+#antiplasmin_initial= 1.18*1000*dilution_factor     # antiplasmin
+#PAI_1_initial = 0.00056*1000*dilution_factor  # PAI_1
+#Fiber_initial = 0*dilution_factor             # Fiber
 
 push!(initial_condition_array,(1.0/characteristic_concentration)*FII_initial)	#	1	vein FII
 push!(initial_condition_array,(1.0/characteristic_concentration)*FIIa_initial)	#	2	vein FIIa

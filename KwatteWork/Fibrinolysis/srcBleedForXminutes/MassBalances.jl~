@@ -30,8 +30,8 @@ include("readParameters.jl")
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 # ----------------------------------------------------------------------------------- #
-#function MassBalances(t,x,dxdt_vector,data_dictionary)
-function MassBalances(t,x,data_dictionary)
+function MassBalances(t,x,dxdt_vector,data_dictionary)
+#function MassBalances(t,x,data_dictionary)
 # ---------------------------------------------------------------------- #
 # MassBalances.jl was generated using the Kwatee code generation system.
 # Username: rachellecover
@@ -97,7 +97,7 @@ tmp_dvdt_vector = C*q_vector;
 (dilution_terms_vector) = Dilution(t,x,tmp_dvdt_vector,data_dictionary);
 
 #for ODE
-dxdt_vector = similar(x)
+#dxdt_vector = similar(x)
 
 # Encode the biochemical balance equations as a matrix vector product - 
 tmp_vector = flow_terms_vector + S*rate_vector - dilution_terms_vector;

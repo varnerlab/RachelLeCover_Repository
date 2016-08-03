@@ -28,8 +28,8 @@ function runModel()
 	 close("all") #close already open windows
 	#set start time, stop time and step sizes
 	 tstart=0
-	 tend=10
-	 step=.0001
+	 tend=60
+	 step=1
 	 data_dict = DataFile(tstart, tend, step)
 	 t, x = SolveBalances(tstart, tend, step, data_dict)
 #	@show size(x)

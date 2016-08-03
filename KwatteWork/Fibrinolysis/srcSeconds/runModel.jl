@@ -28,8 +28,8 @@ function runModel()
 	 close("all") #close already open windows
 	#set start time, stop time and step sizes
 	 tstart=0
-	 tend=10
-	 step=.0001
+	 tend=3600
+	 step=1.0
 	 data_dict = DataFile(tstart, tend, step)
 	 t, x = SolveBalances(tstart, tend, step, data_dict)
 #	@show size(x)
@@ -1058,6 +1058,7 @@ function runModel()
 #	 title("Fiber_heart" ,fontsize=7)
 
 	figure(figsize=(40,20))
+	#counter = 1
 	for j in collect(1:8*18)
 		 plt[:subplot](8,18,j)
 		 plt[:tick_params](axis="both", which="major", labelsize=7)
@@ -1065,8 +1066,10 @@ function runModel()
 		 plt[:ticklabel_format](axis="y", useOffset=false)
 		 currx = [a[j] for a in x]
 		 plot(t, currx ,linewidth=2.0,"k")
+		#counter = counter+1
 	end
-	savefig("output/AllSpeciesHorribleLayoutminStopBleedingSlowlyAt15UsingDilutedInitialValuesUsingSundials.pdf")
+	#plt[:tight_layout]() 
+	savefig("output/FlowOn3600s.pdf")
 
 	 #code to plot compartment volumes, using subplots
 #	 figure(figsize=(20,20))

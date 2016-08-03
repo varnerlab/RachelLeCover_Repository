@@ -79,7 +79,11 @@ for j = 1:number_of_compartments
 	 bestparams = readParameters(pathToFile)
 	 ReducedDict= setParameters(bestparams,ReducedDict)
 	#@show ReducedDict
-	rate_vector_curr = Balances(t*60.0,currx,ReducedDict) #need to convert time into seconds
+	if(j == 8)
+		rate_vector_curr = Balances(t,currx,ReducedDict) #need to convert time into seconds
+	else
+		rate_vector_curr = zeros(1,18)
+	end
 	#@show rate_vector_curr
 	for item in rate_vector_curr
 		push!(rate_vector, item)

@@ -23,7 +23,7 @@ function Balances(t,x,data_dictionary)
   # define the balance equations -
   dxdt_array[1]  = -rate_array[2]-rate_array[1]                    # 1 Prothrombin FII
   dxdt_array[2]  = rate_array[2]+rate_array[1]-rate_array[4]       # 2 thrombin FIIa
-	@show t, rate_array[2],rate_array[1], rate_array[4]
+	#@show t, rate_array[2],rate_array[1], rate_array[4]
   dxdt_array[3]  = -rate_array[3]                                  # 3 PC
   dxdt_array[4]  = rate_array[3]-rate_array[14]                    # 4 APC
   dxdt_array[5]  = -rate_array[4]                                  # 5 ATIII

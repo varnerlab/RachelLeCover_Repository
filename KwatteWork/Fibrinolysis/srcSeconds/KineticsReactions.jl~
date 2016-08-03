@@ -83,7 +83,6 @@ function KineticsReactions(t,x,data_dictionary)
   F= Fibrin + Fiber;
   k_cat_plasminogen_tPA = k_cat_plasminogen_Fibrin_tPA*(F)/(K_plasminogen_Fibrin_tPA+F);
   Km_plasminogen_tPA = Km_plasminogen_Fibrin_tPA*(Ka_plasminogen_Fibrin_tPA+F)/(K_plasminogen_Fibrin_tPA+F);
-
   # k_cat_plasminogen_tPA=k_cat_plasminogen_Fibrin_tPA
   # Km_plasminogen_tPA=Km_plasminogen_Fibrin_tPA
 

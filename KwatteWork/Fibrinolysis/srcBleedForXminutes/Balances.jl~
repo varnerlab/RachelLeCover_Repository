@@ -41,6 +41,6 @@ function Balances(t,x,data_dictionary)
   dxdt_array[17] = -rate_array[14]-rate_array[15]-rate_array[16]   # 17 PAI_1
   dxdt_array[18] = 1.0*(rate_array[7]-rate_array[9]-rate_array[17])# 18 Fibers
 
-	#@show dxdt_array
+	@show dxdt_array
   return dxdt_array
 end

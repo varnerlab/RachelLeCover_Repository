@@ -83,14 +83,13 @@ function KineticsReactions(t,x,data_dictionary)
   F= Fibrin + Fiber;
   k_cat_plasminogen_tPA = k_cat_plasminogen_Fibrin_tPA*(F)/(K_plasminogen_Fibrin_tPA+F);
   Km_plasminogen_tPA = Km_plasminogen_Fibrin_tPA*(Ka_plasminogen_Fibrin_tPA+F)/(K_plasminogen_Fibrin_tPA+F);
-
   # k_cat_plasminogen_tPA=k_cat_plasminogen_Fibrin_tPA
   # Km_plasminogen_tPA=Km_plasminogen_Fibrin_tPA
 
   # Formulate the kinetic rates -
   rate_array      =   zeros(number_of_rates)
   rate_array[1]   =   (k_trigger*TRIGGER*(FII/(K_FII_trigger + FII)))*delay_term
-	@show k_trigger, TRIGGER, FII, K_FII_trigger, delay_term
+	#@show k_trigger, TRIGGER, FII, K_FII_trigger, delay_term
   rate_array[2]   =   k_amplification*FIIa*(FII/(K_FII_amplification + FII));
   rate_array[3]   =   k_APC_formation*TM*(PC/(K_PC_formation + PC));
   rate_array[4]   =   k_inhibition_ATIII*(ATIII)*(FIIa^1.26);

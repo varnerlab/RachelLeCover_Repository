@@ -73,13 +73,11 @@ characteristic_variable_array[4] = characteristic_time
 # ------------------------------------------------------------------------------------------------ #
 
 # Load the stoichiometric matrix - 
-#S = float(open(readdlm,"/home/rachel/Desktop/KWateeServer-v1.0/Fibrinolysis/network/Network.dat"))
-S = float(open(readdlm, "/home/rachel/Documents/work/KwatteWork/Fibrinolysis/network/Network.dat"))
+S = float(open(readdlm,"/home/rachel/Desktop/KWateeServer-v1.0/Fibrinolysis/network/Network.dat"))
 (NSPECIES,NREACTIONS) = size(S)
 
 # Load the stoichiometric matrix - 
-#C = float(open(readdlm,"/home/rachel/Desktop/KWateeServer-v1.0/Fibrinolysis/network/Connectivity.dat"))
-C = float(open(readdlm, "/home/rachel/Documents/work/KwatteWork/Fibrinolysis/network/Connectivity.dat"))
+C = float(open(readdlm,"/home/rachel/Desktop/KWateeServer-v1.0/Fibrinolysis/network/Connectivity.dat"))
 
 # Formulate the initial condition array - 
 initial_condition_array = Float64[]
