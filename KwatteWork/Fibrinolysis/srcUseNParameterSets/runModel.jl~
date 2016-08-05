@@ -28,7 +28,7 @@ function runModel()
 	 close("all") #close already open windows
 	#set start time, stop time and step sizes
 	 tstart=0
-	 tend=3600
+	 tend=1000
 	 step=1.0
 	 data_dict = DataFile(tstart, tend, step)
 	 t, x = SolveBalances(tstart, tend, step, data_dict)
@@ -1069,7 +1069,7 @@ function runModel()
 		#counter = counter+1
 	end
 	#plt[:tight_layout]() 
-	savefig("output/Testing.pdf")
+	savefig("output/FlowOn3600s.pdf")
 
 	 #code to plot compartment volumes, using subplots
 #	 figure(figsize=(20,20))

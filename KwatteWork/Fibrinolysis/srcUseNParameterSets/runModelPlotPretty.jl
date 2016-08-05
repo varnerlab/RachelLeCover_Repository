@@ -82,7 +82,7 @@ function runModelPlotPretty()
 		elseif j in collect(129:136)#PAI_1
 			ax[:set_ylim]([-.1,.6])
 		elseif j in collect(137:144)
-			ax[:set_ylim]([0,2000])
+			ax[:set_ylim]([0,4000])
 		end
 	end
 
@@ -102,5 +102,5 @@ function runModelPlotPretty()
 		annotate(speciesnames[counter], xy = [1;1], xytext = [1.02,.8], xycoords = "axes fraction", textcoords = "axes fraction", rotation = "vertical", fontsize = 7)
 		counter=counter+1
 	end
-	savefig(string("output/PrettyLayoutFlowOnBestParams",".pdf"),bbox_inches="tight")
+	savefig(string("output/PrettyLayoutFlowOnBestParamsPatchedProteinC",".pdf"),bbox_inches="tight")
 end

@@ -75,15 +75,15 @@ for j = 1:number_of_compartments
 	#@show ic_arr
 	ReducedDict= DataFileReactions(ic_arr)
 	#read in best parameters
-	 pathToFile = "/home/rachel/Documents/Fibrinolysis_model_julia/src/bestparams.txt"
+	 pathToFile = "/home/rachel/Documents/Fibrinolysis_model_julia/src/evoqus/global_best_parameter_set.dat"
 	 bestparams = readParameters(pathToFile)
 	 ReducedDict= setParameters(bestparams,ReducedDict)
 	#@show ReducedDict
-	#if(j == 8)
+	if(j == 8)
 		rate_vector_curr = Balances(t,currx,ReducedDict) #need to convert time into seconds
-	#else
-		#rate_vector_curr = zeros(1,18)
-	#end
+	else
+		rate_vector_curr = zeros(1,18)
+	end
 	#@show rate_vector_curr
 	for item in rate_vector_curr
 		push!(rate_vector, item)

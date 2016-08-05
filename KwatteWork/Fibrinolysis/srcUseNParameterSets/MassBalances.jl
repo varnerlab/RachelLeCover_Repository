@@ -31,7 +31,7 @@ include("readParameters.jl")
 # THE SOFTWARE.
 # ----------------------------------------------------------------------------------- #
 #function MassBalances(t,x,dxdt_vector,data_dictionary)
-function MassBalances(t,x,data_dictionary)
+function MassBalances(t,x,data_dictionary,set_number)
 # ---------------------------------------------------------------------- #
 # MassBalances.jl was generated using the Kwatee code generation system.
 # Username: rachellecover
@@ -75,9 +75,10 @@ for j = 1:number_of_compartments
 	#@show ic_arr
 	ReducedDict= DataFileReactions(ic_arr)
 	#read in best parameters
-	 pathToFile = "/home/rachel/Documents/Fibrinolysis_model_julia/src/bestparams.txt"
-	 bestparams = readParameters(pathToFile)
-	 ReducedDict= setParameters(bestparams,ReducedDict)
+	 pathToFile = "/home/rachel/Documents/Fibrinolysis_model_julia/src/best10params.txt"
+	 currparams = readParameters(pathToFile,set_number)
+	 ReducedDict= setParameters(currparams,ReducedDict)
+	#ReducedDict = patchParameters(ReducedDict)
 	#@show ReducedDict
 	#if(j == 8)
 		rate_vector_curr = Balances(t,currx,ReducedDict) #need to convert time into seconds

@@ -40,7 +40,7 @@ function Flow(t,x,data_dictionary)
 # data_dictionary  - Data dictionary instance (holds model parameters) 
 # ---------------------------------------------------------------------- #
 stoptime = 15# stop bleeding after 30 minutes
-data_dictionary=stopBleeding(t,stoptime,data_dictionary)
+#data_dictionary=stopBleeding(t,stoptime,data_dictionary)
 #data_dictionary=stopBleedingSlowly(t,stoptime,data_dictionary)
 
 
@@ -233,7 +233,6 @@ default_flow_parameter_array = data_dictionary["FLOW_PARAMETER_ARRAY"];
 # Calculate the q_vector - 
 q_vector = Float64[];
 cardiac_output = (1.0/characteristic_flow_rate)*bpm*stroke_volume;
-#@show cardiac_output, bpm, stroke_volume
 
 # 1 vein_to_heart
 tmp_flow_rate = cardiac_output*flow_parameter_array[1];

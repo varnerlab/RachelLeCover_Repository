@@ -44,21 +44,21 @@ default_beats_per_minute = 100.0/60.0 #actually want beats per second.
 default_stroke_volume = 70*(1/1000)
 flow_parameter_array = Float64[]
 # ------------------------------------------------------------------------------------------------ #
-push!(flow_parameter_array,1.0)	 #1	vein_to_heart: vein -> heart
-push!(flow_parameter_array,1.0)	 #2	heart_to_lungs: heart -> lungs
-push!(flow_parameter_array,1.0)	 #3	lungs_to_heart: lungs -> heart
-push!(flow_parameter_array,1.0)	 #4	heart_to_artery: heart -> artery
-push!(flow_parameter_array,0.175)	# 5	artery_to_kidney: artery -> kidney
-push!(flow_parameter_array,0.175)	 #6	kidney_to_vein: kidney -> vein
-push!(flow_parameter_array,0.227)	 #7	artery_to_liver: artery -> liver
-push!(flow_parameter_array,0.227)	 #8	liver_to_vein: artery -> vein
-push!(flow_parameter_array,0.597)	 #9	artery_to_bulk: artery -> bulk
-push!(flow_parameter_array,0.598)	 #10	bulk_to_vein: bulk -> vein
-push!(flow_parameter_array,0.002)	 #11	artery_to_wound: artery -> wound
-push!(flow_parameter_array,0.0005)	 #12	artery_to_wound_reverse: wound -> artery
-push!(flow_parameter_array,0.0015)	 #13	wound_to_degredation: wound -> []
+#push!(flow_parameter_array,1.0)	 #1	vein_to_heart: vein -> heart
+#push!(flow_parameter_array,1.0)	 #2	heart_to_lungs: heart -> lungs
+#push!(flow_parameter_array,1.0)	 #3	lungs_to_heart: lungs -> heart
+#push!(flow_parameter_array,1.0)	 #4	heart_to_artery: heart -> artery
+#push!(flow_parameter_array,0.175)	# 5	artery_to_kidney: artery -> kidney
+#push!(flow_parameter_array,0.175)	 #6	kidney_to_vein: kidney -> vein
+#push!(flow_parameter_array,0.227)	 #7	artery_to_liver: artery -> liver
+#push!(flow_parameter_array,0.227)	 #8	liver_to_vein: artery -> vein
+#push!(flow_parameter_array,0.597)	 #9	artery_to_bulk: artery -> bulk
+#push!(flow_parameter_array,0.598)	 #10	bulk_to_vein: bulk -> vein
+#push!(flow_parameter_array,0.002)	 #11	artery_to_wound: artery -> wound
+#push!(flow_parameter_array,0.0005)	 #12	artery_to_wound_reverse: wound -> artery
+#push!(flow_parameter_array,0.0015)	 #13	wound_to_degredation: wound -> []
 
-#flow_parameter_array = zeros(1,13)
+flow_parameter_array = zeros(1,13)
 # ------------------------------------------------------------------------------------------------ #
 
 # Characteristic variables array - 
@@ -66,7 +66,7 @@ characteristic_variable_array = zeros(4)
 # ------------------------------------------------------------------------------------------------ #
 characteristic_volume = 1.0
 characteristic_concentration = 1.0
-characteristic_flow_rate = default_beats_per_minute*default_stroke_volume*60.0
+characteristic_flow_rate = default_beats_per_minute*default_stroke_volume
 characteristic_time = characteristic_volume/characteristic_flow_rate
 characteristic_variable_array[1] = characteristic_volume
 characteristic_variable_array[2] = characteristic_concentration
