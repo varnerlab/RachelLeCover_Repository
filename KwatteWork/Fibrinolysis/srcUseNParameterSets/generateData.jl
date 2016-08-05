@@ -13,7 +13,7 @@ function generateData(num_param_sets)
 		 data_dict = DataFile(tstart, tend, step)
 		 t, x = SolveBalances(tstart, tend, step, data_dict,j)
 		@show size(x)
-		outputfilename = string("output/ResParamSet05Aug", j, ".txt")
+		outputfilename = string("output/ResPatchedSetSeedParamSet", j, ".txt")
 		writedlm(outputfilename, x)
 	end
 end
@@ -230,6 +230,6 @@ function ReadAndPlotWoundAvg(filename, num_param_sets)
 		title(speciesnames[plotcounter], fontsize = 14)
 		plotcounter = plotcounter+1
 		end
-	savefig("output/PrettyUsing10BestParamSetsInWound.pdf")
+	savefig("output/PrettyUsing10BestParamSetsInWoundPatchedSetSeed.pdf")
 	#return forsummary
 end

@@ -52,7 +52,8 @@ initial_condition_vector = data_dictionary["INITIAL_CONDITION_ARRAY"];
 #fbalances(t,y,ydot) = MassBalances(t,y,ydot,data_dictionary);
 #X = Sundials.cvode(fbalances,initial_condition_vector,TSIM,reltol=1e-4,abstol=1e-8);
 fbalances(TSIM,y)=MassBalances(TSIM,y,data_dictionary,set_number)
-TSIM,X=ODE.ode23s(fbalances,initial_condition_vector,TSIM, points=:specified,reltol=1e-5,abstol=1e-9)
+TSIM,X=ODE.ode45(fbalances,initial_condition_vector,TSIM, points=:specified,reltol=1e-2,abstol=1e-4)
+#@show TSIM
 #X = Array{Float64}[]
 #for j in collect(1:18*8)
 #	push!(X,map(y->y[j],y))

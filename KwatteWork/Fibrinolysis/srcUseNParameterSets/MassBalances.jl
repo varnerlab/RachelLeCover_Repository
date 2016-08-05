@@ -78,10 +78,10 @@ for j = 1:number_of_compartments
 	 pathToFile = "/home/rachel/Documents/Fibrinolysis_model_julia/src/best10params.txt"
 	 currparams = readParameters(pathToFile,set_number)
 	 ReducedDict= setParameters(currparams,ReducedDict)
-	#ReducedDict = patchParameters(ReducedDict)
-	#@show ReducedDict
+	ReducedDict = patchParameters(ReducedDict,set_number)
+	#@show (ReducedDict)
 	#if(j == 8)
-		rate_vector_curr = Balances(t,currx,ReducedDict) #need to convert time into seconds
+		rate_vector_curr = Balances(t,currx,ReducedDict)
 	#else
 		#rate_vector_curr = zeros(1,18)
 	#end
@@ -90,7 +90,7 @@ for j = 1:number_of_compartments
 		push!(rate_vector, item)
 	end
 end
-
+#@show size(rate_vector)
 # Call the control function - 
 (rate_vector) = Control(t,x,rate_vector,data_dictionary);
 
