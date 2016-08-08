@@ -4,8 +4,9 @@ function readParameters(pathToFile)
 end
 
 function readParameters(pathToFile, set_number)
-	allparams = readdlm(pathToFile)
-	params = allparams[:,set_number]
+	allparams = readdlm(pathToFile, ',')
+	params = allparams[set_number,:]
+	return params
 end
 
 function setParameters(params, data_dictionary)
@@ -22,6 +23,21 @@ function patchParameters(data_dictionary,set_number)
 	srand(seed)
 	data_dictionary["kinetic_parameter_array"][5] = .1 +.1/10(.5-rand())
 	data_dictionary["kinetic_parameter_array"][6] = 30 + 30/10(.5-rand())
+	
+	#prevent negative k
+	while(data_dictionary["kinetic_parameter_array"][5]<0)
+		if (data_dictionary["kinetic_parameter_array"][5] <0)
+			@show data_dictionary["kinetic_parameter_array"][5] 
+		end
+		data_dictionary["kinetic_parameter_array"][5] = .1 +.1/10(.5-rand())
+		@show data_dictionary["kinetic_parameter_array"][5]
+	end
+
+	while(data_dictionary["kinetic_parameter_array"][6]<0)
+		data_dictionary["kinetic_parameter_array"][6] = 30 + 30/10(.5-rand())
+	end
+
+
 	#@show size(data_dictionary["kinetic_parameter_array"])
 	#println("patched")
 	return data_dictionary

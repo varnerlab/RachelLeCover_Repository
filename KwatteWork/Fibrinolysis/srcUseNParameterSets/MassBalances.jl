@@ -75,7 +75,7 @@ for j = 1:number_of_compartments
 	#@show ic_arr
 	ReducedDict= DataFileReactions(ic_arr)
 	#read in best parameters
-	 pathToFile = "/home/rachel/Documents/Fibrinolysis_model_julia/src/best10params.txt"
+	 pathToFile = "/home/rachel/Documents/Fibrinolysis_model_julia/src/Best10ParameterSets.txt"
 	 currparams = readParameters(pathToFile,set_number)
 	 ReducedDict= setParameters(currparams,ReducedDict)
 	ReducedDict = patchParameters(ReducedDict,set_number)
@@ -110,6 +110,10 @@ number_of_states = length(tmp_vector);
 for state_index in collect(1:number_of_states)
 	dxdt_vector[state_index] = tau_array[state_index]*tmp_vector[state_index];
 end
+
+# Correct nagative x's = throws errors in control even if small - 
+idx = find(x->(x<0),x);
+x[idx] = 0.0;
 
 # Return the volume dvdt terms - 
 number_of_compartments = length(tmp_dvdt_vector);

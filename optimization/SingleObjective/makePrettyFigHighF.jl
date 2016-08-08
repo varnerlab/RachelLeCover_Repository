@@ -1,4 +1,4 @@
-include("/home/rachel/Documents/optimization/SingleObjective/OOModelHighFreq.jl")
+include("/home/rachel/Documents/work/optimization/SingleObjective/OOModelHighFreq.jl")
 #include("/home/rachel/Documents/optimization/SingleObjective/OlufsenModel2011calcHRtweakedPlotOn.jl")
 using PyPlot
 
@@ -203,8 +203,8 @@ function generateDataSingleObj(patientID,outputdir)
 end
 
 function generateDataSingleObjHighF(patientID,outputdir)
-	inputdir = "/home/rachel/Documents/modelingHR/LinkedRecordsTimeData10min/"
-	pathtoparams = "/home/rachel/Documents/optimization/SingleObjective/paramsSingleObjectiveJun20.txt"
+	inputdir = "/home/rachel/Documents/work/optimization/LinkedRecordsTimeData10min/"
+	pathtoparams = "/home/rachel/Documents/work/optimization/SingleObjective/paramsSingleObjectiveJun20.txt"
 	inputdirHighFreqP = "../LinkedRecordsTimeData10minNonNumerics/"
 	datasavestr = string(outputdir, patientID, ".txt")
 	allparamsets = getClusterParams(pathtoparams)
@@ -346,7 +346,7 @@ function mainforSingleObjective()
 end
 
 function mainforSingleObjectiveHighF()
-	highFpatientsPath = "/home/rachel/Documents/optimization/SingleObjective/usefulpatientsThrowingAwayBadPdata.txt"
+	highFpatientsPath = "/home/rachel/Documents/work/optimization/SingleObjective/usefulpatientsThrowingAwayBadPdata.txt"
 	
 	allpatients = AbstractString[]
 
@@ -362,7 +362,7 @@ function mainforSingleObjectiveHighF()
 	for patientID in allpatients
 		close("all")
 		@show patientID
-		mainoutputdir = "/home/rachel/Documents/optimization/SingleObjective/highFreqFiguresJul11lowtol/"
+		mainoutputdir = "/home/rachel/Documents/work/optimization/SingleObjective/highFreqFigures/Aug08"
 		MIMICdata = generateDataSingleObjHighF(patientID,mainoutputdir)
 		curroutput = string(mainoutputdir, patientID, ".txt")
 		times =getTimes(curroutput)

@@ -13,7 +13,7 @@ function generateData(num_param_sets)
 		 data_dict = DataFile(tstart, tend, step)
 		 t, x = SolveBalances(tstart, tend, step, data_dict,j)
 		@show size(x)
-		outputfilename = string("output/ResPatchedSetSeedParamSet", j, ".txt")
+		outputfilename = string("output/Aug08ResPatchedSetSeedParamSet", j, ".txt")
 		writedlm(outputfilename, x)
 	end
 end
@@ -213,16 +213,24 @@ function ReadAndPlotWoundAvg(filename, num_param_sets)
 		push!(stdevs, currstd)
 		k = k+1
 	end
-		speciesnames = ["FII", "FIIa", "Protein C", "APC", "ATIII", "TM", "Trigger", "Fibrin", "Plasmin", "Fibrinogen", "Plasminogen", "tPA", "uPA", "Fibrin monomer", "Protofibril monomer", "antiplasmin", "PAI_1", "Fiber","Volume"]
-	figure(figsize=(20,20), dpi = 80)
+		speciesnames = ["FII", "FIIa", "Protein C", "APC", "ATIII", "TM", "Trigger", "Fibrin", "Plasmin", "Fibrinogen", "Plasminogen", "tPA", "uPA", "Fibrin monomer", "Protofibril monomer", "Antiplasmin", "PAI_1", "Fiber","Volume"]
+	figure(figsize=(40,20), dpi = 80)
+	PyCall.PyDict(matplotlib["rcParams"])["font.sans-serif"] = ["Helvetica"]
 	plotcounter = 1
 	for j in collect(128:145)
 		postive95conf = means[j]+1.96.*stdevs[j]
 		negative95conf = means[j]-1.96.*stdevs[j]
+		#remove data less than zero, unphysical
+		idx = find(x->(x<0),negative95conf);
+		negative95conf[idx] = 0.0;
+		
+		idx = find(x->(x<0),means[j]);
+		means[j][idx] = 0.0;
 		ax = gca()
-		plt[:subplot](4,5,plotcounter)
-		plt[:tick_params](axis="both", which="major", labelsize=12)
-		plt[:tick_params](axis="both", which="minor", labelsize=12)
+		plt[:subplot](2,9,plotcounter)
+		plt[:tick_params](axis="both", which="major", labelsize=14)
+		plt[:tick_params](axis="both", which="minor", labelsize=14)
+		ax[:set_xticklabels]([]) #remove xaxis numbering
 		plt[:tight_layout]() 
 		#plt[:ticklabel_format](axis="y", useOffset=false)
 		plot(t,means[j] ,linewidth=2.0,color = ".03")
@@ -230,6 +238,9 @@ function ReadAndPlotWoundAvg(filename, num_param_sets)
 		title(speciesnames[plotcounter], fontsize = 14)
 		plotcounter = plotcounter+1
 		end
-	savefig("output/PrettyUsing10BestParamSetsInWoundPatchedSetSeed.pdf")
+	ax = gca()
+	plt[:tight_layout]() 
+	ax[:set_xticklabels]([]) #remove xaxis numbering
+	savefig("output/PrettyUsing10BestParamSetsInWoundPatchedSetSeedGTzeroNewLayout.pdf")
 	#return forsummary
 end

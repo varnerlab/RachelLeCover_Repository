@@ -31,7 +31,7 @@ function runModel()
 	 tend=3600
 	 step=1.0
 	 data_dict = DataFile(tstart, tend, step)
-	 t, x = SolveBalances(tstart, tend, step, data_dict)
+	 t, x = SolveBalances(tstart, tend, step, data_dict,1)
 #	@show size(x)
 #	@show x[1]
 #	 Alias the species vector
