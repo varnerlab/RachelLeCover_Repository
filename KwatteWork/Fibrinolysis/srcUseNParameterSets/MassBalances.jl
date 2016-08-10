@@ -66,6 +66,10 @@ number_of_species = 18;
 #@show size(calc_rate_vector)
 #to use reduced order fibrinolysis model
 #@show data_dictionary["INITIAL_CONDITION_ARRAY"]
+	#read in best parameters
+	 pathToFile = "/home/rachel/Documents/Fibrinolysis_model_julia/src/Best100ParameterSets.txt"
+	 currparams = readParameters(pathToFile,set_number)
+
 for j = 1:number_of_compartments
 	ReducedDict = Dict()
 	upper_index = number_of_species*j
@@ -74,9 +78,6 @@ for j = 1:number_of_compartments
 	ic_arr= data_dictionary["INITIAL_CONDITION_ARRAY"][lower_index:upper_index]
 	#@show ic_arr
 	ReducedDict= DataFileReactions(ic_arr)
-	#read in best parameters
-	 pathToFile = "/home/rachel/Documents/Fibrinolysis_model_julia/src/Best10ParameterSets.txt"
-	 currparams = readParameters(pathToFile,set_number)
 	 ReducedDict= setParameters(currparams,ReducedDict)
 	ReducedDict = patchParameters(ReducedDict,set_number)
 	#@show (ReducedDict)

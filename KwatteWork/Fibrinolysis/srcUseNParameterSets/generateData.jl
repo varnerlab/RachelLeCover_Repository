@@ -13,7 +13,7 @@ function generateData(num_param_sets)
 		 data_dict = DataFile(tstart, tend, step)
 		 t, x = SolveBalances(tstart, tend, step, data_dict,j)
 		@show size(x)
-		outputfilename = string("output/Aug08ResPatchedSetSeedParamSet", j, ".txt")
+		outputfilename = string("output/Aug10ResPatchedSetSeedParamSet", j, ".txt")
 		writedlm(outputfilename, x)
 	end
 end
@@ -214,8 +214,8 @@ function ReadAndPlotWoundAvg(filename, num_param_sets)
 		k = k+1
 	end
 		speciesnames = ["FII", "FIIa", "Protein C", "APC", "ATIII", "TM", "Trigger", "Fibrin", "Plasmin", "Fibrinogen", "Plasminogen", "tPA", "uPA", "Fibrin monomer", "Protofibril monomer", "Antiplasmin", "PAI_1", "Fiber","Volume"]
-	figure(figsize=(40,20), dpi = 80)
-	PyCall.PyDict(matplotlib["rcParams"])["font.sans-serif"] = ["Helvetica"]
+	figure(figsize=(30,10), dpi = 80)
+	#PyCall.PyDict(matplotlib["rcParams"])["font.sans-serif"] = ["Helvetica"]
 	plotcounter = 1
 	for j in collect(128:145)
 		postive95conf = means[j]+1.96.*stdevs[j]
@@ -227,7 +227,7 @@ function ReadAndPlotWoundAvg(filename, num_param_sets)
 		idx = find(x->(x<0),means[j]);
 		means[j][idx] = 0.0;
 		ax = gca()
-		plt[:subplot](2,9,plotcounter)
+		plt[:subplot](3,6,plotcounter)
 		plt[:tick_params](axis="both", which="major", labelsize=14)
 		plt[:tick_params](axis="both", which="minor", labelsize=14)
 		ax[:set_xticklabels]([]) #remove xaxis numbering
@@ -237,10 +237,92 @@ function ReadAndPlotWoundAvg(filename, num_param_sets)
 		fill_between((t), squeeze(negative95conf,2), squeeze(postive95conf,2), color = ".75")
 		title(speciesnames[plotcounter], fontsize = 14)
 		plotcounter = plotcounter+1
-		end
+	end
 	ax = gca()
 	plt[:tight_layout]() 
 	ax[:set_xticklabels]([]) #remove xaxis numbering
-	savefig("output/PrettyUsing10BestParamSetsInWoundPatchedSetSeedGTzeroNewLayout.pdf")
+	savefig("output/PrettyUsing10BestParamSetsInWoundPatchedSetSeedGTzeroDiffLayout.pdf")
 	#return forsummary
+end
+
+function plotMeanAllCompartments(filename, num_param_sets)
+
+	close("all")
+	tstart=0
+	 tend=600
+	 step=1.0
+
+	t = collect(tstart:step:tend)
+	numcols = 8
+	upperlim =8*18
+	offset = 8
+
+	alldata = Array[]
+	for j in collect(1:num_param_sets)
+		data = readdlm(string(filename,j,".txt"),',')
+		push!(alldata,data)
+	end
+
+	#arrange data into a form that I can use
+	k = 0
+	numthings = 19*8
+	forsummary = Array[]
+	for x in alldata
+		for j in collect(1:size(x,2))
+	    		  push!(forsummary,x[:,j])
+	   	 end
+	end
+	means = Array[]
+	stdevs = Array[]
+	while (k<=numthings)
+		usefulindexes = Int[]
+		for j in collect(1:size(forsummary,1))
+			if(mod(j,numthings)==k)
+				push!(usefulindexes,j)
+			end
+	       end
+		#@show usefulindexes
+	      # currstuff = Array{Array}(size(forsummary[1],1))
+		currstuff = fill(1.0, size(forsummary[1],1),1)
+		for idx in usefulindexes
+			currstuff=hcat(currstuff,forsummary[idx])
+		end
+		#@show currstuff
+		currmean = mean(currstuff[:,2:end],2)
+		currstd = std(currstuff[:,2:end],2)
+		push!(means,currmean)
+		push!(stdevs, currstd)
+		k = k+1
+	end
+		speciesnames = ["FII", "FIIa", "Protein C", "APC", "ATIII", "TM", "Trigger", "Fibrin", "Plasmin", "Fibrinogen", "Plasminogen", "tPA", "uPA", "Fibrin monomer", "Protofibril monomer", "Antiplasmin", "PAI_1", "Fiber","Volume"]
+
+		plotcounter = 1
+		othercounter = 1
+	figure(figsize=(20,20))
+	for j in collect(2:145)
+		postive95conf = means[j]+1.96.*stdevs[j]
+		negative95conf = means[j]-1.96.*stdevs[j]
+		#remove data less than zero, unphysical
+		idx = find(x->(x<0),negative95conf);
+		negative95conf[idx] = 0.0;
+		
+		idx = find(x->(x<0),means[j]);
+		means[j][idx] = 0.0;
+		ax = gca()
+		plt[:subplot](8,18,othercounter)
+		plt[:tick_params](axis="both", which="major", labelsize=7)
+		plt[:tick_params](axis="both", which="minor", labelsize=7)
+		ax[:set_xticklabels]([]) #remove xaxis numbering
+		#plt[:tight_layout]() 
+		plt[:ticklabel_format](axis="y", useOffset=false)
+		plot(t,means[j] ,linewidth=2.0,color = ".03")
+		fill_between((t), squeeze(negative95conf,2), squeeze(postive95conf,2), color = ".75")
+		#title(speciesnames[plotcounter], fontsize = 7)
+		plotcounter = plotcounter+1
+		othercounter = othercounter+1
+		if(plotcounter>length(speciesnames))
+			plotcounter = 1
+		end
+	end
+
 end

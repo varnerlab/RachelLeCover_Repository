@@ -6,6 +6,7 @@ end
 function readParameters(pathToFile, set_number)
 	allparams = readdlm(pathToFile, ',')
 	params = allparams[set_number,:]
+	println("read")
 	return params
 end
 
@@ -27,10 +28,10 @@ function patchParameters(data_dictionary,set_number)
 	#prevent negative k
 	while(data_dictionary["kinetic_parameter_array"][5]<0)
 		if (data_dictionary["kinetic_parameter_array"][5] <0)
-			@show data_dictionary["kinetic_parameter_array"][5] 
+			#@show data_dictionary["kinetic_parameter_array"][5] 
 		end
 		data_dictionary["kinetic_parameter_array"][5] = .1 +.1/10(.5-rand())
-		@show data_dictionary["kinetic_parameter_array"][5]
+		#@show data_dictionary["kinetic_parameter_array"][5]
 	end
 
 	while(data_dictionary["kinetic_parameter_array"][6]<0)
