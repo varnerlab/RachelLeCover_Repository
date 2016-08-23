@@ -3,6 +3,7 @@ include("/home/rachel/Documents/work/optimization/SingleObjective/OOModelHighFre
 using PyPlot
 
 function processNumericalData(filename)
+	@show filename
 	df=readtable(filename, separator=',',nastrings=["-"])
 	units = df[1,:]
 	deleterows!(df,1) #remove the row that had units
@@ -180,13 +181,13 @@ function linearInterp(lowerVal, upperVal, tstart, tend,step)
 end
 
 function generateDataSingleObj(patientID,outputdir)
-	inputdir = "/home/rachel/Documents/modelingHR/LinkedRecordsTimeData10min/"
-	pathtoparams = "/home/rachel/Documents/optimization/SingleObjective/paramsSingleObjectiveJun20.txt"
+	inputdir = "/home/rachel/Documents/work/optimization/LinkedRecordsTimeData10min/"
+	pathtoparams = "/home/rachel/Documents/work/optimization/SingleObjective/paramsSingleObjectiveJun20.txt"
 	datasavestr = string(outputdir, patientID, ".txt")
 	allparamsets = getClusterParams(pathtoparams)
 	#allparamsets = getClusterParams(pathtocluster2params)
 	
-	savestr = string(outputdir, "Id = ", patientID,"usingfewersteps", ".png")
+	savestr = string(outputdir, "Id = ", patientID)
 	data, units= processNumericalData(string(inputdir, patientID))
 	sort!(data, cols = [order(:_Elapsed_time_)])
 	colnames = (names(data))
@@ -194,7 +195,7 @@ function generateDataSingleObj(patientID,outputdir)
 	for j in collect(1:size(allparamsets, 2))
 		currparams = allparamsets[:, j]
 		@show currparams
-		MSE = calculateHeartRateForSaving(cleaneddata,currparams, savestr, datasavestr)
+		MSE = calculateHeartRatelowerFdata(cleaneddata,currparams, savestr)
 		
 	end
 
@@ -205,7 +206,8 @@ end
 function generateDataSingleObjHighF(patientID,outputdir)
 	inputdir = "/home/rachel/Documents/work/optimization/LinkedRecordsTimeData10min/"
 	pathtoparams = "/home/rachel/Documents/work/optimization/SingleObjective/paramsSingleObjectiveJun20.txt"
-	inputdirHighFreqP = "../LinkedRecordsTimeData10minNonNumerics/"
+	#inputdirHighFreqP = "../LinkedRecordsTimeData10minNonNumerics/"
+	inputdirHighFreqP = inputdir
 	datasavestr = string(outputdir, patientID, ".txt")
 	allparamsets = getClusterParams(pathtoparams)
 	#allparamsets = getClusterParams(pathtocluster2params)
@@ -216,6 +218,7 @@ function generateDataSingleObjHighF(patientID,outputdir)
 	colnames = (names(data))
 	cleaneddata = cleandata(data)
 	highFreqData, units=processNumericalData(string(inputdirHighFreqP, patientID[1:end-1]))
+	#highFreqData, units=processNumericalData(string(inputdirHighFreqP, patientID))
 		if(size(highFreqData,1)>0)
 			highFreqCols = names(highFreqData)
 		else
@@ -261,9 +264,10 @@ end
 
 function makeGraphSingle(data,times, MIMICdata,savestr)
 	@show data
-	p1=plot(MIMICdata[:_Elapsed_time_], MIMICdata[:_HR_], "x", color = "0.0") #actual data
+	p1=plot(MIMICdata[:_Elapsed_time_], MIMICdata[:_HR_], "x", color = "0.0", alpha =.5) #actual data
 	p2=plot(times, transpose(data[:,1]), "v", color = ".5",markeredgewidth=0.0,markersize = 2.5) #using original params
-	p3= plot(times, transpose(data[:,2]), "o", color = ".25",markeredgewidth=0.0,markersize = 2.5) #using new estimated params
+	p3= plot(times, transpose(data[:,2]), "o", color = "r",markeredgewidth=0.0,markersize = 2.5) #using new estimated params
+	@show size(p2), size(p3)
 	xlabel("Time in Seconds", fontsize=18)
 	ylabel("Heart Rate, in BPM", fontsize=18)
 	#legend([p1,p2,p3],["Actual Data", "Using Original Parameters", "Using Optimized Parameters"])
@@ -300,7 +304,7 @@ function mainforclusters()
 		
 		mainoutputdir = "/home/rachel/Documents/optimization/singleobjective/highFreqFigures/"
 		MIMICdata = generateData(patientID,mainoutputdir)
-		curroutput = string(mainoutputdir, patientID, ".txt")
+		curroutput = string(mainoutputdir,"Id = ", patientID, ".txt")
 		times =getTimes(curroutput)
 		numdatapoints = size(times,2)
 		alldata = getGeneratedData(curroutput,numdatapoints)
@@ -310,8 +314,8 @@ function mainforclusters()
 end
 
 function mainforSingleObjective()
-	cluster1path = "/home/rachel/Documents/optimization/multiobjective/usingPOETs/cluster1subjectIDs"
-	cluster2path = "/home/rachel/Documents/optimization/multiobjective/usingPOETs/cluster2subjectIDs"
+	cluster1path = "/home/rachel/Documents/work/optimization/multiobjective/usingPOETs/cluster1subjectIDs"
+	cluster2path = "/home/rachel/Documents/work/optimization/multiobjective/usingPOETs/cluster2subjectIDs"
 	allpatients = AbstractString[]
 
 	f = open(cluster1path)
@@ -334,9 +338,9 @@ function mainforSingleObjective()
 		close("all")
 		@show patientID
 		
-		mainoutputdir = "/home/rachel/Documents/optimization/SingleObjective/outputfigsusingJun20bestparams/"
+		mainoutputdir = "/home/rachel/Documents/work/optimization/SingleObjective/outputfigsusingJun20bestparamsUsingLowFdata/"
 		MIMICdata = generateDataSingleObj(patientID,mainoutputdir)
-		curroutput = string(mainoutputdir, patientID, ".txt")
+		curroutput = string(mainoutputdir, "Id = ",patientID, ".txt")
 		times =getTimes(curroutput)
 		numdatapoints = size(times,2)
 		alldata = getGeneratedData(curroutput,numdatapoints)
@@ -346,14 +350,34 @@ function mainforSingleObjective()
 end
 
 function mainforSingleObjectiveHighF()
-	highFpatientsPath = "/home/rachel/Documents/work/optimization/SingleObjective/usefulpatientsThrowingAwayBadPdata.txt"
-	
+#	highFpatientsPath = "/home/rachel/Documents/work/optimization/SingleObjective/usefulpatientsThrowingAwayBadPdata.txt"
+#	
+#	allpatients = AbstractString[]
+
+#	f = open((highFpatientsPath))
+#	for ln in eachline(f)
+#		if(length(ln)>1)
+#			push!(allpatients, strip(ln))
+#		end
+#	end
+#	close(f)
+
+	cluster1path = "/home/rachel/Documents/work/optimization/multiobjective/usingPOETs/cluster1subjectIDs"
+	cluster2path = "/home/rachel/Documents/work/optimization/multiobjective/usingPOETs/cluster2subjectIDs"
 	allpatients = AbstractString[]
 
-	f = open((highFpatientsPath))
+	f = open(cluster1path)
 	for ln in eachline(f)
 		if(length(ln)>1)
 			push!(allpatients, strip(ln))
+		end
+	end
+	close(f)
+
+	f = open(cluster2path)
+	for ln in eachline(f)
+		if(length(ln)>1)
+			push!(allpatients,strip(ln))
 		end
 	end
 	close(f)
@@ -362,7 +386,7 @@ function mainforSingleObjectiveHighF()
 	for patientID in allpatients
 		close("all")
 		@show patientID
-		mainoutputdir = "/home/rachel/Documents/work/optimization/SingleObjective/highFreqFigures/Aug08"
+		mainoutputdir = "/home/rachel/Documents/work/optimization/SingleObjective/outputfigsusingJun20bestparamsUsingLowFdata/"
 		MIMICdata = generateDataSingleObjHighF(patientID,mainoutputdir)
 		curroutput = string(mainoutputdir, patientID, ".txt")
 		times =getTimes(curroutput)

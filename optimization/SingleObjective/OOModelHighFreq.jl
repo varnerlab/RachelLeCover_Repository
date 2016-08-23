@@ -39,7 +39,57 @@ function eqns(t,y,PTframe)
 	push!(ydot, dcnordt)
 	push!(ydot, dcachdt)
 	
-	currP = lookUpP(t,PTframe)	
+	currP = lookUpP(t,PTframe)
+	@show currP	
+
+	dpbardt = alpha*(currP-pbar)
+	dn1dt = k1.*dpbardt.*n.*(M-n)./(M/2)^2-n1./tau1
+	dn2dt = k2.*dpbardt.*n.*(M-n)./(M/2)^2-n2./tau2
+	
+	push!(ydot, dn1dt)
+	push!(ydot, dn2dt)
+	push!(ydot, dpbardt)
+
+	return ydot
+end
+
+function eqnsLowF(t,y,PTframe)
+	ydot = Float64[]
+	#if(mod(t,.05)==0)
+		@show t
+	#end
+	cnor =y[1]
+	cach = y[2]
+	n1 = y[3]
+	n2 = y[4]
+	pbar =y[5]
+	n = n1+n2+N
+
+	if(cnor<0)
+		cnor =0.0
+	end
+
+	if(cach<0)
+		cach = 0.0
+	end
+
+	if(cach >10)
+		cach = 10.0
+	end
+
+	if(cnor >10)
+		cnor = 10.0
+	end
+
+	fpar =calculatefpar(n)
+	fsym =calculatefsym(n,t,fpar)	
+
+	dcnordt = (fsym-cnor)/taunor
+	dcachdt =(fpar-cach)/tauach
+	push!(ydot, dcnordt)
+	push!(ydot, dcachdt)
+	
+	currP = lookUpPlowF(t,PTframe)
 
 	dpbardt = alpha*(currP-pbar)
 	dn1dt = k1.*dpbardt.*n.*(M-n)./(M/2)^2-n1./tau1
@@ -146,6 +196,30 @@ function lookUpP(t,PTframe)
 		currP = PTframe[((PTframe[:, :_Elapsed_time_].<upperlim)& (PTframe[:,:_Elapsed_time_].>lowerlim)),:][:_ABP_][1]
 	else
 		currP = PTframe[PTframe[:_Elapsed_time_].==t, :_ABP_][1]
+	end
+	return currP
+end
+
+function lookUpPlowF(t,PTframe)
+	ff = 1.0/125.0
+	currP = PTframe[PTframe[:_Elapsed_time_].==t, :_ABP_Mean_]
+
+	if(length(currP)==0)
+		lowerlim = t-ff
+		upperlim = t+ff
+		tester= PTframe[((PTframe[:, :_Elapsed_time_].<upperlim)& (PTframe[:,:_Elapsed_time_].>lowerlim)),:]
+		#@show tester
+		while(size(tester,1)==0)
+			#@show currP
+			#println("In loop")
+			ff = ff+.05
+			lowerlim = t-ff
+			upperlim = t+ff
+			tester = PTframe[((PTframe[:, :_Elapsed_time_].<=upperlim)& (PTframe[:,:_Elapsed_time_].>=lowerlim)),:]
+		end
+		currP = PTframe[((PTframe[:, :_Elapsed_time_].<upperlim)& (PTframe[:,:_Elapsed_time_].>lowerlim)),:][:_ABP_Mean_][1]
+	else
+		currP = PTframe[PTframe[:_Elapsed_time_].==t, :_ABP_Mean_][1]
 	end
 	return currP
 end
@@ -297,6 +371,61 @@ function calculateHeartRateHigherFdata(data,lowfdata,params,savestr)
 	initialconditions = [(1-N/M)/(1+beta*N/M), N/M,0.0,0.0,90.0]
 	fedeqns(lowFreqt,y) = eqns(lowFreqt,y,data)
 	tout,res = ODE.ode45(fedeqns, initialconditions, lowFreqt, reltol = 6E-2, abstol =1E-3, points=:specified)
+
+
+	Cnor = [a[1] for a in res]
+	Cach = [a[2] for a in res]
+	n1 = [a[3] for a in res]
+	n2 = n1 = [a[4] for a in res]
+	Pbar = [a[5] for a in res]
+
+#	initialconditions = [(1-N/M)/(1+beta*N/M); N/M;0.0;0.0;90.0]
+#	fedeqns(t,y,ydot)= eqnsSundials(t,y,ydot,data)
+#	X = Sundials.cvode(fedeqns,initialconditions,lowFreqt, abstol = 1E-10, reltol = 1E-10)
+#	Cnor = X[:,1]
+#	Cach = X[:,2]
+#	n1 = X[:,3]
+#	n2 = X[:,4]
+#	Pbar = X[:,5]
+#	tout = lowFreqt
+
+	n = n1+n2+N
+	fpar =  calculatefpar(n)
+	fsym = calculatefsymArr(n,lowFreqt,fpar)
+	h = calculateHR2012(Cnor, Cach)
+	#plotPrettyHighF(lowfdata[:_Elapsed_time_], Pdata, lowfdata[:_HR_], tout,h,Pbar,string(savestr, ".pdf"))
+	#plotall(tout, Pbar, n1, n2, n,fpar, fsym,Cnor, Cach,lowfdata[:_HR_], h, lowfdata[:_Elapsed_time_],string(savestr, "allvars.pdf"))
+	saveDataToFile(tout,h,string(savestr,".txt"))
+	toc()
+
+end
+
+function calculateHeartRatelowerFdata(data,params,savestr)
+	tic()
+	Pdata = data[:_ABP_]
+	tdata = data[:_Elapsed_time_]
+	@show head(data)
+
+	lowFreqt = Array(data[:_Elapsed_time_])
+	global alpha =1.5
+	global beta = 6
+	global M = 120
+	global k2 = 1.5
+	global tauD = 7
+
+	global N = params[1]
+	global k1 = params[2]
+	global tau1 = params[3]
+	global tau2 = params[4]
+	global tauach = params[5]
+	global taunor = params[6]
+	global h0 = params[7]
+	global Mnor = params[8]
+	global Mach = params[9]
+
+	initialconditions = [(1-N/M)/(1+beta*N/M), N/M,0.0,0.0,90.0]
+	fedeqns(lowFreqt,y) = eqnsLowF(lowFreqt,y,data)
+	tout,res = ODE.ode78(fedeqns, initialconditions, lowFreqt, reltol = 30E-4, abstol =30E-4, points=:specified)
 
 
 	Cnor = [a[1] for a in res]

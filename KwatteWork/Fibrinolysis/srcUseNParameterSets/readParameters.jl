@@ -6,7 +6,7 @@ end
 function readParameters(pathToFile, set_number)
 	allparams = readdlm(pathToFile, ',')
 	params = allparams[set_number,:]
-	println("read")
+	#println("read")
 	return params
 end
 

@@ -86,27 +86,29 @@ C = float(open(readdlm, "/home/rachel/Documents/work/KwatteWork/Fibrinolysis/net
 # Formulate the initial condition array - 
 initial_condition_array = Float64[]
 # ------------------------------------------------------------------------------------------------ #
-FII_initial = 1400.0
-FIIa_initial=0.0
-PC_initial=60.0
-APC_initial = 0.0
-ATIII_initial = 3400.0
-TM_initial = 1.0
-TRIGGER_initial = 5.0
-Fibrin_initial = 0.0
-Plasmin_initial = 0.0
-Fibrinogen_initial =10000.0
-Plasminogen_initial = 2000.0
-tPA_initial = 8.0
-uPA_initial = 0.0
-Fibrin_monomer_initial = 0.0
-Protofibril_initial = 0.0
-antiplasmin_initial = 1180.0
-PAI_1_initial = .56
-Fiber_initial = 0.0
-dilution_factor = .93
+dilutionFactor =10.0
 
-tpa_level = 10.0
+FII_initial = 1400.0/dilutionFactor
+FIIa_initial=0.0/dilutionFactor
+PC_initial=60.0/dilutionFactor
+APC_initial = 0.0/dilutionFactor
+ATIII_initial = 3400.0/dilutionFactor
+TM_initial = 1.0/dilutionFactor
+TRIGGER_initial = 5.0
+Fibrin_initial = 0.0/dilutionFactor
+Plasmin_initial = 0.0/dilutionFactor
+Fibrinogen_initial =10000.0/dilutionFactor
+Plasminogen_initial = 2000.0/dilutionFactor
+tPA_initial = 8.0/dilutionFactor
+uPA_initial = 0.0/dilutionFactor
+Fibrin_monomer_initial = 0.0/dilutionFactor
+Protofibril_initial = 0.0/dilutionFactor
+antiplasmin_initial = 1180.0/dilutionFactor
+PAI_1_initial = .56/dilutionFactor
+Fiber_initial = 0.0/dilutionFactor
+dilution_factor = .93/dilutionFactor
+
+tpa_level = 10.0/dilutionFactor
 
 #FII_initial= 1.4*1000*dilution_factor       # Prothrombin
 #FIIa_initial= 0.0*dilution_factor              # Thrombin

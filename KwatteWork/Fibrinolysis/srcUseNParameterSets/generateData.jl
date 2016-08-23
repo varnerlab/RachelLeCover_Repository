@@ -13,7 +13,7 @@ function generateData(num_param_sets)
 		 data_dict = DataFile(tstart, tend, step)
 		 t, x = SolveBalances(tstart, tend, step, data_dict,j)
 		@show size(x)
-		outputfilename = string("output/Aug10ResPatchedSetSeedParamSet", j, ".txt")
+		outputfilename = string("outputHemodilution/Aug23OneTenthInitialConditions", j, ".txt")
 		writedlm(outputfilename, x)
 	end
 end
@@ -162,7 +162,7 @@ function readandPlotDataWoundOnly(filename,num_param_sets)
 		end
 
 	end
-	savefig(string("output/PrettyLayoutFlowOn10WoundOnlyBestParams",".pdf"),bbox_inches="tight")
+	savefig(string("output/PrettyLayoutFlowOn100WoundOnlyBestParams",".pdf"),bbox_inches="tight")
 end
 
 function ReadAndPlotWoundAvg(filename, num_param_sets)
@@ -241,7 +241,7 @@ function ReadAndPlotWoundAvg(filename, num_param_sets)
 	ax = gca()
 	plt[:tight_layout]() 
 	ax[:set_xticklabels]([]) #remove xaxis numbering
-	savefig("output/PrettyUsing10BestParamSetsInWoundPatchedSetSeedGTzeroDiffLayout.pdf")
+	savefig("outputHemodilution/PrettyUsing10BestParamSetsInWoundIConetenth.pdf")
 	#return forsummary
 end
 

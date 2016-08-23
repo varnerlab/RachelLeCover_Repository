@@ -87,17 +87,37 @@ end
 
 function calculatetotalMSE(params)
 	tic()
-	outputdir = "moretesting/higherfreqPdata/"
-	inputdir = "/home/rachel/Documents/modelingHR/LinkedRecordsTimeData10min/"
-	inputdirHighFreqP = "/home/rachel/Documents/modelingHR/LinkedRecordsTimeData10minNonNumerics/"
+	outputdir = "testingAug11"
+	inputdir = "/home/rachel/Documents/work/optimization/LinkedRecordsTimeData10min/"
+	#inputdirHighFreqP = "/home/rachel/Documents/modelingHR/LinkedRecordsTimeData10minNonNumerics/"
 	allpatients = readdir(inputdir)
-	highFreqPatients = readdir(inputdirHighFreqP)
+	#highFreqPatients = readdir(inputdirHighFreqP)
 	dataWriteTo = string(outputdir, "usefuldatatolAll1E-4only2steps", ".txt")
 	paramsWriteTo = string(outputdir, "paramstolAll1E-4only2steps", ".txt")
 	touch(dataWriteTo)
 	touch(paramsWriteTo)
 	totalMSE = 0.0
 	usefulpatients = 0.0
+
+	cluster1path = "/home/rachel/Documents/work/optimization/multiobjective/usingPOETs/cluster1subjectIDs"
+	cluster2path = "/home/rachel/Documents/work/optimization/multiobjective/usingPOETs/cluster2subjectIDs"
+	allpatients = AbstractString[]
+
+	f = open(cluster1path)
+	for ln in eachline(f)
+		if(length(ln)>1)
+			push!(allpatients, strip(ln))
+		end
+	end
+	close(f)
+
+	f = open(cluster2path)
+	for ln in eachline(f)
+		if(length(ln)>1)
+			push!(allpatients, strip(ln))
+		end
+	end
+	close(f)
 
 	#force positivity on all parameters
 	lowerbound = 1E-9
@@ -131,8 +151,8 @@ function calculatetotalMSE(params)
 				if(size(data,1)>5 && size(highFreqData,1)>5)
 					combinedframe = generateCombinedFrame(data, highFreqData)
 					@show head(combinedframe)
-					#MSE= calculateHeartRate(data, params,savestr)
-					MSE = calculateHeartRateHigherFdata(combinedframe, data, params, savestr)
+					MSE= calculateHeartRate(data, params,savestr)
+					#MSE = calculateHeartRateHigherFdata(combinedframe, data, params, savestr)
 					@show MSE
 					if(contains(string(typeof(MSE)), "Void"))
 						continue
@@ -223,10 +243,89 @@ function makeGraphsForCluster(params)
 end
 
 
+function calculatetotalMSElowF(params)
+	tic()
+	outputdir = "testingAug11/"
+	inputdir = "/home/rachel/Documents/work/optimization/LinkedRecordsTimeData10min/"
+	#inputdirHighFreqP = "/home/rachel/Documents/modelingHR/LinkedRecordsTimeData10minNonNumerics/"
+	allpatients = readdir(inputdir)
+	#highFreqPatients = readdir(inputdirHighFreqP)
+	dataWriteTo = string(outputdir, "usefuldatatolAll1E-4only2steps", ".txt")
+	paramsWriteTo = string(outputdir, "paramstolAll1E-4only2steps", ".txt")
+	touch(dataWriteTo)
+	touch(paramsWriteTo)
+	totalMSE = 0.0
+	usefulpatients = 0.0
+
+	cluster1path = "/home/rachel/Documents/work/optimization/multiobjective/usingPOETs/cluster1subjectIDs"
+	cluster2path = "/home/rachel/Documents/work/optimization/multiobjective/usingPOETs/cluster2subjectIDs"
+	allpatients = AbstractString[]
+
+	f = open(cluster1path)
+	for ln in eachline(f)
+		if(length(ln)>1)
+			push!(allpatients, strip(ln))
+		end
+	end
+	close(f)
+
+	f = open(cluster2path)
+	for ln in eachline(f)
+		if(length(ln)>1)
+			push!(allpatients, strip(ln))
+		end
+	end
+	close(f)
+
+	#force positivity on all parameters
+	lowerbound = 1E-9
+	for j in range(1,length(params))
+		if(params[j])<0
+			params[j] = lowerbound
+		end
+	end
+
+	@show params
+	for patient in allpatients
+		numericPatientID = patient[2:6]
+		date = patient[7:end-7]
+		println(string("processing patient", patient))
+		savestr = string(outputdir, "Id = ", patient,"usingfewersteps", ".png")
+		data, units= processNumericalData(string(inputdir, patient))
+			sort!(data, cols = [order(:_Elapsed_time_)])
+			colnames = (names(data))
+			if(in(:_ABP_Mean_, colnames) && in(:_HR_, colnames)&& (length(data[:_Elapsed_time_])>2) )
+				println("has complete data")
+				data = cleandata(data)
+				if(size(data,1)>5)
+					MSE= calculateHeartRate(data, params,savestr)
+					#MSE = calculateHeartRateHigherFdata(combinedframe, data, params, savestr)
+					@show MSE
+					if(contains(string(typeof(MSE)), "Void"))
+						continue
+					end
+					totalMSE = MSE + totalMSE
+					usefulpatients = usefulpatients +1
+
+					f = open(dataWriteTo, "a")
+					f = write(f, string(patient, ",", MSE, "\n"))
+					close(f)
+				end
+			end
+		overallMSE = totalMSE/usefulpatients
+		g = open(paramsWriteTo, "a")
+		write(g, string(params, ",", overallMSE, "\n"))
+		close(g)
+	end
+	toc()
+	return overallMSE
+end
+
+
 #params0 = [119.5623539942,366.3460933283,0.7780693376,218.5663921848,38.3398575219,50.8979614138,2.4148727713,0.2570577866,0.4516920024,338.5960559755]
 #calculatetotalMSE(params0)
 #bestparamscluster1 = [7.0412565739 0.4517491325 0.0590838127 60.0631494889 0.3801447431 0.0605251009 1.2330453563 0.0544532091 0.1044144738]
 #makeGraphsForCluster(bestparamscluster1)
 
-
+calculatetotalMSElowF([107.33612908104033,41.138842557517954,14.062116217939991,202.92519160829795,2.941876046317941e-5,8.15596008945017,1.4743606995666585,0.1654851281383664,0.05218327316554491])
 

@@ -125,6 +125,7 @@ function saveDataToFile(tsim, HRsim,filename)
 end
 
 function plotPretty(tdata, pdata, HRdata, tsim, HRsim, Psim, savestr)
+	println("drawing")
 	figure(figsize=(20,20))
 	patientID = savestr[1:search(savestr, 'P')-1]
 	
@@ -454,7 +455,7 @@ function calculateHeartRateHigherFdata(data,lowfdata,params,savestr)
 		currP = Pdata[counter]
 		bf(tspan,y)= baroreflex(tspan,y,currP)
 		tspan = collect(time-5*tstep:tstep/10:time)
-		tout, res = ODE.ode78(bf, bfprev,tspan,abstol = 1E-8, reltol=1E-8)
+		tout, res = ODE.ode23(bf, bfprev,tspan,abstol = 1E-4, reltol=1E-4)
 
 		y1 = [a[1] for a in res]
 		y2 = [a[2] for a in res]
@@ -473,7 +474,7 @@ function calculateHeartRateHigherFdata(data,lowfdata,params,savestr)
 		push!(fsymTS, fsym)
 
 		ns(tspan, y)=nervous_system(tspan, y, fsym, fpar)
-		tout, nsRes = ODE.ode78(ns, nsprev, tspan, abstol = 1E-8, reltol=1E-8)
+		tout, nsRes = ODE.ode23(ns, nsprev, tspan, abstol = 1E-4, reltol=1E-4)
 		Cnor = [a[1] for a in nsRes]
 		Cach = [a[2] for a in nsRes]
 		phi = [a[3] for a in nsRes]
