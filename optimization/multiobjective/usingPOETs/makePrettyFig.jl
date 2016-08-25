@@ -1,4 +1,4 @@
-include("/home/rachel/Documents/optimization/SingleObjective/OlufsenModel2011calcHRtweaked.jl")
+include("/home/rachel/Documents/work/optimization/SingleObjective/OlufsenModel2011calcHRtweaked.jl")
 using PyPlot
 
 function processNumericalData(filename)
@@ -120,9 +120,17 @@ function generateData(patientID,outputdir)
 
 end
 
+function writeMSEtoFile(filename,patientID,MSE)
+	f = open(filename, "a")
+	write(f, string(patientID, ",", MSE, "\n"))
+	close(f)
+end
+
 function generateDataSingleObj(patientID,outputdir)
-	inputdir = "/home/rachel/Documents/modelingHR/LinkedRecordsTimeData10min/"
-	pathtoparams = "/home/rachel/Documents/optimization/SingleObjective/paramsSingleObjectiveJun20.txt"
+	inputdir = "/home/rachel/Documents/work/LinkedRecordsTimeData10min/"
+	pathtoparams = "/home/rachel/Documents/work/optimization/SingleObjective/paramsSingleObjectiveJun20.txt"
+	pathToMSEOriginalParams = string(outputdir, "MSEOriginalParams.txt")
+	pathToMSEBestParams = string(outputdir, "MSEBestParams.txt")
 	datasavestr = string(outputdir, patientID, ".txt")
 	allparamsets = getClusterParams(pathtoparams)
 	#allparamsets = getClusterParams(pathtocluster2params)
@@ -136,6 +144,11 @@ function generateDataSingleObj(patientID,outputdir)
 		currparams = allparamsets[:, j]
 		@show currparams
 		MSE = calculateHeartRateForSaving(cleaneddata,currparams, savestr, datasavestr)
+		if(j ==1) #using original params
+			writeMSEtoFile(pathToMSEOriginalParams,patientID,MSE)
+		elseif(j==2) #using best params
+			writeMSEtoFile(pathToMSEBestParams,patientID,MSE)
+		end
 		
 	end
 
@@ -168,7 +181,7 @@ function makeGraph(data,times, MIMICdata,savestr)
 end
 
 function makeGraphSingle(data,times, MIMICdata,savestr)
-	@show data
+	#@show data
 	p1=plot(MIMICdata[:_Elapsed_time_], MIMICdata[:_HR_], "x", color = "0.0") #actual data
 	p2=plot(times, transpose(data[:,1]), "v", color = ".5",markeredgewidth=0.0,markersize = 2.5) #using original params
 	p3= plot(times, transpose(data[:,2]), "o", color = ".25",markeredgewidth=0.0,markersize = 2.5) #using new estimated params
@@ -216,8 +229,8 @@ function mainforclusters()
 end
 
 function mainforSingleObjective()
-	cluster1path = "/home/rachel/Documents/optimization/multiobjective/usingPOETs/cluster1subjectIDs"
-	cluster2path = "/home/rachel/Documents/optimization/multiobjective/usingPOETs/cluster2subjectIDs"
+	cluster1path = "/home/rachel/Documents/work/optimization/multiobjective/usingPOETs/cluster1subjectIDs"
+	cluster2path = "/home/rachel/Documents/work/optimization/multiobjective/usingPOETs/cluster2subjectIDs"
 	allpatients = AbstractString[]
 
 	f = open(cluster1path)
@@ -240,7 +253,7 @@ function mainforSingleObjective()
 		close("all")
 		@show patientID
 		
-		mainoutputdir = "/home/rachel/Documents/optimization/SingleObjective/outputfigsusingJun20bestparams/"
+		mainoutputdir = "/home/rachel/Documents/work/optimization/SingleObjective/testingAug24/"
 		MIMICdata = generateDataSingleObj(patientID,mainoutputdir)
 		curroutput = string(mainoutputdir, patientID, ".txt")
 		times =getTimes(curroutput)

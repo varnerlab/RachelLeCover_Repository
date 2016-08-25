@@ -326,6 +326,7 @@ function calculateHeartRate(data,params,savestr)
 		
 end
 function calculateHeartRateForSaving(data,params,savestr,datasavestr)
+	tic()
 	Pdata = data[:_ABP_Mean_]
 	tdata = data[:_Elapsed_time_]
 
@@ -417,7 +418,7 @@ function calculateHeartRateForSaving(data,params,savestr,datasavestr)
 		currP = P[counter]
 		bf(tspan,y)= baroreflex(tspan,y,currP)
 		tspan = collect(time-5*tstep:tstep/10:time)
-		tout, res = ODE.ode78(bf, bfprev,tspan,abstol = 1E-8, reltol=1E-8, minstep = eps())
+		tout, res = ODE.ode78(bf, bfprev,tspan,abstol = 1E-8, reltol=1E-8, minstep = eps(), points=:specified)
 
 		y1 = [a[1] for a in res]
 		y2 = [a[2] for a in res]
@@ -436,7 +437,7 @@ function calculateHeartRateForSaving(data,params,savestr,datasavestr)
 		push!(fsymTS, fsym)
 
 		ns(tspan, y)=nervous_system(tspan, y, fsym, fpar)
-		tout, nsRes = ODE.ode78(ns, nsprev, tspan, abstol = 1E-8, reltol=1E-8, minstep = eps())
+		tout, nsRes = ODE.ode78(ns, nsprev, tspan, abstol = 1E-8, reltol=1E-8, minstep = eps(), points=:specified)
 		Cnor = [a[1] for a in nsRes]
 		Cach = [a[2] for a in nsRes]
 		phi = [a[3] for a in nsRes]
@@ -485,6 +486,7 @@ function calculateHeartRateForSaving(data,params,savestr,datasavestr)
 #	PyPlot.close()
 	MSE = calculateMSE(tdata, data[:_HR_], t, heartRate2012)
 	saveDataToFile(t,heartRate2012,datasavestr)
+	toc()
 	return MSE
 		
 end

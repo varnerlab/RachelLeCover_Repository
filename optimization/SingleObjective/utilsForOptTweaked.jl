@@ -32,7 +32,7 @@ end
 
 function calculatetotalMSE(params)
 	tic()
-	outputdir = "moretesting/2016_05_16/"
+	outputdir = "moretesting/2016_08_24/"
 	inputdir = "/home/rachel/Documents/optimization/5testingRecords10min/"
 	allpatients = readdir(inputdir)
 	touch(string(outputdir, "usefuldatatol1E-4only2steps.txt"))
