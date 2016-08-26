@@ -96,9 +96,9 @@ function getTimes(filename)
 end
 
 function generateData(patientID,outputdir)
-	inputdir = "/home/rachel/Documents/modelingHR/LinkedRecordsTimeData10min/"
-	pathtocluster1params = "/home/rachel/Documents/optimization/sensitivityanalysis/cluster1bestparams.txt"
-	pathtocluster2params = "/home/rachel/Documents/optimization/sensitivityanalysis/cluster2bestparams.txt"
+	inputdir = "/home/rachel/Documents/work/optimization/LinkedRecordsTimeData10min/"
+	pathtocluster1params = "/home/rachel/Documents/work/optimization/sensitivityanalysis/cluster1bestparams.txt"
+	pathtocluster2params = "/home/rachel/Documents/work/optimization/sensitivityanalysis/cluster2bestparams.txt"
 	#outputdir = "/home/rachel/Documents/optimization/sensitivityanalysis/cluster1figure/"
 	datasavestr = string(outputdir, patientID, ".txt")
 	allparamsets = getClusterParams(pathtocluster1params)
@@ -117,6 +117,36 @@ function generateData(patientID,outputdir)
 	end
 
 	return cleaneddata
+
+end
+
+function getAverageMSE(patientID,outputdir)
+	inputdir = "/home/rachel/Documents/work/optimization/LinkedRecordsTimeData10min/"
+	pathtocluster1params = "/home/rachel/Documents/work/optimization/sensitivityanalysis/cluster1bestparamskeep.txt"
+	pathtocluster2params = "/home/rachel/Documents/work/optimization/sensitivityanalysis/cluster2bestparamskeep.txt"
+	#outputdir = "/home/rachel/Documents/optimization/sensitivityanalysis/cluster1figure/"
+	datasavestr = string(outputdir, patientID, ".txt")
+	#allparamsets = getClusterParams(pathtocluster1params)
+	allparamsets = getClusterParams(pathtocluster2params)
+	
+	savestr = string(outputdir, "Id = ", patientID,"usingfewersteps", ".png")
+	data, units= processNumericalData(string(inputdir, patientID))
+	sort!(data, cols = [order(:_Elapsed_time_)])
+	colnames = (names(data))
+	cleaneddata = cleandata(data)
+	totalMSE = 0.0
+	@show size(allparamsets, 2)
+	for j in collect(1:size(allparamsets, 2))
+		currparams = allparamsets[:, j]
+		#@show currparams
+		MSE = calculateHeartRateForSaving(cleaneddata,currparams, savestr, datasavestr)
+		@show MSE
+		totalMSE = MSE +totalMSE
+		
+	end
+
+	avgMSE = totalMSE/size(allparamsets,2)
+	return cleaneddata, avgMSE
 
 end
 
@@ -192,8 +222,8 @@ function makeGraphSingle(data,times, MIMICdata,savestr)
 end
 
 function mainforclusters()
-	cluster1path = "/home/rachel/Documents/optimization/multiobjective/usingPOETs/cluster1subjectIDs"
-	cluster2path = "/home/rachel/Documents/optimization/multiobjective/usingPOETs/cluster2subjectIDs"
+	cluster1path = "/home/rachel/Documents/work/optimization/multiobjective/usingPOETs/cluster1subjectIDs"
+	cluster2path = "/home/rachel/Documents/work/optimization/multiobjective/usingPOETs/cluster2subjectIDs"
 	cluster1IDs = AbstractString[]
 	cluster2IDs = AbstractString[]
 
@@ -261,5 +291,48 @@ function mainforSingleObjective()
 		alldata = getGeneratedData(curroutput,numdatapoints)
 		savestr = string(mainoutputdir, patientID, ".pdf")
 		makeGraphSingle(alldata,times, MIMICdata,savestr)
+	end
+end
+
+function mainforMSEclusters()
+	cluster1path = "/home/rachel/Documents/work/optimization/multiobjective/usingPOETs/cluster1subjectIDs"
+	cluster2path = "/home/rachel/Documents/work/optimization/multiobjective/usingPOETs/cluster2subjectIDs"
+	#cluster1MSEs = "/home/rachel/Documents/work/optimization/multiobjective/usingPOETs/MSEsAug26/cluster1MSEsUsing10BestParams.txt"
+	#touch(cluster1MSEs)
+	cluster2MSEs = "/home/rachel/Documents/work/optimization/multiobjective/usingPOETs/MSEsAug26/cluster2MSEsUsing10BestParams.txt"
+	touch(cluster2MSEs)
+	mainoutputdir = "/home/rachel/Documents/work/optimization/multiobjective/usingPOETs/MSEsAug26/"
+	cluster1IDs = AbstractString[]
+	cluster2IDs = AbstractString[]
+
+#	f = open(cluster1path)
+#	for ln in eachline(f)
+#		if(length(ln)>1)
+#			push!(cluster1IDs, strip(ln))
+#		end
+#	end
+#	close(f)
+	f = open(cluster2path)
+	for ln in eachline(f)
+		if(length(ln)>1)
+			push!(cluster2IDs, strip(ln))
+		end
+	end
+	close(f)
+
+
+	for patientID in cluster2IDs
+		close("all")
+		@show patientID
+		
+		MIMICdata = generateData(patientID,mainoutputdir)
+		curroutput = string(mainoutputdir, patientID, ".txt")
+		times =getTimes(curroutput)
+		numdatapoints = size(times,2)
+		alldata, avgMSE = getAverageMSE(patientID,numdatapoints)
+		@show avgMSE
+		writeMSEtoFile(cluster2MSEs,patientID,avgMSE)
+		savestr = string(mainoutputdir, patientID, ".pdf")
+		#makeGraph(MIMICdata,times, alldata,savestr)
 	end
 end
