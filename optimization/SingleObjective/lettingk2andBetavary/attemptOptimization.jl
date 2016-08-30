@@ -22,12 +22,13 @@ function attemptOptimization(params0)
 end
 
 function attemptOptimizationusingNLopt(params0)
-	outputdir = "moretesting/forcepositivity/usingScriptToRestartAgainParallel/"
+	outputdir = "/outputAug29/"
 	finalresult = string(outputdir, "finalresult.txt")
 	global startTime = now()
 	@show startTime
-	opt = Opt(:LN_NELDERMEAD,9)
-	lower_bounds!(opt, vec(zeros(1,9)))#constrain all parameters to be positive
+	opt = Opt(:LN_NELDERMEAD,11)
+	#lower_bounds!(opt, vec(zeros(1,11)))#constrain all parameters to be positive
+	lower_bounds!(opt, vec(fill(eps(),1,11)))#constrain all parameters to be positive and non zero
 	xtol_rel!(opt,1e-2)
 	min_objective!(opt, parallel_calculateTotalMSENL)
 	(minf,minx,ret) = NLopt.optimize(opt, params0)
@@ -43,7 +44,6 @@ println("made it here")
 #	push!(params0, float(ARGS[j]))
 #end
 #attemptOptimization(params0)
-params0 = [75,1.5,.5,250, .5, .5, 1.67,.96, .7]
-#params0 = [80.0584404713399,4.737419954240266,1.840655843188263,735.3090096165663,1.0137923403000126,0.7461592266809061,1.4258794318190846,0.7237063083438957,0.01225285446614379]
+params0 = [75,1.5,.5,250, .5, .5, 1.67,.96, .7,6,1.5]
 attemptOptimizationusingNLopt(params0)
 
