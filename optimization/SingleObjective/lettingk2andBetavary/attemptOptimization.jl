@@ -32,6 +32,9 @@ function attemptOptimizationusingNLopt(params0)
 	xtol_rel!(opt,1e-2)
 	min_objective!(opt, parallel_calculateTotalMSENL)
 	(minf,minx,ret) = NLopt.optimize(opt, params0)
+	@show minf
+	@show minx
+	@show ret
 	f = open(finalresult, "a")
 	write(f,"got $minf at $minx after $count iterations (returned $ret)")
 	close(f)

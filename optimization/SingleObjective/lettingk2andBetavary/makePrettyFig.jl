@@ -156,7 +156,7 @@ end
 
 function generateDataSingleObj(patientID,outputdir)
 	inputdir = "/home/rachel/Documents/work/LinkedRecordsTimeData10min/"
-	pathtoparams = pathtoparams = "/home/rachel/Documents/work/optimization/SingleObjective/lettingk2andBetavary/bestparamsAug31morning"
+	pathtoparams = pathtoparams = "/home/rachel/Documents/work/optimization/SingleObjective/lettingk2andBetavary/bestparamsSept1"
 	pathToMSEOriginalParams = string(outputdir, "MSEOriginalParams.txt")
 	pathToMSEBestParams = string(outputdir, "MSEBestParams.txt")
 	datasavestr = string(outputdir, patientID, ".txt")
@@ -281,7 +281,7 @@ function mainforSingleObjective()
 		close("all")
 		@show patientID
 		
-		mainoutputdir = "/home/rachel/Documents/work/optimization/SingleObjective/lettingk2andBetavary/figures/Aug31/"
+		mainoutputdir = "/home/rachel/Documents/work/optimization/SingleObjective/lettingk2andBetavary/figures/Sept1/"
 		MIMICdata = generateDataSingleObj(patientID,mainoutputdir)
 		curroutput = string(mainoutputdir, patientID, ".txt")
 		times =getTimes(curroutput)
