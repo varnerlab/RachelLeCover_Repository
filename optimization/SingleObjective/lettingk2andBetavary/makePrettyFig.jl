@@ -156,7 +156,7 @@ end
 
 function generateDataSingleObj(patientID,outputdir)
 	inputdir = "/home/rachel/Documents/work/LinkedRecordsTimeData10min/"
-	pathtoparams = pathtoparams = "/home/rachel/Documents/work/optimization/SingleObjective/lettingk2andBetavary/bestparamsSept1"
+	pathtoparams = pathtoparams = "/home/rachel/Documents/work/optimization/SingleObjective/lettingk2andBetavary/originalparams"
 	pathToMSEOriginalParams = string(outputdir, "MSEOriginalParams.txt")
 	pathToMSEBestParams = string(outputdir, "MSEBestParams.txt")
 	datasavestr = string(outputdir, patientID, ".txt")
@@ -212,7 +212,7 @@ function makeGraphSingle(data,times, MIMICdata,savestr)
 	#@show data
 	p1=plot(MIMICdata[:_Elapsed_time_], MIMICdata[:_HR_], "x", color = "0.0") #actual data
 	p2=plot(times, transpose(data[:,1]), "v", color = ".5",markeredgewidth=0.0,markersize = 2.5) #using original params
-	p3= plot(times, transpose(data[:,2]), "o", color = ".25",markeredgewidth=0.0,markersize = 2.5) #using new estimated params
+	#p3= plot(times, transpose(data[:,2]), "o", color = ".25",markeredgewidth=0.0,markersize = 2.5) #using new estimated params
 	xlabel("Time in Seconds", fontsize=18)
 	ylabel("Heart Rate, in BPM", fontsize=18)
 	#legend([p1,p2,p3],["Actual Data", "Using Original Parameters", "Using Optimized Parameters"])
@@ -281,7 +281,7 @@ function mainforSingleObjective()
 		close("all")
 		@show patientID
 		
-		mainoutputdir = "/home/rachel/Documents/work/optimization/SingleObjective/lettingk2andBetavary/figures/Sept1/"
+		mainoutputdir = "/home/rachel/Documents/work/optimization/SingleObjective/lettingk2andBetavary/figures/Sept6/"
 		MIMICdata = generateDataSingleObj(patientID,mainoutputdir)
 		curroutput = string(mainoutputdir, patientID, ".txt")
 		times =getTimes(curroutput)

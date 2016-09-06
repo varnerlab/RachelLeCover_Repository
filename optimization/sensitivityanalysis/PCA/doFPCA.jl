@@ -67,6 +67,43 @@ function reshapeData(data)
 	return output
 end
 
+function writeEigenFunctionsToFiles(output)
+	file1EF = "PCAoutput/firstEF.txt"
+	file2EF = "PCAoutput/secondEF.txt"
+	file3EF = "PCAoutput/thirdEF.txt"
+	file4EF = "PCAoutpt/fourthEF.txt"
+	file5EF = "PCAoutpt/fifthEF.txt"
+	file6EF = "PCAoutpt/sixthEF.txt"
+	file7EF = "PCAoutpt/seventhEF.txt"
+	file8EF = "PCAoutpt/eighthEF.txt"
+
+	EFs = output[:phi]
+	files = [file1EF, file2EF, file3EF, file4EF, file5EF, file6EF, file7EF, file8EF]
+
+	counter = 1
+	for file in files
+		touch(file)
+		f=open(file, "a+")
+		cleanedEF= string(EFs[:,counter])[2:end-1]
+		#[2:end-1] is to remove brackets
+		write(f, string(cleanedEF, "\n"))
+		close(f)
+		counter=counter+1
+	end
+
+	
+end
+
+function writeCumFVEtoFile(output)
+	filename = "PCAoutput/CumFVE.txt"
+	cumFVE = output[:cumFVE]
+	touch(filename)
+	f = open(filename, "a+")
+	cleanedFVE = string(cumFVE)[2:end-1]
+	write(f, string(cleanedFVE, "\n")
+	close(f)
+end	
+
 function main()
 	#sampleData = generateSampleData(3,10)
 	#times = float(ones(3,10).*transpose(collect(1:10)))
@@ -115,5 +152,7 @@ function main()
 	#outputFPCA=R"FPCA(sampleData, times, list(error=FALSE, kernel='epan', verbose=TRUE, diagnosticsPlot=TRUE,userBwCov = 10))"
 	#transfer the output back to Julia
 	convoutput =rcopy(outputFPCA)
+	writeEigenFunctionsToFiles(convoutput)
+	writeCumFVEToFile(convoutput)
 	return convoutput
 end

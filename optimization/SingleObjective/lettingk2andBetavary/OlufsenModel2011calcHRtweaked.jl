@@ -91,6 +91,15 @@ function calculateHR2012(cnor, cach)
 #	Mnor = .96
 	hconv = h0*60;
 	h = hconv*(1+Mnor*cnor-Mach*cach)
+	if(h > 220)
+		@show cnor, cach, h
+		println("Too big")
+
+	elseif(h< 30)
+		@show cnor, cach, h
+		println("Too small")
+	end
+
 	return h
 end
 
@@ -385,7 +394,7 @@ function calculateHeartRateForSaving(data,params,savestr,datasavestr)
 	global Mach = params[9]
 	global beta = params[10]
 	global k2 = params[11]
-	
+	println(string("alpha = ", alpha, "N = ", N, "M = ", M, "k1 = ", k1 , "k2 = ", k2, "tau1 = ", tau1, "tau2 = ", tau2, "tauAch = ", tauach, "tauNor = ", taunor, "beta = ", beta, "h0 = ", h0, "mnor = ", Mnor, "mach = ", Mach))
 
 
 	#should play with these
