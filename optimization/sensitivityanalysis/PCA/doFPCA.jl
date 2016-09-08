@@ -197,6 +197,8 @@ function main()
 		writeEigenFunctionsToFiles(convoutput,outputdir)
 		writeCumFVEtoFile(convoutput,outputdir)
 		writeScoresToFile(convoutput,outputdir)
+		#writeRhoToFile(convoutput,outputdir)
+		writedlm(string(outputdir, "totaloutput", k, ".txt"), convoutput)
 		toc()
 	end
 	
