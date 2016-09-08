@@ -107,8 +107,8 @@ function writeCumFVEtoFile(output,outputdir)
 	close(f)
 end
 
-function writeScoresToFile(output,outputdir)
-	filename= string(outputdir, "PCscores.txt")
+function writeScoresToFile(output,outputdir, paramset)
+	filename= string(outputdir, "PCscores", paramset,".txt")
 	score = output[:xiEst]
 	@show score
 	touch(filename)
@@ -119,28 +119,16 @@ function writeScoresToFile(output,outputdir)
 
 end
 
-function writeRhoToFile(output,outputdir)
-	filename= string(outputdir, "PCscores.txt")
-	rho = output[:rho]
-	@show score
-	touch(filename)
-	f = open(filename, "a+")
-	cleanedrho = string(rho)[2:end-1]
-	write(f, string(cleanedrho, "\n"))
-	close(f)
-
-end	
-
 function main()
 	#sampleData = generateSampleData(3,10)
 	#times = float(ones(3,10).*transpose(collect(1:10)))
 	dataDir = "/home/rachel/Documents/work/optimization/sensitivityanalysis/PCA/testingdata25percent/"
-	outputdir = "/home/rachel/Documents/work/optimization/sensitivityanalysis/PCA/PCAoutputSept8/"
+	outputdir = "/home/rachel/Documents/work/optimization/sensitivityanalysis/PCA/PCAoutputSept8Take2/"
 	#load the library neccessary into R
 	R"library(fdapace)"
 	numberOfSamples = 28
 
-	for k in collect(1:numberOfSamples)
+	for k in collect(7:numberOfSamples)
 		tic()
 		searchStr = string("set",k,".Cleaned")
 		tic()
@@ -196,7 +184,7 @@ function main()
 		convoutput =rcopy(outputFPCA)
 		writeEigenFunctionsToFiles(convoutput,outputdir)
 		writeCumFVEtoFile(convoutput,outputdir)
-		writeScoresToFile(convoutput,outputdir)
+		writeScoresToFile(convoutput,outputdir,k)
 		#writeRhoToFile(convoutput,outputdir)
 		writedlm(string(outputdir, "totaloutput", k, ".txt"), convoutput)
 		toc()
