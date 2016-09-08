@@ -105,18 +105,42 @@ function writeCumFVEtoFile(output,outputdir)
 	cleanedFVE = string(cumFVE)[2:end-1]
 	write(f, string(cleanedFVE, "\n"))
 	close(f)
+end
+
+function writeScoresToFile(output,outputdir)
+	filename= string(outputdir, "PCscores.txt")
+	score = output[:xiEst]
+	@show score
+	touch(filename)
+	f = open(filename, "a+")
+	cleanedscore = string(score)[2:end-1]
+	write(f, string(cleanedscore, "\n"))
+	close(f)
+
+end
+
+function writeRhoToFile(output,outputdir)
+	filename= string(outputdir, "PCscores.txt")
+	rho = output[:rho]
+	@show score
+	touch(filename)
+	f = open(filename, "a+")
+	cleanedrho = string(rho)[2:end-1]
+	write(f, string(cleanedrho, "\n"))
+	close(f)
+
 end	
 
 function main()
 	#sampleData = generateSampleData(3,10)
 	#times = float(ones(3,10).*transpose(collect(1:10)))
 	dataDir = "/home/rachel/Documents/work/optimization/sensitivityanalysis/PCA/testingdata25percent/"
-	outputdir = "/home/rachel/Documents/work/optimization/sensitivityanalysis/PCA/crashtest/"
+	outputdir = "/home/rachel/Documents/work/optimization/sensitivityanalysis/PCA/PCAoutputSept8/"
 	#load the library neccessary into R
 	R"library(fdapace)"
 	numberOfSamples = 28
 
-	for k in collect(8:numberOfSamples)
+	for k in collect(1:numberOfSamples)
 		tic()
 		searchStr = string("set",k,".Cleaned")
 		tic()
@@ -160,8 +184,8 @@ function main()
 
 		#@show datalist
 
-		writedlm(string(outputdir,"timelistSet", k, ".txt"), timelist)
-		writedlm(string(outputdir,"datalistSet", k, ".txt"), datalist)	
+		#writedlm(string(outputdir,"timelistSet", k, ".txt"), timelist)
+		#writedlm(string(outputdir,"datalistSet", k, ".txt"), datalist)	
 	
 	#	#run FPCA
 		tic()
@@ -172,7 +196,8 @@ function main()
 		convoutput =rcopy(outputFPCA)
 		writeEigenFunctionsToFiles(convoutput,outputdir)
 		writeCumFVEtoFile(convoutput,outputdir)
+		writeScoresToFile(convoutput,outputdir)
 		toc()
 	end
-	return convoutput
+	
 end
