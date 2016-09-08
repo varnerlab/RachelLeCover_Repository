@@ -141,8 +141,9 @@ end
 
 function saveDataToFile(tsim, HRsim,filename)
 	f = open(filename, "a")
-	write(f, string(tsim, "\n"))
-	write(f, string(HRsim, "\n"))
+	#[2:end-1] to remove square brackets
+	write(f, string(string(tsim)[2:end-1], "\n"))
+	write(f, string(string(HRsim)[2:end-1], "\n"))
 	close(f)
 end
 

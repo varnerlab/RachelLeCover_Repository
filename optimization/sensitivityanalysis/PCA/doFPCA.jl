@@ -24,14 +24,17 @@ function doPCA(data)
 	
 end
 
-function readData(dataDir)
+function readData(dataDir, searchStr)
 	times =Array{Float64}[]
 	hrdata = Array{Float64}[]
 	alltimepoints = size(collect(.5:.5:599),1)
 	filenames = readdir(dataDir)
+	#@show filenames
 	for fn in filenames
-		if(contains(fn, ".txtCleaned"))
+		#@show searchStr
+		if(contains(fn, searchStr))
 			txt = readdlm(string(dataDir,fn), header=false, ',')
+			#@show txt
 			#odd lines contain times, even lines contain hr
 			numrows = size(txt, 1)
 			numcols = size(txt,2)
@@ -67,15 +70,15 @@ function reshapeData(data)
 	return output
 end
 
-function writeEigenFunctionsToFiles(output)
-	file1EF = "PCAoutput/firstEF.txt"
-	file2EF = "PCAoutput/secondEF.txt"
-	file3EF = "PCAoutput/thirdEF.txt"
-	file4EF = "PCAoutpt/fourthEF.txt"
-	file5EF = "PCAoutpt/fifthEF.txt"
-	file6EF = "PCAoutpt/sixthEF.txt"
-	file7EF = "PCAoutpt/seventhEF.txt"
-	file8EF = "PCAoutpt/eighthEF.txt"
+function writeEigenFunctionsToFiles(output,outputdir)
+	file1EF = string(outputdir,"firstEF.txt")
+	file2EF = string(outputdir,"secondEF.txt")
+	file3EF = string(outputdir,"thirdEF.txt")
+	file4EF = string(outputdir,"fourthEF.txt")
+	file5EF = string(outputdir,"fifthEF.txt")
+	file6EF = string(outputdir,"sixthEF.txt")
+	file7EF = string(outputdir,"seventhEF.txt")
+	file8EF = string(outputdir,"eighthEF.txt")
 
 	EFs = output[:phi]
 	files = [file1EF, file2EF, file3EF, file4EF, file5EF, file6EF, file7EF, file8EF]
@@ -94,65 +97,82 @@ function writeEigenFunctionsToFiles(output)
 	
 end
 
-function writeCumFVEtoFile(output)
-	filename = "PCAoutput/CumFVE.txt"
+function writeCumFVEtoFile(output,outputdir)
+	filename = string(outputdir,"CumFVE.txt")
 	cumFVE = output[:cumFVE]
 	touch(filename)
 	f = open(filename, "a+")
 	cleanedFVE = string(cumFVE)[2:end-1]
-	write(f, string(cleanedFVE, "\n")
+	write(f, string(cleanedFVE, "\n"))
 	close(f)
 end	
 
 function main()
 	#sampleData = generateSampleData(3,10)
 	#times = float(ones(3,10).*transpose(collect(1:10)))
-	dataDir = "/home/rachel/Documents/work/optimization/SingleObjective/lettingk2andBetavary/figures/Sept1/"
-	tic()
-	times, sampleData = readData(dataDir)
-	toc()
-	times = reshapeData(times)
-	sampleData = reshapeData(sampleData)
-	#@show times
-
+	dataDir = "/home/rachel/Documents/work/optimization/sensitivityanalysis/PCA/testingdata25percent/"
+	outputdir = "/home/rachel/Documents/work/optimization/sensitivityanalysis/PCA/crashtest/"
 	#load the library neccessary into R
 	R"library(fdapace)"
-	#transfer the data from Julia to R
-	@rput (sampleData)
-	@rput times
-	#convert the data in R to dataframes
-	R"sampleDatadf<-data.frame(sampleData)"
-	R"timesdf<-data.frame(times)"
-	#remove filler text
-	R"sampleDatadf[sampleDatadf==-1]<-NA"
-	R"timesdf[timesdf==-1]<-NA"
+	numberOfSamples = 28
 
-	#remove NAs
-	R"cleanedData<-data.frame()"
-	R"cleanedTimes<-data.frame()"
-	#R"for (i in seq(1,nrow(sampleDatadf))){idx<-!is.na(sampleDatadf[i,]); cleanedData[[i]]<-sampleDatadf[i,idx]}"
-	#R"for (i in seq(1,nrow(timesdf))){idx<-!is.na(timesdf[i,]); cleanedTimes[[i]]<-timesdf[i,idx]}"
+	for k in collect(8:numberOfSamples)
+		tic()
+		searchStr = string("set",k,".Cleaned")
+		tic()
+		times, sampleData = readData(dataDir, searchStr)
+		toc()
+		times = reshapeData(times)
+		sampleData = reshapeData(sampleData)
+		@show size(times)
 
-	#R"for (i in seq(1,nrow(sampleDatadf))){idx<-!is.na(sampleDatadf[i,]); sampleDatadf[i,]<-sampleDatadf[i,idx]}"
-	#R"for (i in seq(1,nrow(timesdf))){idx<-!is.na(timesdf[i,]); timesdf[i,]<-timesdf[i,idx]}"
 
-#	#convert to lists
-	R"datalist = list()"
-	#R"for (i in seq(1,nrow(sampleDatadf))){datalist[[i]]<-as.numeric(as.vector(na.omit(sampleDatadf[i,])))}"
-	R"for (i in seq(1,nrow(sampleDatadf))){cleanedvector<-sampleDatadf[i,];length(cleanedvector)<-sum(!is.na(cleanedvector));datalist[[i]]<-as.numeric(cleanedvector)}"
-	R"timelist = list()"
-	#R"for (i in seq(1,nrow(timesdf))){timelist[[i]]<-as.numeric(as.vector(na.omit(timesdf[i,])))}"
-	R"for (i in seq(1,nrow(timesdf))){cleanedvector<-timesdf[i,];length(cleanedvector)<-sum(!is.na(cleanedvector));timelist[[i]]<-as.numeric(cleanedvector)}"
-	R"print(timelist[1])"	
+		#transfer the data from Julia to R
+		@rput (sampleData)
+		@rput times
+
+		#R"sampleData"
+		#convert the data in R to dataframes
+		R"sampleDatadf<-data.frame(sampleData)"
+		R"timesdf<-data.frame(times)"
+		#remove filler text
+		R"sampleDatadf[sampleDatadf==-1]<-NA"
+		R"timesdf[timesdf==-1]<-NA"
+
+		#remove NAs
+		R"cleanedData<-data.frame()"
+		R"cleanedTimes<-data.frame()"
+		#R"for (i in seq(1,nrow(sampleDatadf))){idx<-!is.na(sampleDatadf[i,]); cleanedData[[i]]<-sampleDatadf[i,idx]}"
+		#R"for (i in seq(1,nrow(timesdf))){idx<-!is.na(timesdf[i,]); cleanedTimes[[i]]<-timesdf[i,idx]}"
+
+		#R"for (i in seq(1,nrow(sampleDatadf))){idx<-!is.na(sampleDatadf[i,]); sampleDatadf[i,]<-sampleDatadf[i,idx]}"
+		#R"for (i in seq(1,nrow(timesdf))){idx<-!is.na(timesdf[i,]); timesdf[i,]<-timesdf[i,idx]}"
+
+	#	#convert to lists
+		R"datalist = list()"
+		#R"for (i in seq(1,nrow(sampleDatadf))){datalist[[i]]<-as.numeric(as.vector(na.omit(sampleDatadf[i,])))}"
+		R"for (i in seq(1,nrow(sampleDatadf))){cleanedvector<-sampleDatadf[i,];length(cleanedvector)<-sum(!is.na(cleanedvector));datalist[[i]]<-as.numeric(cleanedvector)}"
+		R"timelist = list()"
+		#R"for (i in seq(1,nrow(timesdf))){timelist[[i]]<-as.numeric(as.vector(na.omit(timesdf[i,])))}"
+		R"for (i in seq(1,nrow(timesdf))){cleanedvector<-timesdf[i,];length(cleanedvector)<-sum(!is.na(cleanedvector));timelist[[i]]<-as.numeric(cleanedvector)}"
+		datalist = rcopy(R"datalist")
+		timelist = rcopy(R"timelist")
+
+		#@show datalist
+
+		writedlm(string(outputdir,"timelistSet", k, ".txt"), timelist)
+		writedlm(string(outputdir,"datalistSet", k, ".txt"), datalist)	
 	
-#	#run FPCA
-	tic()
-	outputFPCA=R"FPCA(datalist, timelist, list(error=FALSE, kernel='epan', verbose=TRUE, diagnosticsPlot=TRUE,userBwCov = 10))"
-	toc()
-	#outputFPCA=R"FPCA(sampleData, times, list(error=FALSE, kernel='epan', verbose=TRUE, diagnosticsPlot=TRUE,userBwCov = 10))"
-	#transfer the output back to Julia
-	convoutput =rcopy(outputFPCA)
-	writeEigenFunctionsToFiles(convoutput)
-	writeCumFVEToFile(convoutput)
+	#	#run FPCA
+		tic()
+		outputFPCA=R"FPCA(datalist, timelist, list(error=FALSE, kernel='epan', verbose=TRUE, diagnosticsPlot=TRUE,userBwCov = 10, maxK = 10))"
+		toc()
+		#outputFPCA=R"FPCA(sampleData, times, list(error=FALSE, kernel='epan', verbose=TRUE, diagnosticsPlot=TRUE,userBwCov = 10))"
+		#transfer the output back to Julia
+		convoutput =rcopy(outputFPCA)
+		writeEigenFunctionsToFiles(convoutput,outputdir)
+		writeCumFVEtoFile(convoutput,outputdir)
+		toc()
+	end
 	return convoutput
 end
