@@ -116,8 +116,8 @@ function writeMSEtoFile(filename,patientID,MSE)
 end
 
 function generateDataSingleObj(patientID,outputdir)
-	inputdir = "/home/rachel/Documents/work/LinkedRecordsTimeData10min/"
-	pathtoparams ="/home/rachel/Documents/work/optimization/sensitivityanalysis/usingSALib/samplesSaltellinof1noTauD25percent.txt" 
+	inputdir = "/home/rachel/Documents/work/optimization/LinkedRecordsTimeData10min/"
+	pathtoparams ="/home/rachel/Documents/work/optimization/sensitivityanalysis/usingSALib/parameters25Percent.txt" 
 	pathToMSEAllParams = string(outputdir, "MSEAllParams.txt")
 	allparamsets = getClusterParams(pathtoparams)
 	#allparamsets = [[1.5,75.0,120.0, 1.5, 1.5, .5, 250.0, .5, .5, 6, 1.67, .96, .7]]
@@ -166,7 +166,7 @@ function mainforSingleObjective()
 		close("all")
 		@show patientID
 		
-		mainoutputdir = "/home/rachel/Documents/work/optimization/sensitivityanalysis/PCA/testingdata25percent/"
+		mainoutputdir = "/home/rachel/Documents/work/optimization/sensitivityanalysis/PCA/data25PercentSept9/"
 		MIMICdata = generateDataSingleObj(patientID,mainoutputdir)
 
 	end
