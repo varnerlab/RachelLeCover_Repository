@@ -1,3 +1,5 @@
+#to agglomerate data for each patient
+
 function processFPCAdata(numParamSets, dataDir,inNameStr, outNameStr,outputdir)
 	filenames = readdir(dataDir)
 	counter = 1

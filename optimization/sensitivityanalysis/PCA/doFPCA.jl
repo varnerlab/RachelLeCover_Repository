@@ -122,15 +122,15 @@ end
 function main()
 	#sampleData = generateSampleData(3,10)
 	#times = float(ones(3,10).*transpose(collect(1:10)))
-	dataDir = "/home/rachel/Documents/work/optimization/sensitivityanalysis/PCA/testingdata25percent/"
-	outputdir = "/home/rachel/Documents/work/optimization/sensitivityanalysis/PCA/PCAoutputSept8Take2/"
+	dataDir = "/home/rachel/Documents/work/optimization/sensitivityanalysis/PCA/data25PercentSept9/"
+	outputdir = "/home/rachel/Documents/work/optimization/sensitivityanalysis/PCA/PCAoutputSept12/"
 	#load the library neccessary into R
 	R"library(fdapace)"
-	numberOfSamples = 28
+	numberOfSamples = 280
 
-	for k in collect(7:numberOfSamples)
+	for k in collect(57:numberOfSamples)
 		tic()
-		searchStr = string("set",k,".Cleaned")
+		searchStr = string("paramset", k, ".txt")
 		tic()
 		times, sampleData = readData(dataDir, searchStr)
 		toc()
