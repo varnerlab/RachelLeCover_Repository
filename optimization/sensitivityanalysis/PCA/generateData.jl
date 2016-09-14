@@ -117,7 +117,7 @@ end
 
 function generateDataSingleObj(patientID,outputdir)
 	inputdir = "/home/rachel/Documents/work/optimization/LinkedRecordsTimeData10min/"
-	pathtoparams ="/home/rachel/Documents/work/optimization/sensitivityanalysis/usingSALib/parameters25Percent.txt" 
+	pathtoparams ="/home/rachel/Documents/work/optimization/sensitivityanalysis/usingSALib/morrisParamsN20.txt" 
 	pathToMSEAllParams = string(outputdir, "MSEAllParams.txt")
 	allparamsets = getClusterParams(pathtoparams)
 	#allparamsets = [[1.5,75.0,120.0, 1.5, 1.5, .5, 250.0, .5, .5, 6, 1.67, .96, .7]]
@@ -166,7 +166,7 @@ function mainforSingleObjective()
 		close("all")
 		@show patientID
 		
-		mainoutputdir = "/home/rachel/Documents/work/optimization/sensitivityanalysis/PCA/data25PercentSept9/"
+		mainoutputdir = "/home/rachel/Documents/work/optimization/sensitivityanalysis/PCA/data25PercentMorrisN20/"
 		MIMICdata = generateDataSingleObj(patientID,mainoutputdir)
 
 	end

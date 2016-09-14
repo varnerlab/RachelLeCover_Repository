@@ -128,7 +128,7 @@ function main()
 	R"library(fdapace)"
 	numberOfSamples = 280
 
-	for k in collect(57:numberOfSamples)
+	for k in collect(194:numberOfSamples)
 		tic()
 		searchStr = string("paramset", k, ".txt")
 		tic()
@@ -177,7 +177,7 @@ function main()
 	
 	#	#run FPCA
 		tic()
-		outputFPCA=R"FPCA(datalist, timelist, list(error=FALSE, kernel='epan', verbose=TRUE, diagnosticsPlot=TRUE,userBwCov = 10, maxK = 10))"
+		outputFPCA=R"FPCA(datalist, timelist, list(error=FALSE, kernel='epan', verbose=TRUE, diagnosticsPlot=FALSE,userBwCov = 10, maxK = 10))"
 		toc()
 		#outputFPCA=R"FPCA(sampleData, times, list(error=FALSE, kernel='epan', verbose=TRUE, diagnosticsPlot=TRUE,userBwCov = 10))"
 		#transfer the output back to Julia
@@ -188,6 +188,84 @@ function main()
 		#writeRhoToFile(convoutput,outputdir)
 		writedlm(string(outputdir, "totaloutput", k, ".txt"), convoutput)
 		toc()
+	end
+	
+end
+
+function mainEachPatient()
+	dataDir = "/home/rachel/Documents/work/optimization/sensitivityanalysis/PCA/data25PercentSept9/"
+	outputdir = "/home/rachel/Documents/work/optimization/sensitivityanalysis/PCA/PCAoutputSept12/"
+	#load the library neccessary into R
+	R"library(fdapace)"
+	numberOfSamples = 280
+
+	cluster1path = "/home/rachel/Documents/work/optimization/multiobjective/usingPOETs/cluster1subjectIDs"
+	cluster2path = "/home/rachel/Documents/work/optimization/multiobjective/usingPOETs/cluster2subjectIDs"
+	allpatients = AbstractString[]
+
+	f = open(cluster1path)
+	for ln in eachline(f)
+		if(length(ln)>1)
+			push!(allpatients, strip(ln))
+		end
+	end
+	close(f)
+
+	f = open(cluster2path)
+	for ln in eachline(f)
+		if(length(ln)>1)
+			push!(allpatients, strip(ln))
+		end
+	end
+	close(f)
+	for patientID in allpatients
+	
+			tic()
+			searchStr = string(patientID,"paramset", ".txt")
+			tic()
+			times, sampleData = readData(dataDir, searchStr)
+			toc()
+			times = reshapeData(times)
+			sampleData = reshapeData(sampleData)
+			@show size(times)
+
+			#transfer the data from Julia to R
+			@rput (sampleData)
+			@rput times
+
+			#R"sampleData"
+			#convert the data in R to dataframes
+			R"sampleDatadf<-data.frame(sampleData)"
+			R"timesdf<-data.frame(times)"
+			#remove filler text
+			R"sampleDatadf[sampleDatadf==-1]<-NA"
+			R"timesdf[timesdf==-1]<-NA"
+
+			#remove NAs
+			R"cleanedData<-data.frame()"
+			R"cleanedTimes<-data.frame()"
+
+			#convert to lists
+			R"datalist = list()"
+			#R"for (i in seq(1,nrow(sampleDatadf))){datalist[[i]]<-as.numeric(as.vector(na.omit(sampleDatadf[i,])))}"
+			R"for (i in seq(1,nrow(sampleDatadf))){cleanedvector<-sampleDatadf[i,];length(cleanedvector)<-sum(!is.na(cleanedvector));datalist[[i]]<-as.numeric(cleanedvector)}"
+			R"timelist = list()"
+			#R"for (i in seq(1,nrow(timesdf))){timelist[[i]]<-as.numeric(as.vector(na.omit(timesdf[i,])))}"
+			R"for (i in seq(1,nrow(timesdf))){cleanedvector<-timesdf[i,];length(cleanedvector)<-sum(!is.na(cleanedvector));timelist[[i]]<-as.numeric(cleanedvector)}"
+			datalist = rcopy(R"datalist")
+			timelist = rcopy(R"timelist")
+
+			#run FPCA
+			tic()
+			outputFPCA=R"FPCA(datalist, timelist, list(error=FALSE, kernel='epan', verbose=TRUE, diagnosticsPlot=TRUE,userBwCov = 10, maxK = 10))"
+			toc()
+			#transfer the output back to Julia
+			convoutput =rcopy(outputFPCA)
+			writeEigenFunctionsToFiles(convoutput,outputdir)
+			writeCumFVEtoFile(convoutput,outputdir)
+			writeScoresToFile(convoutput,outputdir,patientID)
+			writedlm(string(outputdir, "totaloutput", patientID, ".txt"), convoutput)
+			toc()
 	end
 	
 end
