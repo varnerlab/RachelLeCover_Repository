@@ -161,9 +161,10 @@ function mainforSingleObjective()
 		end
 	end
 	close(f)
-
-	for patientID in allpatients
+	#[1:length(allpatients)][allpatients .=="s17795-3483-10-23-06-36n"] #to look up index of a patient
+	for j in collect(30:length(allpatients))
 		close("all")
+		patientID = allpatients[j]
 		@show patientID
 		
 		mainoutputdir = "/home/rachel/Documents/work/optimization/sensitivityanalysis/PCA/data25PercentMorrisN100/"
