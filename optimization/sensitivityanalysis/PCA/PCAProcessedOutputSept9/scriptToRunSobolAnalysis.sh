@@ -1,7 +1,8 @@
 #!/bin/bash
-for j in `seq 1 273`;
+files=/home/rachel/Documents/work/optimization/sensitivityanalysis/PCA/PCAoutput25PercentMorrisN20/
+for f in $files;
 do
-	echo $i
-	python -m SALib.analyze.sobol -p boundsnoTauD25percent.txt -Y "PCScoresForPatient"$j".txt" -c 0 > "Patient"$j"SobolResults.txt"
+	echo $f
+	python -m SALib.analyze.morris -p /home/rachel/Documents/work/optimization/sensitivityanalysis/usingSALib/morrisParamsN20.txt -X $f -c 0 > $f"MorrisResults.txt"
 
 done

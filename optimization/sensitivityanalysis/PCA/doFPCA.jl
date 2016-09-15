@@ -31,7 +31,7 @@ function readData(dataDir, searchStr)
 	filenames = readdir(dataDir)
 	#@show filenames
 	for fn in filenames
-		#@show searchStr
+		#@show searchStr,fn
 		if(contains(fn, searchStr))
 			txt = readdlm(string(dataDir,fn), header=false, ',')
 			#@show txt
@@ -128,7 +128,7 @@ function main()
 	R"library(fdapace)"
 	numberOfSamples = 280
 
-	for k in collect(194:numberOfSamples)
+	for k in collect(244:numberOfSamples)
 		tic()
 		searchStr = string("paramset", k, ".txt")
 		tic()
@@ -193,8 +193,8 @@ function main()
 end
 
 function mainEachPatient()
-	dataDir = "/home/rachel/Documents/work/optimization/sensitivityanalysis/PCA/data25PercentSept9/"
-	outputdir = "/home/rachel/Documents/work/optimization/sensitivityanalysis/PCA/PCAoutputSept12/"
+	dataDir = "/home/rachel/Documents/work/optimization/sensitivityanalysis/PCA/data25PercentMorrisN20/"
+	outputdir = "/home/rachel/Documents/work/optimization/sensitivityanalysis/PCA/PCAoutput25PercentMorrisN20/"
 	#load the library neccessary into R
 	R"library(fdapace)"
 	numberOfSamples = 280
@@ -221,7 +221,7 @@ function mainEachPatient()
 	for patientID in allpatients
 	
 			tic()
-			searchStr = string(patientID,"paramset", ".txt")
+			searchStr = string(patientID,"paramset")
 			tic()
 			times, sampleData = readData(dataDir, searchStr)
 			toc()
@@ -257,11 +257,11 @@ function mainEachPatient()
 
 			#run FPCA
 			tic()
-			outputFPCA=R"FPCA(datalist, timelist, list(error=FALSE, kernel='epan', verbose=TRUE, diagnosticsPlot=TRUE,userBwCov = 10, maxK = 10))"
+			outputFPCA=R"FPCA(datalist, timelist, list(error=FALSE, kernel='epan', verbose=TRUE, diagnosticsPlot=FALSE,userBwCov = 10, maxK = 10))"
 			toc()
 			#transfer the output back to Julia
 			convoutput =rcopy(outputFPCA)
-			writeEigenFunctionsToFiles(convoutput,outputdir)
+			#writeEigenFunctionsToFiles(convoutput,outputdir)
 			writeCumFVEtoFile(convoutput,outputdir)
 			writeScoresToFile(convoutput,outputdir,patientID)
 			writedlm(string(outputdir, "totaloutput", patientID, ".txt"), convoutput)
