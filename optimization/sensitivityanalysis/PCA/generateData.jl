@@ -162,7 +162,7 @@ function mainforSingleObjective()
 	end
 	close(f)
 	#[1:length(allpatients)][allpatients .=="s17795-3483-10-23-06-36n"] #to look up index of a patient
-	for j in collect(30:length(allpatients))
+	for j in collect(158:length(allpatients))
 		close("all")
 		patientID = allpatients[j]
 		@show patientID
