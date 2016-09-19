@@ -193,8 +193,8 @@ function main()
 end
 
 function mainEachPatient()
-	dataDir = "/home/rachel/Documents/work/optimization/sensitivityanalysis/PCA/data25PercentMorrisN20/"
-	outputdir = "/home/rachel/Documents/work/optimization/sensitivityanalysis/PCA/PCAoutput25PercentMorrisN20/"
+	dataDir = "/home/rachel/Documents/work/optimization/sensitivityanalysis/PCA/data25PercentMorrisN100/"
+	outputdir = "/home/rachel/Documents/work/optimization/sensitivityanalysis/PCA/PCAoutput25PercentMorrisN100/"
 	#load the library neccessary into R
 	R"library(fdapace)"
 	numberOfSamples = 280
