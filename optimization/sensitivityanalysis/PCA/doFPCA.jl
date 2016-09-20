@@ -122,8 +122,8 @@ end
 function main()
 	#sampleData = generateSampleData(3,10)
 	#times = float(ones(3,10).*transpose(collect(1:10)))
-	dataDir = "/home/rachel/Documents/work/optimization/sensitivityanalysis/PCA/data25PercentSept9/"
-	outputdir = "/home/rachel/Documents/work/optimization/sensitivityanalysis/PCA/PCAoutputSept12/"
+	dataDir = "/home/rachel/Documents/work/optimization/sensitivityanalysis/PCA/data25PercentMorrisN100/"
+	outputdir = "/home/rachel/Documents/work/optimization/sensitivityanalysis/PCA/PCAoutputMorrisN100_25Percent/"
 	#load the library neccessary into R
 	R"library(fdapace)"
 	numberOfSamples = 280
