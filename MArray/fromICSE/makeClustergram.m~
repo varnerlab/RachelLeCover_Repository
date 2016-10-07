@@ -6,10 +6,10 @@ function makeClustergram()
     %cgobj = clustergram(numericgendata, 'RowLabels', names, 'ColumnLabels', names, ...
     %    'ColorMap', gray, 'Cluster', 'column', 'DisplayRange', 100, 'Linkage', 'average');
     cgobj = clustergram(transformedddata,...
-       'ColorMap', gray, 'Cluster', 'column',...)%, 'DisplayRange', 3, 'Linkage', 'average'...
-       'Symmetric', false, 'DisplayRange', 30);
+       'ColorMap', gray, 'Cluster', 'column', 'DisplayRange', 3, 'Linkage', 'average'...
+       ,'Symmetric', false);
     set(cgobj, 'DisplayRatio', .3);
-    set(cgobj,'Linkage','complete','Dendrogram',18) %color linkages
+    set(cgobj,'Linkage','complete','Dendrogram',4) %color linkages
     %add the color bar
     cbButton = findall(gcf,'tag','Annotation.InsertColorbar');
     ccb = get(cbButton,'ClickedCallback');

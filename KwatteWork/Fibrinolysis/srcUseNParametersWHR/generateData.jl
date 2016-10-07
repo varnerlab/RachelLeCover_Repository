@@ -254,7 +254,7 @@ end
 function plotMeanAllCompartments(dir, num_param_sets, patientID)
 	close("all")
 	tstart=0
-	 tend=600
+	 tend=100
 	 step=1.0
 
 	t = collect(tstart:step:tend)
@@ -361,7 +361,7 @@ function plotMeanAllCompartments(dir, num_param_sets, patientID)
 		elseif j in collect(57:64) #Fibrin
 			ax[:set_ylim]([0,10000])
 		elseif j in collect(65:72) #Plasmin
-			ax[:set_ylim]([0000,2100])
+			ax[:set_ylim]([0000,300])
 		elseif j in collect(73:80) #Fibrinogen
 			ax[:set_ylim]([0,10000])
 		elseif j in collect(81:88) #Plasminogen
@@ -413,5 +413,5 @@ function plotMeanAllCompartments(dir, num_param_sets, patientID)
 
 
 
-	savefig(string("outputOct6/600s/patient", patientID, "AllCompartments.pdf"),bbox_inches="tight")
+	savefig(string("outputOct7/100s/patient", patientID, "AllCompartments.pdf"),bbox_inches="tight")
 end
