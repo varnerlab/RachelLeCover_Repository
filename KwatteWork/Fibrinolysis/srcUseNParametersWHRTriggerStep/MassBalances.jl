@@ -82,10 +82,12 @@ for j = 1:number_of_compartments
 	ReducedDict= DataFileReactions(ic_arr)
 	 ReducedDict= setParameters(currparams,ReducedDict)
 	ReducedDict = patchParameters(ReducedDict,set_number)
-	#@show (ReducedDict)
+	#@show j
 	if(j == 8) #in wound
 		if(t<t_trigger)
 			ReducedDict[7]=0.0
+			@show t
+			println("set trigger to 0")
 		end
 	end
 		rate_vector_curr = Balances(t,currx,ReducedDict)

@@ -7,7 +7,7 @@ function generateData(num_param_sets, patientID,t_trigger)
 	close("all") #close already open windows
 	#set start time, stop time and step sizes
 	 tstart=0
-	 tend=100
+	 tend=600
 	 step=1.0
 	for j in collect(1:num_param_sets)
 		println(string("On set ", j," out of ",num_param_sets))
@@ -254,7 +254,7 @@ end
 function plotMeanAllCompartments(dir, num_param_sets, patientID)
 	close("all")
 	tstart=0
-	 tend=600
+	 tend=100
 	 step=1.0
 
 	t = collect(tstart:step:tend)
@@ -413,5 +413,5 @@ function plotMeanAllCompartments(dir, num_param_sets, patientID)
 
 
 
-	savefig(string("outputOct6/600s/patient", patientID, "AllCompartments.pdf"),bbox_inches="tight")
+	savefig(string("outputOct7/100s/patient", patientID, "AllCompartments.pdf"),bbox_inches="tight")
 end
