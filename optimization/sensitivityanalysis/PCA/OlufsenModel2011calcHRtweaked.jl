@@ -1,6 +1,6 @@
-@everywhere using ODE
-@everywhere using PyPlot
-@everywhere using DataFrames
+#@everywhere using ODE
+#@everywhere using PyPlot
+#@everywhere using DataFrames
 
 function nervous_system(t,y,fsym,fpar)
 	cnor = y[1]

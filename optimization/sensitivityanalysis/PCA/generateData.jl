@@ -1,27 +1,29 @@
 include("/home/rachel/Documents/work/optimization/sensitivityanalysis/PCA/OlufsenModel2011calcHRtweaked.jl")
 using PyPlot
+@everywhere using DataFrames
 
-function processNumericalData(filename)
-	df=readtable(filename, separator=',',nastrings=["-"])
+
+@everywhere function processNumericalData(filename)
+	df=DataFrames.readtable(filename, separator=',',nastrings=["-"])
 	units = df[1,:]
-	deleterows!(df,1) #remove the row that had units
-	writetable("tempoutputTA.csv", df)
-	dfnew = readtable("tempoutputTA.csv", separator=',')
+	DataFrames.deleterows!(df,1) #remove the row that had units
+	DataFrames.writetable(string("thread", myid(),"tempoutputTA.csv"), df)
+	dfnew = DataFrames.readtable(string("thread", myid(),"tempoutputTA.csv"), separator=',')
 	return dfnew, units
 end
 
-function cleandata(data)
+@everywhere function cleandata(data)
 	#remove any rows with NAs in the places I care about
 	data[~isna(data[:,symbol("_ABP_Mean_")]),:]	
-	deleterows!(data,find(isna(data[:,symbol("_ABP_Mean_")])))
+	DataFrames.deleterows!(data,find(isna(data[:,symbol("_ABP_Mean_")])))
 	data[~isna(data[:,symbol("_HR_")]),:]	
-	deleterows!(data,find(isna(data[:,symbol("_HR_")])))
+	DataFrames.deleterows!(data,find(isna(data[:,symbol("_HR_")])))
 
 	if(length(data[:_Elapsed_time_])>2)
 		timediff = data[:_Elapsed_time_][2]-data[:_Elapsed_time_][1]
 		#@show(timediff)
 		if (timediff > 10) #if there's a big gap between first and second measurement, throw out first one, start analysis at second point
-			deleterows!(data,1)
+			DataFrames.deleterows!(data,1)
 			println("found large gap and removed it")
 		end
 	end
@@ -29,14 +31,14 @@ function cleandata(data)
 	return data
 end
 
-function getClusterParams(pathtoclusterparams)
+@everywhere function getClusterParams(pathtoclusterparams)
 	number_of_parameters = 13
 	allparams = readdlm(pathtoclusterparams)
 	return transpose(allparams)
 
 end
 
-function getGeneratedData(filename, numdatapoints)
+@everywhere function getGeneratedData(filename, numdatapoints)
 	generatedData =zeros(numdatapoints)
 	f = open(filename)
 	alltext = readall(f)
@@ -60,7 +62,7 @@ function getGeneratedData(filename, numdatapoints)
 	return generatedData[:, 2:end]
 end
 
-function getTimes(filename)
+@everywhere function getTimes(filename)
 	
 	f = open(filename)
 	alltext = readall(f)
@@ -109,22 +111,22 @@ function getAverageMSE(patientID,outputdir)
 
 end
 
-function writeMSEtoFile(filename,patientID,MSE)
+@everywhere function writeMSEtoFile(filename,patientID,MSE)
 	f = open(filename, "a")
 	write(f, string(patientID, ",", MSE, "\n"))
 	close(f)
 end
 
-function generateDataSingleObj(patientID,outputdir)
+@everywhere function generateDataSingleObj(patientID,outputdir)
 	inputdir = "/home/rachel/Documents/work/optimization/LinkedRecordsTimeData10min/"
-	pathtoparams ="/home/rachel/Documents/work/optimization/sensitivityanalysis/usingSALib/morrisParamsN100.txt" 
+	pathtoparams ="/home/rachel/Documents/work/optimization/sensitivityanalysis/usingSALib/morrisParamsN500.txt" 
 	pathToMSEAllParams = string(outputdir, "MSEAllParams.txt")
 	allparamsets = getClusterParams(pathtoparams)
 	#allparamsets = [[1.5,75.0,120.0, 1.5, 1.5, .5, 250.0, .5, .5, 6, 1.67, .96, .7]]
 
-	savestr = string(outputdir, "Id = ", patientID,"usingfewersteps", ".png")
+	savestr = string(outputdir, "Id = ", patientID,"usingfewersteps", "thread", myid(), ".png")
 	data, units= processNumericalData(string(inputdir, patientID))
-	sort!(data, cols = [order(:_Elapsed_time_)])
+	sort!(data, cols = [DataFrames.order(:_Elapsed_time_)])
 	colnames = (names(data))
 	cleaneddata = cleandata(data)
 	for j in collect(1:size(allparamsets, 2))
@@ -162,13 +164,14 @@ function mainforSingleObjective()
 	end
 	close(f)
 	#[1:length(allpatients)][allpatients .=="s17795-3483-10-23-06-36n"] #to look up index of a patient
-	for j in collect(158:length(allpatients))
+	@parallel (+) for j in collect(1:length(allpatients))
 		close("all")
 		patientID = allpatients[j]
 		@show patientID
 		
-		mainoutputdir = "/home/rachel/Documents/work/optimization/sensitivityanalysis/PCA/data25PercentMorrisN100/"
+		mainoutputdir = "/home/rachel/Documents/work/optimization/sensitivityanalysis/PCA/data25PercentMorrisN500/"
 		MIMICdata = generateDataSingleObj(patientID,mainoutputdir)
+		j
 
 	end
 end
