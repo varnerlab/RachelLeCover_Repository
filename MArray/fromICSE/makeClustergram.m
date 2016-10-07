@@ -1,0 +1,22 @@
+function makeClustergram()
+    close all;
+	gendata = readtable('MArray.dat','Delimiter', '\t','ReadVariableNames',false);
+    numericdata = table2array(gendata);
+    transformedddata = abs(log10(numericdata)); %log transform the data so we can see differences
+    %cgobj = clustergram(numericgendata, 'RowLabels', names, 'ColumnLabels', names, ...
+    %    'ColorMap', gray, 'Cluster', 'column', 'DisplayRange', 100, 'Linkage', 'average');
+    cgobj = clustergram(transformedddata,...
+       'ColorMap', gray, 'Cluster', 'column', 'DisplayRange', 3, 'Linkage', 'average'...
+       ,'Symmetric', false);
+    set(cgobj, 'DisplayRatio', .3);
+    set(cgobj,'Linkage','complete','Dendrogram',4) %color linkages
+    %add the color bar
+    cbButton = findall(gcf,'tag','Annotation.InsertColorbar');
+    ccb = get(cbButton,'ClickedCallback');
+    set(cbButton,'State','on');
+    %ccb{1}(cbButton,{},ccb{2});
+    %plotcg = plot(cgobj);
+    %set(gcf,'PaperUnits','inches','PaperPosition',[0 0 800 800])
+    %print('5xClustergram', '-dpdf','-r100') 
+
+end

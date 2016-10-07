@@ -3,7 +3,7 @@ include("DataFile.jl")
 include("runPatient.jl")
 using PyPlot
 
-function generateData(num_param_sets, patientID)
+function generateData(num_param_sets, patientID,t_trigger)
 	close("all") #close already open windows
 	#set start time, stop time and step sizes
 	 tstart=0
@@ -11,7 +11,7 @@ function generateData(num_param_sets, patientID)
 	 step=1.0
 	for j in collect(1:num_param_sets)
 		println(string("On set ", j," out of ",num_param_sets))
-		t,x = runPatient(patientID,j,tend)
+		t,x = runPatient(patientID,j,tend,t_trigger)
 		@show size(x)
 		strx = string(x)
 	
