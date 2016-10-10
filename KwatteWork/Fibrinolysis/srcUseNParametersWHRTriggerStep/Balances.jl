@@ -10,11 +10,11 @@ function Balances(t,x,data_dictionary)
 
   # Call my kinetics function -
   rate_array = KineticsReactions(t,x,data_dictionary)
-  # @show rate_array #currently all zero-why?
+   #@show x[7] #currently all zero-why?
 
   # Call my control function -
   control_array = ControlReactions(t,x,data_dictionary)
-	#@show control_array #fine, nonzero
+	#@show x[7] #fine, nonzero
   # Compute the modified rate -
   rate_array = rate_array.*control_array;
 

@@ -21,7 +21,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 # ----------------------------------------------------------------------------------- #
-function Control(t,x,rate_vector,data_dictionary)
+@everywhere function Control(t,x,rate_vector,data_dictionary)
 # ---------------------------------------------------------------------- #
 # Control.jl was generated using the Kwatee code generation system.
 # Username: rachellecover
@@ -213,6 +213,7 @@ volume_wound = x[152];
 
 # Modify the rate_vector with the control variables - 
 rate_vector = rate_vector.*control_vector;
+#@show t, x[133]
 
 # Return the modified rate vector - 
 return rate_vector;

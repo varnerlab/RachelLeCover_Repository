@@ -1,4 +1,4 @@
-function KineticsReactions(t,x,data_dictionary)
+@everywhere function KineticsReactions(t,x,data_dictionary)
 
  # Get the parameters from the data dictionary -
   parameter_array = data_dictionary["kinetic_parameter_array"]

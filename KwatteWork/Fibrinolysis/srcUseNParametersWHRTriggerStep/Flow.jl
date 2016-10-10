@@ -26,7 +26,7 @@ include("stopBleeding.jl")
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 # ----------------------------------------------------------------------------------- #
-function Flow(t,x,data_dictionary,datasource)
+@everywhere function Flow(t,x,data_dictionary,datasource)
 # ---------------------------------------------------------------------- #
 # Flow.jl was generated using the Kwatee code generation system.
 # Username: rachellecover
@@ -977,6 +977,8 @@ tmp_flow_term = 0;
 tmp_flow_term = -(q_vector[12]+q_vector[13])*Fiber_wound+(q_vector[11]*Fiber_artery);
 push!(species_flow_vector,(1.0/volume_wound)*tmp_flow_term);
 tmp_flow_term = 0;
+
+#@show t, x[133]
 
 return (species_flow_vector,q_vector);
 end;

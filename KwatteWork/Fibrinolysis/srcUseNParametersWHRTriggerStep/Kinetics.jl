@@ -21,7 +21,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 # ----------------------------------------------------------------------------------- #
-function Kinetics(t,x,data_dictionary)
+@everywhere function Kinetics(t,x,data_dictionary)
 # --------------------------------------------------------------------- #
 # Kinetics.jl was generated using the Kwatee code generation system.
 # Username: rachellecover

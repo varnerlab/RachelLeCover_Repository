@@ -1,23 +1,23 @@
-function readParameters(pathToFile)
+@everywhere function readParameters(pathToFile)
 	params = readdlm(pathToFile)
 	return params
 end
 
-function readParameters(pathToFile, set_number)
+@everywhere function readParameters(pathToFile, set_number)
 	allparams = readdlm(pathToFile, ',')
 	params = allparams[set_number,:]
 	#println("read")
 	return params
 end
 
-function setParameters(params, data_dictionary)
+@everywhere function setParameters(params, data_dictionary)
 	data_dictionary["kinetic_parameter_array"] = params[1:29]
 	data_dictionary["control_parameter_array"]= params[30:end]
 	#data_dictionary=patchParameters(data_dictionary)
 	return data_dictionary
 end
 
-function patchParameters(data_dictionary,set_number)
+@everywhere function patchParameters(data_dictionary,set_number)
 	#to change the parameters in the protein C pathway to something closer to what they should be
 	#@show size(data_dictionary["kinetic_parameter_array"])
 	seed =set_number

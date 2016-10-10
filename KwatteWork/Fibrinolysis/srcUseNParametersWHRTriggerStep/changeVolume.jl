@@ -1,4 +1,4 @@
-function changeVolume(t,Cach,Cnor,V0,compartment_name)
+@everywhere function changeVolume(t,Cach,Cnor,V0,compartment_name)
 	dr = (3*V0/(4*pi))^(1/3) #assume everything is a sphere
 	AcrossSectional = V0/dr
 	S50 = 77# mircomolar (log mol/L)^-1 #from Blood flow responses to intra-arterial acetylcholine in man: effects of basal flow and conduit vessel lengt

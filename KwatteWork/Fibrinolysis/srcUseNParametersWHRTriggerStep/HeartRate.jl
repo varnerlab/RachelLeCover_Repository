@@ -23,7 +23,7 @@
 include("OlufsenModel2011calcHR.jl")
 include("helpersToReadData.jl")
 # ----------------------------------------------------------------------------------- #
-function HeartRate(t,x,beats_per_minute,stroke_volume,data_dictionary,datasource)
+@everywhere function HeartRate(t,x,beats_per_minute,stroke_volume,data_dictionary,datasource)
 # ---------------------------------------------------------------------- #
 # HeartRate.jl was generated using the Kwatee code generation system.
 # Username: rachellecover

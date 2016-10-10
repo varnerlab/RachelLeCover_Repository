@@ -21,7 +21,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 # ----------------------------------------------------------------------------------- #
-function DataFile(TSTART,TSTOP,Ts)
+@everywhere function DataFile(TSTART,TSTOP,Ts)
 # ----------------------------------------------------------------------------------- #
 # DataFile.jl was generated using the Kwatee code generation system.
 # DataFile: Stores model parameters as key - value pairs in a Julia Dict() 
@@ -274,7 +274,7 @@ push!(initial_condition_array,(1.0/characteristic_concentration)*PC_initial)	#	1
 push!(initial_condition_array,(1.0/characteristic_concentration)*APC_initial)	#	130	wound APC
 push!(initial_condition_array,(1.0/characteristic_concentration)*ATIII_initial)	#	131	wound ATIII
 push!(initial_condition_array,(1.0/characteristic_concentration)*TM_initial)	#	132	wound TM
-push!(initial_condition_array,(1.0/characteristic_concentration)*5)	#	133	wound TRIGGER
+push!(initial_condition_array,(1.0/characteristic_concentration)*0.0)	#	133	wound TRIGGER
 push!(initial_condition_array,(1.0/characteristic_concentration)*Fibrin_initial)	#	134	wound Fibrin
 push!(initial_condition_array,(1.0/characteristic_concentration)*Plasmin_initial)	#	135	wound Plasmin
 push!(initial_condition_array,(1.0/characteristic_concentration)*Fibrinogen_initial)	#	136	wound Fibrinogen

@@ -23,7 +23,7 @@ include("changeVolume.jl")
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 # ----------------------------------------------------------------------------------- #
-function CardiacDistribution(t,x,default_flow_parameter_array,data_dictionary,Cnor,Cach)
+@everywhere function CardiacDistribution(t,x,default_flow_parameter_array,data_dictionary,Cnor,Cach)
 # ---------------------------------------------------------------------- #
 # CardiacDistribution.jl was generated using the Kwatee code generation system.
 # Username: rachellecover

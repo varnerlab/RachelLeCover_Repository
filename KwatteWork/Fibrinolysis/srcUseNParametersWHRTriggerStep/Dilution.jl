@@ -21,7 +21,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 # ----------------------------------------------------------------------------------- #
-function Dilution(t,x,dvdt_vector,data_dictionary)
+@everywhere function Dilution(t,x,dvdt_vector,data_dictionary)
 # ---------------------------------------------------------------------- #
 # Dilution.jl was generated using the Kwatee code generation system.
 # Username: rachellecover

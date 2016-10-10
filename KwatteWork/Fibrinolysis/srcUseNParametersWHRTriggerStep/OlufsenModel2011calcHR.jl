@@ -2,7 +2,7 @@ using ODE
 using PyPlot
 using DataFrames
 
-function nervous_system(t,y,fsym,fpar)
+@everywhere function nervous_system(t,y,fsym,fpar)
 	cnor = y[1]
 	cach = y[2]
 	phi = y[3]
@@ -21,7 +21,7 @@ function nervous_system(t,y,fsym,fpar)
 	return ydot
 end
 
-function baroreflex(t,y,currP)
+@everywhere function baroreflex(t,y,currP)
 	#println("got here")
 	n1=y[1]
 	n2=y[2]
@@ -37,12 +37,12 @@ function baroreflex(t,y,currP)
 	return ydot
 end
 
-function calculatefpar(n)
+@everywhere function calculatefpar(n)
 	fpar = n/M
 	return fpar
 end
 
-function calculatefsym(n,t,fpar)
+@everywhere function calculatefsym(n,t,fpar)
 	fsym = (1-n*(t-tauD)/M)/(1+beta*fpar)
 	if(fsym < 0)
 		fsym = 0.0
@@ -52,12 +52,12 @@ function calculatefsym(n,t,fpar)
 end
 
 
-function linearInterp(lowerVal, upperVal, tstart, tend,step)
+@everywhere function linearInterp(lowerVal, upperVal, tstart, tend,step)
 	val = lowerVal + (upperVal-lowerVal)/(tend-tstart)*step
 	return val
 end
 
-function calculateHR(phiTS, times)
+@everywhere function calculateHR(phiTS, times)
 	#HR = fill(100.0, length(phiTS), 1) #originally, fill with basic heart rate
 	HR = Float64[]
 	tprev = 0.0
@@ -78,13 +78,13 @@ function calculateHR(phiTS, times)
 	return HR
 end
 
-function calculateHR2012(cnor, cach)
+@everywhere function calculateHR2012(cnor, cach)
 	hconv = h0*60 # convert to bpm
 	h = hconv*(1+Mnor*cnor-Mach*cach)
 	return h
 end
 
-function plotPretty(tdata, pdata, HRdata, tsim, HRsim, Psim, savestr)
+@everywhere function plotPretty(tdata, pdata, HRdata, tsim, HRsim, Psim, savestr)
 	figure(figsize=(20,20))
 	patientID = savestr[1:search(savestr, 'P')-1]
 	
@@ -112,7 +112,7 @@ function plotPretty(tdata, pdata, HRdata, tsim, HRsim, Psim, savestr)
 	
 end
 
-function calculateMSE(tdata, HRdata, tsim, HRsim)
+@everywhere function calculateMSE(tdata, HRdata, tsim, HRsim)
 	#need to map tdata to tsim
 	totalError = 0.0;
 	indexdata = 1;
@@ -154,7 +154,7 @@ function calculateMSE(tdata, HRdata, tsim, HRsim)
 end
 
 
-function calculateHeartRate(Pdata, tdata,nsprev, bfprev)
+@everywhere function calculateHeartRate(Pdata, tdata,nsprev, bfprev)
 	t = Float64[]
 	P = Float64[]
 	numIntervals = 100.0

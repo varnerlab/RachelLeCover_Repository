@@ -1,4 +1,4 @@
-function DataFileReactions(initial_condition_array)
+@everywhere function DataFileReactions(initial_condition_array)
 
   # Initialize the data dictionary -
   data_dictionary = Dict()

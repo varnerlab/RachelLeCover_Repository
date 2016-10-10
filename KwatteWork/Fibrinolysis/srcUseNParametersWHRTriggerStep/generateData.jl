@@ -3,25 +3,29 @@ include("DataFile.jl")
 include("runPatient.jl")
 using PyPlot
 
-function generateData(num_param_sets, patientID,t_trigger)
+@everywhere function generateData(num_param_sets, patientID,t_trigger)
 	close("all") #close already open windows
 	#set start time, stop time and step sizes
 	 tstart=0
-	 tend=600
+	 tend=600.0
 	 step=1.0
-	for j in collect(1:num_param_sets)
+	t = Float64[]
+	x = Float64[]
+	@parallel (+) for j in collect(1:num_param_sets)
 		println(string("On set ", j," out of ",num_param_sets))
 		t,x = runPatient(patientID,j,tend,t_trigger)
 		@show size(x)
 		strx = string(x)
 	
 		#cleanedstrx =replace(replace(strx, "[", ""), "]", "")
-		outputfilename = string("outputOct7/100s/","for_patient", patientID,"set",j, ".txt")
+		outputfilename = string("outputOct10/600sParallel/","for_patient", patientID,"set",j, ".txt")
 		writedlm(outputfilename, x)
+		j
 	end
+	#return t,x
 end
 
-function readAndPlotData(filename,num_param_sets)
+@everywhere function readAndPlotData(filename,num_param_sets)
 	close("all")
 	tstart=0
 	 tend=600
@@ -130,7 +134,7 @@ function readAndPlotData(filename,num_param_sets)
 	savefig(string("output/PrettyLayoutFlowOn10BestParams",".pdf"),bbox_inches="tight")
 end
 
-function readandPlotDataWoundOnly(filename,num_param_sets)
+@everywhere function readandPlotDataWoundOnly(filename,num_param_sets)
 	close("all")
 	tstart=0
 	 tend=600
@@ -168,7 +172,7 @@ function readandPlotDataWoundOnly(filename,num_param_sets)
 	savefig(string("output/PrettyLayoutFlowOn100WoundOnlyBestParams",".pdf"),bbox_inches="tight")
 end
 
-function ReadAndPlotWoundAvg(dir, num_param_sets, patientID)
+@everywhere function ReadAndPlotWoundAvg(dir, num_param_sets, patientID)
 	close("all")
 	tstart=0
 	 tend=100
@@ -251,10 +255,10 @@ function ReadAndPlotWoundAvg(dir, num_param_sets, patientID)
 	#return forsummary
 end
 
-function plotMeanAllCompartments(dir, num_param_sets, patientID)
+@everywhere function plotMeanAllCompartments(dir, num_param_sets, patientID)
 	close("all")
 	tstart=0
-	 tend=100
+	 tend=40
 	 step=1.0
 
 	t = collect(tstart:step:tend)
@@ -409,9 +413,9 @@ function plotMeanAllCompartments(dir, num_param_sets, patientID)
 	#remove one remaining xtricks
 	plt[:subplot](18,8,18*8)
 	ax = gca()
-	ax[:set_xticklabels]([])
+	#ax[:set_xticklabels]([])
 
 
 
-	savefig(string("outputOct7/100s/patient", patientID, "AllCompartments.pdf"),bbox_inches="tight")
+	savefig(string("outputOct10/60s/patient", patientID, "AllCompartments.pdf"),bbox_inches="tight")
 end

@@ -30,8 +30,8 @@ include("readParameters.jl")
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 # ----------------------------------------------------------------------------------- #
-#function MassBalances(t,x,dxdt_vector,data_dictionary)
-function MassBalances(t,x,data_dictionary,datasource,set_number,t_trigger)
+#@everywhere function MassBalances(t,x,dxdt_vector,data_dictionary)
+@everywhere function MassBalances(t,x,data_dictionary,datasource,set_number,t_trigger)
 # ---------------------------------------------------------------------- #
 # MassBalances.jl was generated using the Kwatee code generation system.
 # Username: rachellecover
@@ -56,8 +56,8 @@ tau_array = data_dictionary["TIME_CONSTANT_ARRAY"];
 idx = find(x->(x<0),x);
 x[idx] = 0.0;
 
-# Call the kinetics function - 
-# Call the kinetics function - 
+# Call the kinetics @everywhere function - 
+# Call the kinetics @everywhere function - 
 (calc_rate_vector) = Kinetics(t,x,data_dictionary);
 rate_vector = Float64[]
 number_of_compartments = size(C, 1)
@@ -85,9 +85,14 @@ for j = 1:number_of_compartments
 	#@show j
 	if(j == 8) #in wound
 		if(t<t_trigger)
-			ReducedDict[7]=0.0
-			@show t
-			println("set trigger to 0")
+			currx[7]=0.0
+			#@show t
+			#@show currx[7]
+			#println("set trigger to 0")
+
+		else
+			#println("set trigger to 5")
+			currx[7]=5.0
 		end
 	end
 		rate_vector_curr = Balances(t,currx,ReducedDict)
@@ -95,15 +100,16 @@ for j = 1:number_of_compartments
 	for item in rate_vector_curr
 		push!(rate_vector, item)
 	end
+	x[lower_index:upper_index]=currx
 end
 #@show size(rate_vector)
-# Call the control function - 
+# Call the control @everywhere function - 
 (rate_vector) = Control(t,x,rate_vector,data_dictionary);
 
-# Call the flow function - 
+# Call the flow @everywhere function - 
 (flow_terms_vector,q_vector) = Flow(t,x,data_dictionary,datasource);
 
-# Call the dilution function - 
+# Call the dilution @everywhere function - 
 tmp_dvdt_vector = C*q_vector;
 (dilution_terms_vector) = Dilution(t,x,tmp_dvdt_vector,data_dictionary);
 

@@ -24,12 +24,13 @@
 include("SolveBalances.jl")
 include("DataFile.jl")
 using PyPlot
-function runModel(setnumber,datasource,savestr,tend,t_trigger)
+@everywhere function runModel(setnumber,datasource,savestr,tend,t_trigger)
 	 close("all") #close already open windows
 	#set start time, stop time and step sizes
 	 tstart=0
 	 step=1.0
 	 data_dict = DataFile(tstart, tend, step)
+	#@show data_dict["INITIAL_CONDITION_ARRAY"][133]
 	 t, x = SolveBalances(tstart, tend, step, data_dict,datasource, setnumber,t_trigger)
 	return t,x
 	 end

@@ -1,4 +1,4 @@
-function ControlReactions(t,x,data_dictionary)
+@everywhere function ControlReactions(t,x,data_dictionary)
 
    # Get the control parameters from the data dictionary -
   parameter_array = data_dictionary["control_parameter_array"]

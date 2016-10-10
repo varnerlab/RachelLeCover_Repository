@@ -7,7 +7,7 @@ function generateData(num_param_sets, patientID)
 	close("all") #close already open windows
 	#set start time, stop time and step sizes
 	 tstart=0
-	 tend=100
+	 tend=600
 	 step=1.0
 	for j in collect(1:num_param_sets)
 		println(string("On set ", j," out of ",num_param_sets))
@@ -16,7 +16,7 @@ function generateData(num_param_sets, patientID)
 		strx = string(x)
 	
 		#cleanedstrx =replace(replace(strx, "[", ""), "]", "")
-		outputfilename = string("outputOct7/100s/","for_patient", patientID,"set",j, ".txt")
+		outputfilename = string("outputOct10/600s/","for_patient", patientID,"set",j, ".txt")
 		writedlm(outputfilename, x)
 	end
 end
