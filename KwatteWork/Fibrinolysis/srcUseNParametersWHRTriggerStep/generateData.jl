@@ -258,7 +258,7 @@ end
 @everywhere function plotMeanAllCompartments(dir, num_param_sets, patientID)
 	close("all")
 	tstart=0
-	 tend=40
+	 tend=600
 	 step=1.0
 
 	t = collect(tstart:step:tend)
@@ -417,5 +417,5 @@ end
 
 
 
-	savefig(string("outputOct10/60s/patient", patientID, "AllCompartments.pdf"),bbox_inches="tight")
+	savefig(string("outputOct10/600s/patient", patientID, "AllCompartments.pdf"),bbox_inches="tight")
 end
