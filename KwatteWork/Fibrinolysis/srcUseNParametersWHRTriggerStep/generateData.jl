@@ -417,5 +417,5 @@ end
 
 
 
-	savefig(string("outputOct10/600s/patient", patientID, "AllCompartments.pdf"),bbox_inches="tight")
+	savefig(string("outputOct10/600sParallel/patient", patientID, "AllCompartments.pdf"),bbox_inches="tight")
 end
