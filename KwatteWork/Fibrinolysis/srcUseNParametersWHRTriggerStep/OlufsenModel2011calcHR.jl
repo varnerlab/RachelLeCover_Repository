@@ -236,10 +236,14 @@ end
 		bf(tspan,y)= baroreflex(tspan,y,currP)
 		tspan = collect(time-5*tstep:tstep/10:time)
 		tout, res = ODE.ode78(bf, bfprev,tspan,abstol = 1E-9)
+		res = hcat(res...).'
+		y1 = res[:,1]
+		y2 = res[:,2]
+		y3 = res[:,3]
 
-		y1 = [a[1] for a in res]
-		y2 = [a[2] for a in res]
-		y3 =[a[3] for a in res]
+		#y1 = [a[1] for a in res]
+		#y2 = [a[2] for a in res]
+		#y3 =[a[3] for a in res]
 
 		push!(n1TS, y1[end])
 		push!(n2TS, y2[end])
@@ -255,9 +259,14 @@ end
 
 		ns(tspan, y)=nervous_system(tspan, y, fsym, fpar)
 		tout, nsRes = ODE.ode23(ns, nsprev, tspan, abstol = 1E-9)
-		Cnor = [a[1] for a in nsRes]
-		Cach = [a[2] for a in nsRes]
-		phi = [a[3] for a in nsRes]
+		nsRes = hcat(nsRes...).'
+		Cnor = nsRes[:,1]
+		Cach = nsRes[:,2]
+		phi = nsRes[:,3]
+
+		#Cnor = [a[1] for a in nsRes]
+		#Cach = [a[2] for a in nsRes]
+		#phi = [a[3] for a in nsRes]
 
 		if(Cnor[end]< 0)
 			Cnor[end] = 0.0
@@ -296,10 +305,10 @@ end
 
 		push!(phiTS, currPhi)
 		push!(heartRate, currHR)
-		nsprev = [Cnor[end], Cach[end], currPhi]
+		nsprev = [Cnor[end]; Cach[end]; currPhi]
 	end
 
-	return [heartRate2012[end], nsprev, bfprev];
+	return [heartRate2012[end]; nsprev; bfprev];
 		
 end
 

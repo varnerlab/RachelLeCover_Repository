@@ -7,19 +7,21 @@ using PyPlot
 	close("all") #close already open windows
 	#set start time, stop time and step sizes
 	 tstart=0
-	 tend=600.0
+	 tend=40.0
 	 step=1.0
 	t = Float64[]
 	x = Float64[]
 	@parallel (+) for j in collect(1:num_param_sets)
+		tic()
 		println(string("On set ", j," out of ",num_param_sets))
 		t,x = runPatient(patientID,j,tend,t_trigger)
 		@show size(x)
 		strx = string(x)
 	
 		#cleanedstrx =replace(replace(strx, "[", ""), "]", "")
-		outputfilename = string("outputOct10/600sParallel/","for_patient", patientID,"set",j, ".txt")
+		outputfilename = string("outputOct12/60s/","for_patient", patientID,"set",j, ".txt")
 		writedlm(outputfilename, x)
+		toc()
 		j
 	end
 	#return t,x
@@ -258,7 +260,7 @@ end
 @everywhere function plotMeanAllCompartments(dir, num_param_sets, patientID)
 	close("all")
 	tstart=0
-	 tend=600
+	 tend=60
 	 step=1.0
 
 	t = collect(tstart:step:tend)
@@ -413,7 +415,7 @@ end
 	#remove one remaining xtricks
 	plt[:subplot](18,8,18*8)
 	ax = gca()
-	#ax[:set_xticklabels]([])
+	ax[:set_xticklabels]([])
 
 
 
