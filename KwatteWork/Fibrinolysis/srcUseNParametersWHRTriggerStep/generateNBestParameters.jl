@@ -18,6 +18,6 @@ function generateBestNparameters(n)
 		pc_array[1:size(pc_array,1) .!= min_index,: ]
 		deleteat!(vec(total_error),min_index)
 	end
-	writedlm(string("/home/rachel/Documents/work/KwatteWork/Fibrinolysis/srcUseNParameterSets/Best", n, "ParameterSets.txt"), best_params)
+	writedlm(string("/home/rachel/Documents/work/KwatteWork/Fibrinolysis/srcUseNParametersWHRTriggerStep/Best", n, "ParameterSets.txt"), best_params)
 
 end
