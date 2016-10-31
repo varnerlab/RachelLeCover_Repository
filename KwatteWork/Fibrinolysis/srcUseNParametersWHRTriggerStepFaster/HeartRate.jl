@@ -38,8 +38,8 @@ include("helpersToReadData.jl")
 # stoke_volume - stroke volume per beat
 # data_dictionary  - Data dictionary instance (holds model parameters) 
 # ---------------------------------------------------------------------- #
-adjustedt = t*60+180; #need to convert from minutes to seconds
-adjustedtnoshift = t*60.0
+#adjustedt = t*60+180; #need to convert from minutes to seconds
+#adjustedtnoshift = t*60.0
 # Alias the species vector - 
 # vein
 FII_vein = x[1];
@@ -210,8 +210,8 @@ volume_bulk = x[151];
 volume_wound = x[152];
 
 data = getUsefulData(datasource)
-P=getPressureAtSelectedTime(adjustedtnoshift,data)
-nextP =getPressureAtSelectedTime(adjustedtnoshift+10^15*eps(),data)
+P=getPressureAtSelectedTime(t,data)
+nextP =getPressureAtSelectedTime(t+10^15*eps(),data)
 
 
 # Update the beats_per_minute -
@@ -221,20 +221,21 @@ beta = 6.0
 
 tol = 1E-5
 P0 = 100;
-nsprev= collect(fill(1.0,1,2))
-bfprev = collect(fill(1.0,1,3))
+#nsprev= collect(fill(1.0,1,2))
+#bfprev = collect(fill(1.0,1,3))
 Pdata = fill(1.0,1,2)
 tdata = fill(1.0,1,2)
 
-if(t <=0.0+tol)
-	nsprev = [(1-N/M)/(1+beta*N/M), N/M];
-	bfprev = [0.0,0.0,90.0];
-end
+nsprev =data_dictionary["NS_PREV"]
+bfprev = data_dictionary["BF_PREV"]
+
 #nextP = P+10^15*eps()
 Pdata = [P, nextP]
-tdata = [adjustedt, adjustedt+10^15*eps()]
+tdata = [t, t+10^15*eps()]
 
-#@show Pdata, tdata
+@show Pdata, tdata
+@show nsprev
+@show bfprev
 
 beats_per_minute, nsprev[1], nsprev[2], bfprev[1],bfprev[2],bfprev[3] = calculateHeartRatelowerFdata(Pdata,tdata,nsprev, bfprev)
 Cnor = nsprev[1]
@@ -260,5 +261,9 @@ stroke_volume = stroke_volume;
 #Cnor = .4
 #Cach = 23E-100
 
-return (beats_per_minute,stroke_volume,Cnor,Cach);
+#update initial conditions for heart rate in data dictionary
+data_dictionary["NS_PREV"] = nsprev
+data_dictionary["BF_PREV"] = bfprev
+
+return (beats_per_minute,stroke_volume,Cnor,Cach,data_dictionary);
 end;

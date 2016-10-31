@@ -164,14 +164,14 @@ function calculatefsym(n,t,fpar)
 end
 
 function calculatefsymArr(n,t,fpar)
-	#@show sizeof(n), sizeof(t), sizeof(fpar)
+	@show sizeof(n), sizeof(t), sizeof(fpar)
 	fsym = (1-n.*(t-tauD)./M)./(1+beta.*fpar)
 	return fsym
 end
 
 function calculateHR2012(cnor, cach)
 	hconv = h0*60;
-	h = hconv*(1+Mnor*cnor-Mach*cach)
+	h = hconv.*(1+Mnor.*cnor-Mach.*cach)
 	return h
 end
 
@@ -370,13 +370,13 @@ function calculateHeartRateHigherFdata(data,lowfdata,params,savestr)
 
 	initialconditions = [(1-N/M)/(1+beta*N/M), N/M,0.0,0.0,90.0]
 	fedeqns(lowFreqt,y) = eqns(lowFreqt,y,data)
-	tout,res = ODE.ode45(fedeqns, initialconditions, lowFreqt, reltol = 6E-2, abstol =1E-3, points=:specified)
+	tout,res = ODE.ode23s(fedeqns, initialconditions, lowFreqt, reltol = 6E-4, abstol =1E-4, points=:specified)
 
 
 	Cnor = [a[1] for a in res]
 	Cach = [a[2] for a in res]
 	n1 = [a[3] for a in res]
-	n2 = n1 = [a[4] for a in res]
+	n2 = [a[4] for a in res]
 	Pbar = [a[5] for a in res]
 
 #	initialconditions = [(1-N/M)/(1+beta*N/M); N/M;0.0;0.0;90.0]
@@ -389,12 +389,16 @@ function calculateHeartRateHigherFdata(data,lowfdata,params,savestr)
 #	Pbar = X[:,5]
 #	tout = lowFreqt
 
+	@show sizeof(lowFreqt)
+	@show sizeof(tout)
+	@show sizeof(Cnor)
 	n = n1+n2+N
 	fpar =  calculatefpar(n)
-	fsym = calculatefsymArr(n,lowFreqt,fpar)
+	fsym = calculatefsymArr(n,tout,fpar)
 	h = calculateHR2012(Cnor, Cach)
+	@show size(h)
 	#plotPrettyHighF(lowfdata[:_Elapsed_time_], Pdata, lowfdata[:_HR_], tout,h,Pbar,string(savestr, ".pdf"))
-	#plotall(tout, Pbar, n1, n2, n,fpar, fsym,Cnor, Cach,lowfdata[:_HR_], h, lowfdata[:_Elapsed_time_],string(savestr, "allvars.pdf"))
+	plotall(tout, Pbar, n1, n2, n,fpar, fsym,Cnor, Cach,lowfdata[:_HR_], h, lowfdata[:_Elapsed_time_],string(savestr, "allvars.pdf"))
 	saveDataToFile(tout,h,string(savestr,".txt"))
 	toc()
 
@@ -425,7 +429,7 @@ function calculateHeartRatelowerFdata(data,params,savestr)
 
 	initialconditions = [(1-N/M)/(1+beta*N/M), N/M,0.0,0.0,90.0]
 	fedeqns(lowFreqt,y) = eqnsLowF(lowFreqt,y,data)
-	tout,res = ODE.ode78(fedeqns, initialconditions, lowFreqt, reltol = 30E-4, abstol =30E-4, points=:specified)
+	tout,res = ODE.ode23s(fedeqns, initialconditions, lowFreqt,reltol = 6E-4, abstol =1E-4, points=:specified)
 
 
 	Cnor = [a[1] for a in res]
@@ -448,8 +452,8 @@ function calculateHeartRatelowerFdata(data,params,savestr)
 	fpar =  calculatefpar(n)
 	fsym = calculatefsymArr(n,lowFreqt,fpar)
 	h = calculateHR2012(Cnor, Cach)
-	#plotPrettyHighF(lowfdata[:_Elapsed_time_], Pdata, lowfdata[:_HR_], tout,h,Pbar,string(savestr, ".pdf"))
-	#plotall(tout, Pbar, n1, n2, n,fpar, fsym,Cnor, Cach,lowfdata[:_HR_], h, lowfdata[:_Elapsed_time_],string(savestr, "allvars.pdf"))
+	#plotPrettyHighF(data[:_Elapsed_time_], Pdata, data[:_HR_], tout,h,Pbar,string(savestr, ".pdf"))
+	plotall(tout, Pbar, n1, n2, n,fpar, fsym,Cnor, Cach,data[:_HR_], h, data[:_Elapsed_time_],string(savestr, "allvars.pdf"))
 	saveDataToFile(tout,h,string(savestr,".txt"))
 	toc()
 

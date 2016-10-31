@@ -90,7 +90,7 @@ function eqnsLowF(t,y,PTframe)
 	push!(ydot, dcachdt)
 	
 	currP = PTframe[end]
-	@show currP
+	#@show currP
 
 	dpbardt = alpha*(currP-pbar)
 	dn1dt = k1.*dpbardt.*n.*(M-n)./(M/2)^2-n1./tau1
@@ -99,7 +99,7 @@ function eqnsLowF(t,y,PTframe)
 	push!(ydot, dn1dt)
 	push!(ydot, dn2dt)
 	push!(ydot, dpbardt)
-	@show ydot
+	#@show ydot
 
 	return (ydot)
 end
@@ -166,7 +166,7 @@ function calculatefsym(n,t,fpar)
 end
 
 function calculatefsymArr(n,t,fpar)
-	@show sizeof(n), sizeof(t), sizeof(fpar)
+	#@show sizeof(n), sizeof(t), sizeof(fpar)
 	fsym = (1-n.*(t-tauD)./M)./(1+beta.*fpar)
 	return fsym
 end
@@ -413,6 +413,7 @@ function calculateHeartRatelowerFdata(Pdata,tdata,nsprev, bfprev)
 	#@show DataFrames.head(data)
 
 	lowFreqt = tdata
+	@show lowFreqt
 	global N = 75.0
 	global M = 120.0
 	global beta = 6
@@ -429,12 +430,12 @@ function calculateHeartRatelowerFdata(Pdata,tdata,nsprev, bfprev)
 	global tau1 = .5
 	global tau2 = 250
 	#initialconditions = [(1-N/M)/(1+beta*N/M), N/M,0.0,0.0,90.0]
-	@show nsprev
-	@show bfprev
+	#@show nsprev
+	#@show bfprev
 	initialconditions=[nsprev; bfprev]
-	@show initialconditions
+	#@show initialconditions
 	fedeqns(lowFreqt,y) = eqnsLowF(lowFreqt,y,Pdata)
-	tout,res = ODE.ode23s(fedeqns, initialconditions, lowFreqt,reltol = 6E-4, abstol =1E-4, points=:specified)
+	tout,res = ODE.ode45(fedeqns, initialconditions, lowFreqt,reltol = 6E-4, abstol =1E-4, points=:specified)
 
 
 	Cnor = [a[1] for a in res]

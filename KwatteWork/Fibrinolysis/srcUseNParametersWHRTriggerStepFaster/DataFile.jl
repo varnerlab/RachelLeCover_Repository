@@ -661,6 +661,14 @@ input_concentration_array = Float64[]
 # ------------------------------------------------------------------------------------------------ #
 # ------------------------------------------------------------------------------------------------ #
 
+#heart rate model
+# Update the beats_per_minute -
+N = 75.0
+M = 120.0 
+beta = 6.0
+nsprev = [(1-N/M)/(1+beta*N/M), N/M];
+bfprev = [0.0,0.0,90.0];
+
 # ---------------------------- DO NOT EDIT BELOW THIS LINE --------------------------------------- #
 data_dictionary = Dict()
 data_dictionary["CHARACTERISTIC_VARIABLE_ARRAY"] = characteristic_variable_array
@@ -675,6 +683,8 @@ data_dictionary["SATURATION_CONSTANT_ARRAY"] = saturation_constant_array
 data_dictionary["INITIAL_CONDITION_ARRAY"] = initial_condition_array
 data_dictionary["TIME_CONSTANT_ARRAY"] = time_constant_array
 data_dictionary["CONTROL_PARAMETER_ARRAY"] = control_parameter_array
+data_dictionary["NS_PREV"]= nsprev
+data_dictionary["BF_PREV"] = bfprev
 # ------------------------------------------------------------------------------------------------ #
 return data_dictionary
 end

@@ -225,8 +225,8 @@ default_bpm = data_dictionary["DEFAULT_BEATS_PER_MINUTE"];
 default_stroke_volume = data_dictionary["DEFAULT_STROKE_VOLUME"];
 default_flow_parameter_array = data_dictionary["FLOW_PARAMETER_ARRAY"];
 
-# Update the heart rate, and stroke volume - 
-(bpm,stroke_volume,Cnor,Cach) = HeartRate(t,x,default_bpm,default_stroke_volume,data_dictionary,datasource);
+
+(bpm,stroke_volume,Cnor,Cach, data_dictionary) = HeartRate(t,x,default_bpm,default_stroke_volume,data_dictionary,datasource);
 # Update the fraction of cardiac output going to each organ - 
 (flow_parameter_array) = CardiacDistribution(t,x,default_flow_parameter_array,data_dictionary,Cnor,Cach);
 

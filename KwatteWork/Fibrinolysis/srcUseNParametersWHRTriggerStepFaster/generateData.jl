@@ -7,7 +7,7 @@ using PyPlot
 	close("all") #close already open windows
 	#set start time, stop time and step sizes
 	 tstart=0
-	 tend=40.0
+	 tend=600.0
 	 step=1.0
 	t = Float64[]
 	x = Float64[]
@@ -19,7 +19,7 @@ using PyPlot
 		strx = string(x)
 	
 		#cleanedstrx =replace(replace(strx, "[", ""), "]", "")
-		outputfilename = string("outputOct12/60s/","for_patient", patientID,"set",j, ".txt")
+		outputfilename = string("outputOct31/Parallel600s/","for_patient", patientID,"set",j, ".txt")
 		writedlm(outputfilename, x)
 		toc()
 		j

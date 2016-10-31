@@ -62,6 +62,8 @@ function calculate_k(V0, BV, tBV)
 end
 
 function recreateBP(BP0, vol_lost, terminal_vol_lost, alpha, beta)
+	@show (vol_lost/terminal_vol_lost).^beta
+	@show (1-(vol_lost/terminal_vol_lost).^beta).^alpha
 	BP = BP0*real(1-real(vol_lost/terminal_vol_lost).^beta).^alpha
 	@show size(BP)
 	return BP
@@ -82,7 +84,7 @@ function runSimulation(tend, tIV_insert, initial_BV)
 	#initial_BV = 5.0/60.0 #assume the person bleeds out 5 mL in first minute
 	initial_k = calculate_k(V0, initial_BV, 1.0) 
 
-	IVin_rates = [fill(0.0, tIV_insert); fill(5.0/60.0, tend-tIV_insert)] #assume IV inserted at time tIV_insert at a rate of 5mL/min
+	IVin_rates = [fill(0.0, tIV_insert); fill(30.0/60.0, tend-tIV_insert)] #assume IV inserted at time tIV_insert at a rate of 5mL/min
 	IVdecay_rates = fill(0.0, tend) #right now, just make zeros. Should actually find values
 	Qctr= Float64[0.0]
 

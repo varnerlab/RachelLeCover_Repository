@@ -1,5 +1,5 @@
 using DataFrames
-using Optim
+#using Optim
 include("OOModelHighFreq.jl")
 
 function processNumericalData(filename)
@@ -99,8 +99,8 @@ function calculatetotalMSE(params)
 	outputdir = "/moretesting/higherFreqPbestParams/"
 	inputdir = "../LinkedRecordsTimeData10min/"
 	inputdirHighFreqP = "../LinkedRecordsTimeData10minNonNumerics/"
-	allpatients = readdir(inputdir)
-	#allpatients =["s00652-2965-06-14-18-19n"]
+	#allpatients = readdir(inputdir)
+	allpatients =["s00652-2965-06-14-18-19n"]
 	highFreqPatients = readdir(inputdirHighFreqP)
 	dataWriteTo = string(outputdir, "usefuldatatolAll1E-4only2steps", ".txt")
 	paramsWriteTo = string(outputdir, "paramstolAll1E-4only2steps", ".txt")
