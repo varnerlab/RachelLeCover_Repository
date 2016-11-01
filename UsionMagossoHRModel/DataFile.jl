@@ -44,9 +44,10 @@ function DataFile()
 	Vupa=0.0
 	Vupp=123.0
 	Vupv=120.0
+	Vtot = 5300.0
 	push!(volume_array, Vusa)
 	push!(volume_array, Vusp)
-	push!(volume_array, Veup)
+	push!(volume_array, Vuep)
 	push!(volume_array, Vump)
 	push!(volume_array, Vubp)
 	push!(volume_array, Vuhp)
@@ -58,6 +59,7 @@ function DataFile()
 	push!(volume_array, Vupa)
 	push!(volume_array, Vupp)
 	push!(volume_array, Vupv)
+	push!(volume_array, Vtot)
 
 	resistance_array = Float64[]
 	Rsa =0.06
@@ -113,6 +115,8 @@ function DataFile()
 	Vurv = 40.8
 	Emaxrv = 1.75
 	krrv = 1.4E-3
+	ksys = .075
+	Tsys0 = .5
 	push!(heart_array, Cla)
 	push!(heart_array, Vula)
 	push!(heart_array, Rla)
@@ -129,6 +133,199 @@ function DataFile()
 	push!(heart_array, Vurv)
 	push!(heart_array, Emaxrv)
 	push!(heart_array, krrv)
+	push!(heart_array, ksys)
+	push!(heart_array, Tsys0)
+
+	dvTerms = Float64[]
+	dVusudt = 0.0
+	dVumvdt = 0.0
+
+	push!(dvTerms, dVusudt)
+	push!(dvTerms, dVumvdt)
+
+	barroreflex = Float64[]
+	tauzb = 6.37
+	taupb = 2.076
+	fabmin = 2.52
+	fabmax = 47.78
+	Pn = 92
+	kab = 11.76
+	push!(barroreflex, tauzb)
+	push!(barroreflex, taupb)
+	push!(barroreflex, fabmin)
+	push!(barroreflex, fabmax)
+	push!(barroreflex, Pn)
+	push!(barroreflex, kab)
+
+	chemoreflex = Float64[]
+	tauc = 2
+	facmin = 1.16
+	facmax = 17.07
+	PO2n = 45
+	kac = 29.27
+	PaO2 = 95.0 #nominal pressure, reduce to induce hypoxia
+	push!(chemoreflex, tauc)
+	push!(chemoreflex, facmin)
+	push!(chemoreflex, facmax)
+	push!(chemoreflex, PO2n)
+	push!(chemoreflex, kac)
+	push!(chemoreflex, PaO2)
+
+	pulmonaryStretch = Float64[]
+	taup = 2
+	Gap = 23.29
+	push!(pulmonaryStretch,taup)
+	push!(pulmonaryStretch, Gap)
+
+	sympathetic = Float64[]
+	fesinf = 2.1
+	fes0 = 16.11
+	fesmin = 2.66
+	fesmax = 60
+	kes = .0675
+	Wbsp = 1
+	Wcsp = 5
+	Wpsp = .34
+	Wbsh = 1
+	Wcsh = 1
+	push!(sympathetic, fesinf)
+	push!(sympathetic, fes0)
+	push!(sympathetic, fesmin)
+	push!(sympathetic, fesmax)
+	push!(sympathetic, kes)
+	push!(sympathetic, Wbsp)
+	push!(sympathetic, Wcsp)
+	push!(sympathetic, Wpsp)
+	push!(sympathetic, Wbsh)
+	push!(sympathetic, Wcsh)
+
+	vagal = Float64[]
+	fevinf = 6.3
+	fev0 = 3.2
+	fab0 = 25
+	kev = 7.07
+	Wcv = .2
+	Wpv = .103
+	Thetav = -.68
+	push!(vagal, fevinf)
+	push!(vagal, fev0)
+	push!(vagal, fab0)
+	push!(vagal, kev)
+	push!(vagal, Wcv)
+	push!(vagal, Wpv)
+	push!(vagal, Thetav)
+
+	CNS = Float64[]
+	ChiMaxsp = 13.32
+	ChiMaxsh = 3.59
+	tauisc = 30
+	ChiMinsp = 7.33
+	ChiMinsh = -49.38
+	PO2nsp = 30
+	PO2nsh = 45
+	kiscsp = 2
+	kiscsh = 6
+	push!(CNS, ChiMaxsp)
+	push!(CNS, ChiMaxsh)
+	push!(CNS, tauisc)
+	push!(CNS, ChiMinsp)
+	push!(CNS, ChiMinsh)
+	push!(CNS, PO2nsp)
+	push!(CNS, PO2nsh)
+	push!(CNS, kiscsp)
+	push!(CNS, kiscsh)
+	
+	vetilatory=Float64[] 
+	Gv = .125
+	tauv = 3
+	Dv =6
+	VTn = .583
+	facn = 3.6
+	push!(vetilatory, Gv)
+	push!(vetilatory, tauv)
+	push!(vetilatory, Dv)
+	push!(vetilatory, VTn)
+	push!(vetilatory, facn)
+
+	reflex=Float64[]
+	GEmaxlv = .475
+	GEmaxrv = .282
+	GRsp =.695
+	GRep = 1.94
+	GRmp = 2.47
+	GVusv= -265.4
+	GVuev = -74.31
+	GVumv = -58.29	
+	GTs =-.13
+	GTv = .09
+	tauEmaxlv = 8
+	tauEmaxrv = 8
+	tauRsp = 6
+	tauRep = 6
+	tauRmp = 6
+	tauVusv = 20
+	tauVuev = 20
+	tauVumv = 20
+	tauTs = 2
+	tauTv = 1.5
+	DEmaxlv = 2
+	DEmaxrv = 2
+	DRsp = 2
+	DRep = 2
+	DRmp = 2
+	DVusv = 5
+	DVuev = 5
+	DVumv = 5
+	DTs = 2
+	DTv = .2
+	Emaxlv0 = 2.392
+	Emaxrv0 = 1.412
+	Rsp0 = 2.49
+	Rep0 = 1.655
+	Rmp0 = 2.106
+	Vusv0 = 1435.4
+	Vuev0 = 640.73
+	Vumv0 =503.26
+	T0 = .58
+	push!(reflex, GEmaxlv)
+	push!(reflex, GEmaxrv)
+	push!(reflex, GRsp)
+	push!(reflex, GRep)
+	push!(reflex, GRmp)
+	push!(reflex, GVusv)
+	push!(reflex, GVuev)
+	push!(reflex, GVumv)
+	push!(reflex, GTs)
+	push!(reflex, GTv)
+	push!(reflex,tauEmaxlv)
+	push!(reflex,tauEmaxrv)
+	push!(reflex,tauRsp)
+	push!(reflex,tauRep)
+	push!(reflex, tauRmp)
+	push!(reflex,tauVusv)
+	push!(reflex,tauVuev)
+	push!(reflex,tauVumv)
+	push!(reflex,tauTs)
+	push!(reflex,tauTv)
+	push!(reflex,DEmaxlv)
+	push!(reflex,DEmaxrv)
+	push!(reflex,DRsp)
+	push!(reflex,DRep)
+	push!(reflex,DRmp)
+	push!(reflex,DVusv)
+	push!(reflex,DVuev)
+	push!(reflex,DVumv)
+	push!(reflex,DTs)
+	push!(reflex,DTv)
+	push!(reflex,Emaxlv0)
+	push!(reflex,Emaxrv0)
+	push!(reflex,Rsp0)
+	push!(reflex,Rep0)
+	push!(reflex,Rmp0)
+	push!(reflex,Vusv0)
+	push!(reflex,Vuev0)
+	push!(reflex,Vumv0)
+	push!(reflex,T0)	
 
 	data_dictionary = Dict()
 	data_dictionary["COMPLIANCE"] =compliance_array
@@ -137,5 +334,14 @@ function DataFile()
 	data_dictionary["INERTANCE"] = inhertance_array
 	data_dictionary["HEART"] = heart_array
 	data_dictionary["BASAL_HEART_PERIOD"] = .833
+	data_dictionary["DVTERMS"] = dvTerms
+	data_dictionary["BARROREFLEX"] = barroreflex
+	data_dictionary["CHEMOREFLEX"] = chemoreflex
+	data_dictionary["PULMONARY_STRETCH"]= pulmonaryStretch
+	data_dictionary["SYMPATHETIC"]= sympathetic
+	data_dictionary["VAGAL"] = vagal
+	data_dictionary["CNS"] = CNS
+	data_dictionary["VENTILATORY"] = vetilatory
+	data_dictionary["REFLEX"] = reflex
 	return data_dictionary	
 end
