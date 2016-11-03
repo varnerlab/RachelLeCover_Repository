@@ -117,6 +117,7 @@ function DataFile()
 	krrv = 1.4E-3
 	ksys = .075
 	Tsys0 = .5
+
 	push!(heart_array, Cla)
 	push!(heart_array, Vula)
 	push!(heart_array, Rla)
@@ -327,6 +328,66 @@ function DataFile()
 	push!(reflex,Vumv0)
 	push!(reflex,T0)	
 
+	localmetabolic = Float64[]
+	CvmO2n = .155
+	CvbO2n = .14
+	CvhO2n = .11
+	Whn = 12660
+	Mdotm = .86
+	Mdotb =.7917
+	Mdothn = .4
+	GmO2 = 30
+	GbO2 = 10
+	GhO2 = 35
+	tauw = 5
+	taum = 10
+	taub = 10
+	tauh = 10
+	C = 9
+	a = .3836
+	alpha = .03198
+	beta = .008275
+	K = 14.99
+	push!(localmetabolic, CvmO2n)
+	push!(localmetabolic, CvbO2n)
+	push!(localmetabolic, CvhO2n)
+	push!(localmetabolic, Whn)
+	push!(localmetabolic, Mdotm)
+	push!(localmetabolic, Mdotb)
+	push!(localmetabolic, Mdothn)
+	push!(localmetabolic,GmO2)
+	push!(localmetabolic,GbO2)
+	push!(localmetabolic,GhO2)
+	push!(localmetabolic,tauw)
+	push!(localmetabolic,taum)
+	push!(localmetabolic, taub)
+	push!(localmetabolic,tauh)
+	push!(localmetabolic,C)
+	push!(localmetabolic,a)
+	push!(localmetabolic,alpha)
+	push!(localmetabolic,beta)
+	push!(localmetabolic, K)
+
+	extraheartparams = Float64[]
+	Pn = 92
+	ka = 11.758
+	fmin = 2.52
+	tauz = 6.37
+	fmax = 47.78
+	taup = 2.076
+	kes = .00675
+	fcs0 = 25
+	push!(extraheartparams, Pn)
+	push!(extraheartparams, ka)
+	push!(extraheartparams, fmin)
+	push!(extraheartparams,tauz)
+	push!(extraheartparams,fmax)
+	push!(extraheartparams,taup)
+	push!(extraheartparams,kes)
+	push!(extraheartparams, fcs0)
+	
+	historicaldata =ones(1,8)
+
 	data_dictionary = Dict()
 	data_dictionary["COMPLIANCE"] =compliance_array
 	data_dictionary["UNSTRESSEDVOLUME"]= volume_array
@@ -343,5 +404,10 @@ function DataFile()
 	data_dictionary["CNS"] = CNS
 	data_dictionary["VENTILATORY"] = vetilatory
 	data_dictionary["REFLEX"] = reflex
+	data_dictionary["LOCAL_METABOLIC"] = localmetabolic
+	data_dictionary["CO2_PRESSURE"] = 35 #mmHg, from wikipedia
+	data_dictionary["EXTRA_HEART_PARAMS"] = extraheartparams
+	data_dictionary["HISTORICALDATA"] = historicaldata
+
 	return data_dictionary	
 end

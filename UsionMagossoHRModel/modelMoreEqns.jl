@@ -2,7 +2,6 @@
 using Sundials
 include("DataFile.jl")
 include("buildIC.jl")
-include("utilities.jl")
 using PyPlot
 
 #function complexHeartModel(t,y,data_dict)
@@ -26,23 +25,26 @@ function complexHeartModel(t,y,dydt,data_dict)
 	Psquiggle = y[17]
 	fac = y[18]
 	fap = y[19]
-	Thetasp = y[20]
-	Thetash = y[21]
-	deltaVT = y[22]
-	deltaEmaxlv = y[23]
-	deltaEmaxrv = y[24]
-	deltaRsp = y[25]
-	deltaRep = y[26]
-	deltaRmp = y[27]
-	deltaVusv = y[28]
-	deltaVuev = y[29]
-	deltaVumv = y[30]
-	deltaTs = y[31]
-	deltaTv = y[32]
-	xb = y[33]
-	xh = y[34]
-	xm = y[35]
-	Wh = y[36]
+	fsp = y[20]
+	fsh = y[21]
+	fv = y[22]
+	Thetasp = y[23]
+	Thetash = y[24]
+	deltaVT = y[25]
+	deltaEmaxlv = y[26]
+	deltaEmaxrv = y[27]
+	deltaRsp = y[28]
+	deltaRep = y[29]
+	deltaRmp = y[30]
+	deltaVusv = y[31]
+	deltaVuev = y[32]
+	deltaVumv = y[33]
+	deltaTs = y[34]
+	deltaTv = y[35]
+	xb = y[36]
+	xh = y[37]
+	xm = y[38]
+	Wh = y[39]
 
 	#unpack data dictionary
 	volumes = data_dict["UNSTRESSEDVOLUME"]
@@ -62,8 +64,6 @@ function complexHeartModel(t,y,dydt,data_dict)
 	reflex = data_dict["REFLEX"]
 	localmetabolic = data_dict["LOCAL_METABOLIC"]
 	PaCO2 = data_dict["CO2_PRESSURE"]
-	extraheartparams = data_dict["EXTRA_HEART_PARAMS"]
-	
 	
 	Csa=compliances[1]
 	Csp=compliances[2]
@@ -248,15 +248,6 @@ function complexHeartModel(t,y,dydt,data_dict)
 	beta = localmetabolic[18]
 	K = localmetabolic[19]
 
-	Pn = extraheartparams[1]
-	ka =  extraheartparams[2]
-	fmin =  extraheartparams[3]
-	tauz =  extraheartparams[4]
-	fmax =  extraheartparams[5]
-	taup =  extraheartparams[6]
-	kes =  extraheartparams[7]
-	fcs0 = extraheartparams[8]
-
 	#conversation of mass
 
 	Vu = Vusa +Vusp +Vuep+Vump + Vubp+Vuhp+Vusv+Vuev+Vumv+Vubv+Vuhv+Vura+Vupa+Vupp+Vupv+Vula#eqn 13
@@ -265,31 +256,9 @@ function complexHeartModel(t,y,dydt,data_dict)
 	#reflex regulation, cardiac elastances
 	SigmaSubEmaxlv = 0.0
 	SigmaSubEmaxrv = 0.0
-	#efferent neural pathways
-	#from heart paper
-	fcs = (fmin-fmax*exp((Psquiggle-Pn)/ka))/(1+exp((Psquiggle-Pn)/ka))
-
-	fes = fesinf+(fes0-fesinf)*exp(kes*fcs)
-	fab = (fabmin+fabmax*exp((Psquiggle-Pn)/kab))/(1+exp((Psquiggle-Pn)/kab))
-	#vagal
-	fv = (fev0+fevinf*exp((fab-fab0)/kev))/(1+exp((fab-fab0)/kev))
-	fsp = fesinf +(fes0-fesinf)*exp(-Wbsp*fab+Wcsp*fac-Wpsp*fap-Thetasp)
-	fev = (fev0+fevinf*exp((fcs-fcs0)/kev))/(1+exp((fcs-fcs0)/kev))
-	if(fsp < fesmax)
-		fsp = fesinf +(fes0-fesinf)*exp(-Wbsp*fab+Wcsp*fac-Wpsp*fap-Thetasp)
-	else
-		fsp = fesmax
-	end
-
-	if(fes < fesmax)
-		fsh = fesinf +(fes0-fesinf)*exp(-Wbsh*fab+Wcsh*fac-Thetash)
-	else
-		fsh = fesmax
-	end
-
 	if(fsh>=fesmin)
-		SigmaSubEmaxlv= GEmaxlv*log(abs(lookUpValue(data_dict["HISTORICALDATA"], AbstractString("fsh"), t-DEmaxlv)-fesmin+1))
-		SigmaSubEmaxrv= GEmaxrv*log(abs(lookUpValue(data_dict["HISTORICALDATA"], AbstractString("fsh"), t-DEmaxrv)-fesmin+1))
+		SigmaSubEmaxlv= GEmaxlv*log(abs(fsh*(t-DEmaxlv)-fesmin+1))
+		SigmaSubEmaxrv= GEmaxrv*log(abs(fsh*(t-DEmaxrv)-fesmin+1))
 	else
 		SigmaSubEmaxlv = 0.0
 		SigmaSubEmaxrv = 0.0
@@ -304,13 +273,13 @@ function complexHeartModel(t,y,dydt,data_dict)
 	#@show Emaxlv, Emaxrv
 	#heart period
 	SigmaTs = 0.0
-	if(fes >= fesmin)
-		SigmaTs = GTs*log(abs(lookUpValue(data_dict["HISTORICALDATA"], AbstractString("fes"), t-DTs)-fesmin+1))
+	if(fsh > fesmin)
+		SigmaTs = GTs*log(abs(fsh*(t-DTs)-fesmin+1))
 	else
 		SigmaTs = 0.0
 	end
 	ddeltaTsdt = 1/tauTs*(-deltaTs+SigmaTs)
-	SigmaTv = GTv*lookUpValue(data_dict["HISTORICALDATA"], AbstractString("fev"), t-DTv)#fev*(t-DTv)
+	SigmaTv = GTv*fv*(t-DTv)
 	ddeltaTvdt = 1/tauTv*(-deltaTv+SigmaTv)
 	T = deltaTs+deltaTv+T0
 
@@ -322,7 +291,7 @@ function complexHeartModel(t,y,dydt,data_dict)
 		dPsidt = 0
 	end
 	u = mod(Psi,1) #equvalent to frac, reset when it gets to one
-	#@show t,T, Psi, dPsidt, deltaTs, deltaTv,u
+	@show t,T, Psi, dPsidt, deltaTs, deltaTv,u
 #	if(Psi >1) #reset, equvalent to frac
 #		Psi = 0.0
 #	end
@@ -372,7 +341,7 @@ function complexHeartModel(t,y,dydt,data_dict)
 
 	#ventilatory response 
 	VT = VTn + deltaVT
-	ddeltaVTdt = 1/tauv*(-deltaVT+Gv*(lookUpValue(data_dict["HISTORICALDATA"],AbstractString("fac"), (t-Dv))-facn))	
+	ddeltaVTdt = 1/tauv*(-deltaVT+Gv*(fac*(t-Dv)-facn))	
 
 	#force balances
 	dPpadt = 1/Cpa*(For-Fpa) #eqn 1, conversation of mass at pulmonary arteries
@@ -392,6 +361,7 @@ function complexHeartModel(t,y,dydt,data_dict)
 	dPbdt = dPsadt
 	dPsquiggledt = 1/taupb*(Pb+tauzb*dPbdt-Psquiggle)
 	fab = (fabmin+fabmax*exp((Psquiggle-Pn)/kab))/(1+exp((Psquiggle-Pn)/kab))
+	dfabdt = (fabmax-fabmin)*dPsquiggledt*sech((Pn-Psquiggle)/2*kab)^2/(4*kab) #from wolfram alpha
 	
 	#afferent chemoreflex
 	Phiac = (facmax-facmin*exp((PaO2-PO2n)/kac))/(1+exp((PaO2-PO2n)/kac))
@@ -399,6 +369,22 @@ function complexHeartModel(t,y,dydt,data_dict)
 	#pulmonarystretch
 	Phiap = Gap*VT
 	dfapdt = 1/taup*(-fap*Phiap)	
+
+	#efferent neural pathways
+	if(fsh < fesmax)
+		fsp = fesinf +(fes0-fesinf)*exp(-Wbsp*fab+Wcsp*fac-Wpsp*fap-Thetasp)
+	else
+		fsp = fesmax
+	end
+
+	if(fsh < fesmax)
+		fsh = fesinf +(fes0-fesinf)*exp(-Wbsh*fab+Wcsh*fac-Thetash)
+	else
+		fsh = fesmax
+	end
+	#vagal
+	fv = (fev0+fevinf*exp((fab-fab0)/kev))/(1+exp((fab-fab0)/kev))
+	dfvdt = (fevinf-fev0)*dfabdt*sech((fab0-fab)/2kev)^2/(4*kev)
 
 	#CNS hypoxic response
 	Chisp = (ChiMinsp+ChiMaxsp*exp((PaO2-PO2nsp)/kiscsp))/(1+exp((PaO2-PO2nsp)/kiscsp))
@@ -409,12 +395,12 @@ function complexHeartModel(t,y,dydt,data_dict)
 	#reflex regulation
 		#resistances and unstressed volumes
 	if(fsp >=fesmin)
-		SigmaSubRsp = GRsp*log(abs(lookUpValue(data_dict["HISTORICALDATA"], AbstractString("fsp"), t-DRsp)-fesmin+1))
-		SigmaSubRep = GRep*log(abs(lookUpValue(data_dict["HISTORICALDATA"], AbstractString("fsp"), t-DRep)-fesmin+1))
-		SigmaSubRmp = GRmp*log(abs(lookUpValue(data_dict["HISTORICALDATA"], AbstractString("fsp"), t-DRmp)-fesmin+1))
-		SigmaSubVusv = GVusv*log(abs(lookUpValue(data_dict["HISTORICALDATA"], AbstractString("fsp"), t-DVusv)-fesmin+1))
-		SigmaSubVuev = GVuev*log(abs(lookUpValue(data_dict["HISTORICALDATA"], AbstractString("fsp"), t-DVuev)-fesmin+1))
-		SigmaSubVumv = GVumv*log(abs(lookUpValue(data_dict["HISTORICALDATA"], AbstractString("fsp"), t-DVumv)-fesmin+1))
+		SigmaSubRsp = GRsp*log(abs(fsp*(t-DRsp)-fesmin+1))
+		SigmaSubRep = GRep*log(abs(fsp*(t-DRep)-fesmin+1))
+		SigmaSubRmp = GRmp*log(abs(fsp*(t-DRmp)-fesmin+1))
+		SigmaSubVusv = GVusv*log(abs(fsp*(t-DVusv)-fesmin+1))
+		SigmaSubVuev = GVuev*log(abs(fsp*(t-DVuev)-fesmin+1))
+		SigmaSubVumv = GVumv*log(abs(fsp*(t-DVumv)-fesmin+1))
 	else
 		SigmaSubRsp = 0
 		SigmaSubRep = 0
@@ -523,46 +509,44 @@ function complexHeartModel(t,y,dydt,data_dict)
 	dydt[17]= dPsquiggledt
 	dydt[18] = dfacdt
 	dydt[19] = dfapdt
-	dydt[20] = dThetaspdt
-	dydt[21] = dThetashdt
-	dydt[22] = ddeltaVTdt
-	dydt[23] = ddeltaEmaxlvdt
-	dydt[24] = ddeltaEmaxrvdt
-	dydt[25] = ddeltaRspdt
-	dydt[26] = ddeltaRepdt
-	dydt[27] = ddeltaRmpdt
-	dydt[28] = ddeltaVusvdt
-	dydt[29] = ddeltaVuevdt
-	dydt[30] = ddeltaVumvdt
-	dydt[31] = ddeltaTsdt
-	dydt[32] = ddeltaTvdt
-	dydt[33] = dxbdt
-	dydt[34] = dxhdt
-	dydt[35] = dxmdt
-	dydt[36] = dWhdt
-	#store data
-	data_dict["HISTORICALDATA"] = storeData(t, fev, fes, fcs, fsp, fsh, fv, fac, data_dict["HISTORICALDATA"])
+	dydt[20] = 0 #fsp
+	dydt[21] = 0 #fsh
+	dydt[22] = 0#dfvdt
+	dydt[23] = dThetaspdt
+	dydt[24] = dThetashdt
+	dydt[25] = ddeltaVTdt
+	dydt[26] = ddeltaEmaxlvdt
+	dydt[27] = ddeltaEmaxrvdt
+	dydt[28] = ddeltaRspdt
+	dydt[29] = ddeltaRepdt
+	dydt[30] = ddeltaRmpdt
+	dydt[31] = ddeltaVusvdt
+	dydt[32] = ddeltaVuevdt
+	dydt[33] = ddeltaVumvdt
+	dydt[34] = ddeltaTsdt
+	dydt[35] = ddeltaTvdt
+	dydt[36] = dxbdt
+	dydt[37] = dxhdt
+	dydt[38] = dxmdt
+	dydt[39] = dWhdt
 	#@show dydt
-	@show t
 	return dydt
 
 end
 
 function main()
-	t = collect(0:.01:60)
+	t = collect(0:.01:800)
 	data_dict = DataFile()
 	initial_conditions = buildIC(39)
 	#need to actually figure out initial conditions
 	#fedeqns(t,y)= complexHeartModel(t,y,data_dict)
-	#tout, res = ode23s(fedeqns, initial_conditions, t)
-	tic()
+	#tout, res = ODE.ode23(fedeqns, initial_conditions, t, points=:specified)
 	fedeqns(t,y,ydot)= complexHeartModel(t,y,ydot,data_dict)
-	res = Sundials.cvode(fedeqns, vec(initial_conditions), t, integrator=:Adams)#, reltol=1E-1, abstol=1E-2)
-	toc()
+	res = Sundials.cvode(fedeqns, vec(initial_conditions), t)
 	#psi = [a[14] for a in res]
 	#@show res
-	#psi = res[:, 14]
-	#plot(tout, mod(psi,1), "kx")
+	psi = res[:, 14]
+	#plot(t, mod(psi,1), "kx")
 	plotPretty(t, res,data_dict)
 	
 end
@@ -580,7 +564,9 @@ function plotPretty(tout, res,data_dict)
 #	fsh = [a[21] for a in res]
 	Psa = res[:, 5] #systemic pressure
 	fac =res[:, 18]
-
+	fap = res[:, 19]
+	fsp= res[:, 20]
+	fsh =res[:, 21]
 	figure(figsize=(30,20))
 	PyPlot.hold(true)
 	#plt[:tight_layout]() 	 #to prevent plots from overlapping
@@ -596,13 +582,12 @@ function plotPretty(tout, res,data_dict)
 	plot(tout, fac, "k")
 	ylabel("Afferent Activity from peripherial chemoreceptors")
 	plt[:subplot](2,4,4)
-	plot(tout, Ts, "k")
-	ylabel("deltaTs")
+	plot(tout, fap, "k")
+	ylabel("Afferent Activity from lung stretch receptors")
 	plt[:subplot](2,4,5)
-	plot(tout, Tv, "k")
-	ylabel("deltaTv")
-#	plt[:subplot](2,4,6)
-#	plot(tout, fsh, "k")
-#	ylabel("Efferent activity in heart")
-	savefig("Nov3rdEveningAttempt.pdf")
+	plot(tout, fsp, "k")
+	ylabel("Efferent activity in vessels")
+	plt[:subplot](2,4,6)
+	plot(tout, fsh, "k")
+	ylabel("Efferent activity in heart")
 end
