@@ -48,7 +48,7 @@ end
 
 function processUsefulPatients()
 	actuallyUsefulPatients = AbstractString[]
-	usefulPatients = readdlm("potentiallyUsefulPatients.txt")
+	usefulPatients = readdlm("usefulPatients.txt")
 	for patient in usefulPatients
 		lowFstring = string(patient, "n")
 		lowFdata =  readdlm(IOBuffer(readall(`rdsamp -r mimic2wdb/matched/$lowFstring -p -v -H -t 600 -c`)), ',', '\n');
@@ -78,14 +78,14 @@ function processUsefulPatients()
 		nonzeros = countnz(highFdataDF[:ABP])
 
 		if(nonzeros>100)
-			plotData(lowFdataDF, highFdataDF)
+			plotData(lowFdataDF, highFdataDF, patient)
 			push!(actuallyUsefulPatients, patient)
 		end
 	end
 	writedlm("ActuallyUsefulPatients.txt", actuallyUsefulPatients)
 end
 
-function plotData(lowFdata, highFdata)
+function plotData(lowFdata, highFdata, patient)
 	close("all")
 	#@show lowFdata[:Elapsedtime]
 	figure()
@@ -93,5 +93,34 @@ function plotData(lowFdata, highFdata)
 	plot(lowFdata[:Elapsedtime], lowFdata[:HR], "k.")
 	plt[:subplot](2,1,2)
 	plot(highFdata[:Elapsedtime], highFdata[:ABP], "k-")
+	@show string("figures/",patient[8:end], ".pdf")
+	savefig(string("figures/",patient[8:end], ".pdf"))
 
+end
+
+function extractdata(patient)
+		lowFstring = string(patient, "n")
+		lowFdata =  readdlm(IOBuffer(readall(`rdsamp -r mimic2wdb/matched/$lowFstring -p -v -H -t 600 -c`)), ',', '\n');
+		highFdata =  readdlm(IOBuffer(readall(`rdsamp -r mimic2wdb/matched/$patient -p -v -H -t 600 -c`)), ',', '\n');
+		lowFdata[lowFdata .=="-"] =0.0
+		highFdata[highFdata.=="-"] = 0.0
+		lowFdataDF=  DataFrame(lowFdata);
+		highFdataDF = DataFrame(highFdata); 
+		lowFnames = Symbol[]
+		highFnames = Symbol[]
+		for j in collect(1:size(lowFdata,2))
+			push!(lowFnames, replace(replace(strip(lowFdata[1,j]), " ", ""), "'", ""))
+		end
+
+		for j in collect(1:size(highFdata,2))
+			push!(highFnames, replace(replace(strip(highFdata[1,j]), " ", ""), "'", ""))
+		end
+
+		#@show lowFnames
+		names!(lowFdataDF, lowFnames)
+		names!(highFdataDF, highFnames)
+		deleterows!(lowFdataDF, 1:2)
+		deleterows!(highFdataDF, 1:2)
+		return lowFdataDF, highFdataDF;
+	
 end

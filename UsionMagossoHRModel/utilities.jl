@@ -166,3 +166,62 @@ function plotPretty(tout, res,data_dict, outputfn)
 #	ylabel("Efferent activity in heart")
 	savefig(outputfn)
 end
+
+function plotPrettyWithOverlaidData(tout,res, data_dict, lowFdata, highFdata, outputfn)
+	resistances = data_dict["RESISTANCE"]
+	Rsa=resistances[1]
+	Rsp=resistances[2]
+	Rep=resistances[3]
+	Rmp=resistances[4]
+	Rbp=resistances[5]
+	Rhp=resistances[6]
+	Rsv=resistances[7]
+	Rev=resistances[8]
+	Rmv=resistances[9]
+	Rbv=resistances[10]
+	Rhv=resistances[11]
+	Rpa=resistances[12]
+	Rpp=resistances[13]
+	Rpv=resistances[14]
+
+
+	Ts = res[:, 31]
+	Tv = res[:, 32]
+	T = Ts+Tv+data_dict["REFLEX"][end]
+	Psa = res[:, 5] #systemic pressure
+	fac =res[:, 18]
+	Psp = res[:, 7]
+
+	Fsp = Psp/Rsp
+	Fep = Psp/Rep
+	Fmp = Psp/Rmp
+	Fbp = Psp/Rbp
+	Fhp = Rsp/Rhp
+
+	figure(figsize=(30,20))
+	PyPlot.hold(true)
+	#plt[:tight_layout]() 	 #to prevent plots from overlapping
+	plt[:subplot](2,4,1)
+	plot(tout, 1./T*60, "k")
+	plot(lowFdata[:Elapsedtime], lowFdata[:HR], "r.")
+	#xlabel("Time in seconds")
+	ylabel("HR, in BPM")
+	plt[:subplot](2,4,2)
+	plot(tout, Psa, "k", linewidth = .5)
+	plot(highFdata[:Elapsedtime], highFdata[:ABP], "r-",linewidth = .25)
+	ylabel("Systemic Pressure, in mmHg")
+
+	plt[:subplot](2,4,3)
+	plot(tout, Fsp, "k")
+	ylabel("Splanchnic peripheral flow")
+	plt[:subplot](2,4,4)
+	plot(tout, Fep, "k")
+	ylabel("Extrasplanchnic flow")
+	plt[:subplot](2,4,5)
+	plot(tout, Fmp, "k")
+	ylabel("Muscle flow")
+#	plt[:subplot](2,4,6)
+#	plot(tout, fsh, "k")
+#	ylabel("Efferent activity in heart")
+	savefig(outputfn)
+end
