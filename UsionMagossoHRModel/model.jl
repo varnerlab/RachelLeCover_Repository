@@ -544,7 +544,13 @@ function complexHeartModel(t,y,dydt,data_dict)
 	#store data
 	data_dict["HISTORICALDATA"] = storeData(t, fev, fes, fcs, fsp, fsh, fv, fac, data_dict["HISTORICALDATA"])
 	#bleed out at 10mL/min
-	data_dict["UNSTRESSEDVOLUME"][16] = data_dict["UNSTRESSEDVOLUME"][15]-t*(30.0/60.0)
+	#run for 2 minutes, then start bleeding out at 30 mL/min
+	tstartbleed = 120.0
+	if(t <tstartbleed)
+		data_dict["UNSTRESSEDVOLUME"][16] = data_dict["UNSTRESSEDVOLUME"][15]
+	else
+		data_dict["UNSTRESSEDVOLUME"][16] = data_dict["UNSTRESSEDVOLUME"][15]-(t-tstartbleed)*(30.0/60.0)
+	end
 	#@show dydt
 	@show t, Psi,data_dict["UNSTRESSEDVOLUME"][16]
 	return dydt
@@ -552,7 +558,7 @@ function complexHeartModel(t,y,dydt,data_dict)
 end
 
 function main()
-	t = collect(0:.1:60)
+	t = collect(0:.1:600)
 	data_dict = DataFile()
 	initial_conditions = buildIC(36)
 	#need to actually figure out initial conditions
@@ -566,9 +572,9 @@ function main()
 	#@show res
 	#psi = res[:, 14]
 	#plot(tout, mod(psi,1), "kx")
-	plotEverything(t, res, data_dict, "figures/EverythingStep.1absrel1E-1BleedOut30mLminSearchTest.pdf")
-	plotPretty(t, res, data_dict, "figures/PrettyStep.1absrel1E-1BleedOut30mLminSearchTest.pdf")
-	#writedlm("results60sNoBleed.txt", res)
+	plotEverything(t, res, data_dict, "figures/EverythingStep.1absrel1E-1600sBleedOut30mLminStartingAt120s.pdf")
+	plotPretty(t, res, data_dict, "figures/PrettyStep.1absrel1E-1600sBleedOut30mLminStartingAt120s.pdf")
+	writedlm("results600s30mLminBleedStartingAt120s.txt", res)
 	return t, res, data_dict
 end
 
