@@ -94,7 +94,8 @@ function complexHeartModel(t,y,dydt,data_dict)
 	Vupa=volumes[12]
 	Vupp=volumes[13]
 	Vupv=volumes[14]
-	Vtot = volumes[15]
+	Vtot0 = volumes[15]
+	Vtot = volumes[16]
 
 	Rsa=resistances[1]
 	Rsp=resistances[2]
@@ -316,7 +317,7 @@ function complexHeartModel(t,y,dydt,data_dict)
 
 	#heart calculations
 	
-	#Psi = mod(Psi, 1)
+	Psi = mod(Psi, 1)
 	dPsidt = 1/T
 	if(Psi>1)
 		dPsidt = 0
@@ -542,67 +543,33 @@ function complexHeartModel(t,y,dydt,data_dict)
 	dydt[36] = dWhdt
 	#store data
 	data_dict["HISTORICALDATA"] = storeData(t, fev, fes, fcs, fsp, fsh, fv, fac, data_dict["HISTORICALDATA"])
+	#bleed out at 10mL/min
+	data_dict["UNSTRESSEDVOLUME"][16] = data_dict["UNSTRESSEDVOLUME"][15]-t*(30.0/60.0)
 	#@show dydt
-	@show t
+	@show t, Psi,data_dict["UNSTRESSEDVOLUME"][16]
 	return dydt
 
 end
 
 function main()
-	t = collect(0:.01:60)
+	t = collect(0:.1:60)
 	data_dict = DataFile()
-	initial_conditions = buildIC(39)
+	initial_conditions = buildIC(36)
 	#need to actually figure out initial conditions
 	#fedeqns(t,y)= complexHeartModel(t,y,data_dict)
 	#tout, res = ode23s(fedeqns, initial_conditions, t)
 	tic()
 	fedeqns(t,y,ydot)= complexHeartModel(t,y,ydot,data_dict)
-	res = Sundials.cvode(fedeqns, vec(initial_conditions), t, integrator=:Adams)#, reltol=1E-1, abstol=1E-2)
+	res = Sundials.cvode(fedeqns, vec(initial_conditions), t, integrator=:Adams, reltol=1E-1, abstol=1E-1)
 	toc()
 	#psi = [a[14] for a in res]
 	#@show res
 	#psi = res[:, 14]
 	#plot(tout, mod(psi,1), "kx")
-	plotPretty(t, res,data_dict)
-	
+	plotEverything(t, res, data_dict, "figures/EverythingStep.1absrel1E-1BleedOut30mLminSearchTest.pdf")
+	plotPretty(t, res, data_dict, "figures/PrettyStep.1absrel1E-1BleedOut30mLminSearchTest.pdf")
+	#writedlm("results60sNoBleed.txt", res)
+	return t, res, data_dict
 end
 
-function plotPretty(tout, res,data_dict)
-	#Ts = [ a[34] for a in res]
-	#Tv =[ a[35] for a in res] 
-	Ts = res[:, 34]
-	Tv = res[:, 35]
-	T = Ts+Tv+data_dict["REFLEX"][end]
-#	Psa = [a[5] for a in res] #systemic pressure
-#	fac = [a[18] for a in res]
-#	fap = [a[19] for a in res]
-#	fsp= [a[20] for a in res]
-#	fsh = [a[21] for a in res]
-	Psa = res[:, 5] #systemic pressure
-	fac =res[:, 18]
 
-	figure(figsize=(30,20))
-	PyPlot.hold(true)
-	#plt[:tight_layout]() 	 #to prevent plots from overlapping
-	plt[:subplot](2,4,1)
-	plot(tout, 1./T*60, "k")
-	#xlabel("Time in seconds")
-	ylabel("HR, in BPM")
-	plt[:subplot](2,4,2)
-	plot(tout, Psa, "k", linewidth = .5)
-	ylabel("Systemic Pressure, in mmHg")
-
-	plt[:subplot](2,4,3)
-	plot(tout, fac, "k")
-	ylabel("Afferent Activity from peripherial chemoreceptors")
-	plt[:subplot](2,4,4)
-	plot(tout, Ts, "k")
-	ylabel("deltaTs")
-	plt[:subplot](2,4,5)
-	plot(tout, Tv, "k")
-	ylabel("deltaTv")
-#	plt[:subplot](2,4,6)
-#	plot(tout, fsh, "k")
-#	ylabel("Efferent activity in heart")
-	savefig("Nov3rdEveningAttempt.pdf")
-end

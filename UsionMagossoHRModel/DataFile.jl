@@ -60,6 +60,7 @@ function DataFile()
 	push!(volume_array, Vupp)
 	push!(volume_array, Vupv)
 	push!(volume_array, Vtot)
+	push!(volume_array, Vtot)
 
 	resistance_array = Float64[]
 	Rsa =0.06
