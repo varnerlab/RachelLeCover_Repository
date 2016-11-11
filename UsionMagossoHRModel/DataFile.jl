@@ -77,6 +77,9 @@ function DataFile()
 	Rpa =0.023
 	Rpp =0.0894
 	Rpv =0.0056
+	Rbp_init = Rbp
+	Rhp_init= Rhp
+	Rmp_init = Rmp	
 
 	push!(resistance_array, Rsa)
 	push!(resistance_array, Rsp)
@@ -92,6 +95,9 @@ function DataFile()
 	push!(resistance_array, Rpa)
 	push!(resistance_array, Rpp)
 	push!(resistance_array, Rpv)
+	push!(resistance_array, Rbp_init)
+	push!(resistance_array, Rhp_init)
+	push!(resistance_array, Rmp_init)
 
 	inhertance_array = Float64[]
 	Lsa = .22E-3
@@ -112,7 +118,7 @@ function DataFile()
 	Vura = 25
 	Rra = 2.5E-3
 	P0rv = 1.5
-	kerv = 0.011
+	kErv = 0.011
 	Vurv = 40.8
 	Emaxrv = 1.75
 	krrv = 1.4E-3
@@ -131,7 +137,7 @@ function DataFile()
 	push!(heart_array, Vura)
 	push!(heart_array, Rra)
 	push!(heart_array, P0rv)
-	push!(heart_array, kerv)
+	push!(heart_array, kErv)
 	push!(heart_array, Vurv)
 	push!(heart_array, Emaxrv)
 	push!(heart_array, krrv)
@@ -139,8 +145,8 @@ function DataFile()
 	push!(heart_array, Tsys0)
 
 	dvTerms = Float64[]
-	dVusudt = 0.0
-	dVumvdt = 0.0
+	dVusudt = 10.0
+	dVumvdt = 10.0
 
 	push!(dvTerms, dVusudt)
 	push!(dvTerms, dVumvdt)
@@ -183,7 +189,7 @@ function DataFile()
 	fesinf = 2.1
 	fes0 = 16.11
 	fesmin = 2.66
-	fesmax = 60
+	fesmax = 60.0
 	kes = .0675
 	Wbsp = 1
 	Wcsp = 5
@@ -205,7 +211,7 @@ function DataFile()
 	fevinf = 6.3
 	fev0 = 3.2
 	fab0 = 25
-	kev = 7.07
+	kev = 7.06
 	Wcv = .2
 	Wpv = .103
 	Thetav = -.68
@@ -387,7 +393,7 @@ function DataFile()
 	push!(extraheartparams,kes)
 	push!(extraheartparams, fcs0)
 	
-	historicaldata =ones(1,8)
+	historicaldata =zeros(1,8)
 
 	data_dictionary = Dict()
 	data_dictionary["COMPLIANCE"] =compliance_array
@@ -406,7 +412,7 @@ function DataFile()
 	data_dictionary["VENTILATORY"] = vetilatory
 	data_dictionary["REFLEX"] = reflex
 	data_dictionary["LOCAL_METABOLIC"] = localmetabolic
-	data_dictionary["CO2_PRESSURE"] = 35 #mmHg, from wikipedia
+	data_dictionary["CO2_PRESSURE"] = 70.0 # 35 mmHg, from wikipedia
 	data_dictionary["EXTRA_HEART_PARAMS"] = extraheartparams
 	data_dictionary["HISTORICALDATA"] = historicaldata
 

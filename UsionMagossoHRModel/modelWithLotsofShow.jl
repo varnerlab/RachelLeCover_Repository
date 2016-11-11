@@ -111,9 +111,6 @@ function complexHeartModel(t,y,dydt,data_dict)
 	Rpa=resistances[12]
 	Rpp=resistances[13]
 	Rpv=resistances[14]
-	Rbp_init = resistances[15]
-	Rhp_init = resistances[16]
-	Rmp_init = resistances[17]
 
 	Lsa = inertances[1]
 	Lpa = inertances[2]
@@ -266,46 +263,26 @@ function complexHeartModel(t,y,dydt,data_dict)
 	Vu = Vusa +Vusp +Vuep+Vump + Vubp+Vuhp+Vusv+Vuev+Vumv+Vubv+Vuhv+Vura+Vupa+Vupp+Vupv+Vula#eqn 13
 	Vpp = Cpp*Ppp
 	Pev = 1/Cev*(Vtot-Csa*Psa-(Csp+Cep+Cmp+Cbp+Chp)*Psp-Csv*Psv -Cmv*Pmv -Cbv*Pbv-Chv*Phv-Cra*Pra-Vrv-Cpa*Ppa-Cpp*Vpp-Cpv*Ppv-Cla*Pla-Vlv-Vu)#eqn 12
-
-
-	#@show Vu, Vpp, Pev
-	#@show Vtot
-	#@show Csa*Psa
-	#@show (Csp+Cep+Cmp+Cbp+Chp)*Psp
-	#@show Csv*Psv 
-	#@show Psv
-	#@show Cmv*Pmv 
-	#@show Cbv*Pbv
-	#@show Chv*Phv
-	#@show Cra*Pra
-	#@show Vrv
-	#@show Cpa*Ppa
-	#@show Cpp*Vpp
-	#@show Cpv*Ppv
-	#@show Cla*Pla
-	#@show Vlv
-	#@show Vu
+	#@show Vu, Pev
 	#reflex regulation, cardiac elastances
 	SigmaSubEmaxlv = 0.0
 	SigmaSubEmaxrv = 0.0
 	#efferent neural pathways
 	#from heart paper
-	fcs = (fmin+fmax*exp((Psquiggle-Pn)/ka))/(1+exp((Psquiggle-Pn)/ka))
+	fcs = (fmin-fmax*exp((Psquiggle-Pn)/ka))/(1+exp((Psquiggle-Pn)/ka))
 
 	fes = fesinf+(fes0-fesinf)*exp(-kes*fcs)
 	fab = (fabmin+fabmax*exp((Psquiggle-Pn)/kab))/(1+exp((Psquiggle-Pn)/kab))
 	#vagal
 	fv = (fev0+fevinf*exp((fab-fab0)/kev))/(1+exp((fab-fab0)/kev))+Wcv*fac-Wpv*fap-Thetav
-	fsp =lookUpValue(data_dict["HISTORICALDATA"], AbstractString("fsp"), t-eps())
+	fsp = fesinf +(fes0-fesinf)*exp(kes*(-Wbsp*fab+Wcsp*fac-Wpsp*fap-Thetasp))
 	fev = (fev0+fevinf*exp((fcs-fcs0)/kev))/(1+exp((fcs-fcs0)/kev))
-	#@show fcs, fes, fab, fv, fsp, fev
 	if(fsp <= fesmax)
 		fsp = fesinf +(fes0-fesinf)*exp(kes*(-Wbsp*fab+Wcsp*fac-Wpsp*fap-Thetasp))
 	else
 		fsp = fesmax
 	end
-	
-	fsh = fesinf +(fes0-fesinf)*exp(kes*(-Wbsh*fab+Wcsh*fac-Thetash))
+
 	if(fes < fesmax)
 		fsh = fesinf +(fes0-fesinf)*exp(kes*(-Wbsh*fab+Wcsh*fac-Thetash))
 	elseif(fsh>=fesmax)
@@ -319,9 +296,8 @@ function complexHeartModel(t,y,dydt,data_dict)
 		SigmaSubEmaxlv = 0.0
 		SigmaSubEmaxrv = 0.0
 	end
-	#@show fsh, fsp
-	##@show SigmaSubEmaxlv, SigmaSubEmaxrv
-	##@show deltaEmaxlv, deltaEmaxrv
+	#@show SigmaSubEmaxlv, SigmaSubEmaxrv
+	#@show deltaEmaxlv, deltaEmaxrv
 	ddeltaEmaxlvdt = 1/tauEmaxlv*(-deltaEmaxlv+SigmaSubEmaxlv)
 	ddeltaEmaxrvdt = 1/tauEmaxrv*(-deltaEmaxrv+SigmaSubEmaxrv)
 
@@ -339,17 +315,16 @@ function complexHeartModel(t,y,dydt,data_dict)
 	SigmaTv = GTv*lookUpValue(data_dict["HISTORICALDATA"], AbstractString("fv"), t-DTv)#fev*(t-DTv)
 	ddeltaTvdt = 1/tauTv*(-deltaTv+SigmaTv)
 	T = deltaTs+deltaTv+T0
-	#@show deltaTs,deltaTv, T0, SigmaTs, SigmaTv
 
 	#heart calculations
-	
+	#checked to here
 	Psi = mod(Psi, 1)
 	dPsidt = 1/T
 	if(Psi>1)
 		dPsidt = 0
 	end
 	u = mod(Psi,1) #equvalent to frac, reset when it gets to one
-	##@show t,T, Psi, dPsidt, deltaTs, deltaTv,u
+	#@show t,T, Psi, dPsidt, deltaTs, deltaTv,u
 #	if(Psi >1) #reset, equvalent to frac
 #		Psi = 0.0
 #	end
@@ -361,8 +336,7 @@ function complexHeartModel(t,y,dydt,data_dict)
 	elseif(u>=Tsys/T && u<=1)
 		phi = 0.0
 	end
-	@show phi
-	@show u, Tsys/T
+
 	Pmaxlv = phi*Emaxlv*(Vlv*Vulv)+(1-phi)*P0lv*(exp(kelv*Vlv)-1)
 	Rlv = krlv*Pmaxlv
 	if(Pmaxlv<=Psa)
@@ -371,7 +345,7 @@ function complexHeartModel(t,y,dydt,data_dict)
 		Fol = (Pmaxlv-Psa)/Rlv
 	end
 	Plv = Pmaxlv - Rlv*Fol
-	if(Pla<=Plv)
+	if(Plv>=Pla)
 		Fil = 0.0
 	else
 		Fil = (Pla-Plv)/Rla
@@ -401,39 +375,7 @@ function complexHeartModel(t,y,dydt,data_dict)
 	#ventilatory response 
 	VT = VTn + deltaVT
 	ddeltaVTdt = 1/tauv*(-deltaVT+Gv*(lookUpValue(data_dict["HISTORICALDATA"],AbstractString("fac"), (t-Dv))-facn))	
-	#@show VT, Fir, For, Fil, Fol
 
-	#local effect of O2
-	Rbp = Rbp_init/abs(1+xb)
-	Rhp = Rhp_init/abs(1+xh)
-	Rmp = Rmp_init/abs(1+xm)
-
-	Rsp = deltaRsp+Rsp0
-	Rep = deltaRep + Rep0
-	Rmp = deltaRmp + Rmp0
-	Vusv = deltaVusv+Vusv0
-	Vuev = deltaVuev+Vuev0
-	Vumv = deltaVumv+Vumv0
-
-	#update datadict
-	data_dict["RESISTANCE"][5] = Rbp
-	data_dict["RESISTANCE"][6]=Rhp
-	data_dict["RESISTANCE"][4] = Rmp
-	data_dict["RESISTANCE"][2] = Rsp
-	data_dict["RESISTANCE"][3] = Rep
-	data_dict["UNSTRESSEDVOLUME"][7] = Vusv
-	data_dict["UNSTRESSEDVOLUME"][8] = Vuev
-	data_dict["UNSTRESSEDVOLUME"][9] = Vumv
-	@show Rbp
-	@show Rhp
-	@show Rmp
-	@show Rsp
-	@show Rep
-	@show Vusv
-	@show Vuev
-	@show Vumv
-	
-	#@show Rsp, Rsp0, Rep, Rep0, Rmp, Rmp0, Vusv, Vusv0, Vuev, Vuev0, Vumv, Vumv0
 	#force balances
 	dPpadt = 1/Cpa*(For-Fpa) #eqn 1, conversation of mass at pulmonary arteries
 	dFpadt = 1/Lpa*(Ppa-Ppp-Rpa*Fpa)# eqn 2, balance of forces at pulmonary arteries
@@ -458,8 +400,7 @@ function complexHeartModel(t,y,dydt,data_dict)
 	dfacdt = 1/tauc*(-fac+Phiac)
 	#pulmonarystretch
 	Phiap = Gap*VT
-	#@show Phiap, Phiap-fap
-	dfapdt = 1/taup*(-fap+Phiap)	
+	dfapdt = 1/taup*(-fap*Phiap)	
 
 	#CNS hypoxic response
 	Chisp = (ChiMinsp+ChiMaxsp*exp((PaO2-PO2nsp)/kiscsp))/(1+exp((PaO2-PO2nsp)/kiscsp))
@@ -470,12 +411,12 @@ function complexHeartModel(t,y,dydt,data_dict)
 	#reflex regulation
 		#resistances and unstressed volumes
 	if(fsp >=fesmin)
-		SigmaSubRsp = GRsp*log((lookUpValue(data_dict["HISTORICALDATA"], AbstractString("fsp"), t-DRsp)-fesmin+1))
-		SigmaSubRep = GRep*log((lookUpValue(data_dict["HISTORICALDATA"], AbstractString("fsp"), t-DRep)-fesmin+1))
-		SigmaSubRmp = GRmp*log((lookUpValue(data_dict["HISTORICALDATA"], AbstractString("fsp"), t-DRmp)-fesmin+1))
-		SigmaSubVusv = GVusv*log((lookUpValue(data_dict["HISTORICALDATA"], AbstractString("fsp"), t-DVusv)-fesmin+1))
-		SigmaSubVuev = GVuev*log((lookUpValue(data_dict["HISTORICALDATA"], AbstractString("fsp"), t-DVuev)-fesmin+1))
-		SigmaSubVumv = GVumv*log((lookUpValue(data_dict["HISTORICALDATA"], AbstractString("fsp"), t-DVumv)-fesmin+1))
+		SigmaSubRsp = GRsp*log(abs(lookUpValue(data_dict["HISTORICALDATA"], AbstractString("fsp"), t-DRsp)-fesmin+1))
+		SigmaSubRep = GRep*log(abs(lookUpValue(data_dict["HISTORICALDATA"], AbstractString("fsp"), t-DRep)-fesmin+1))
+		SigmaSubRmp = GRmp*log(abs(lookUpValue(data_dict["HISTORICALDATA"], AbstractString("fsp"), t-DRmp)-fesmin+1))
+		SigmaSubVusv = GVusv*log(abs(lookUpValue(data_dict["HISTORICALDATA"], AbstractString("fsp"), t-DVusv)-fesmin+1))
+		SigmaSubVuev = GVuev*log(abs(lookUpValue(data_dict["HISTORICALDATA"], AbstractString("fsp"), t-DVuev)-fesmin+1))
+		SigmaSubVumv = GVumv*log(abs(lookUpValue(data_dict["HISTORICALDATA"], AbstractString("fsp"), t-DVumv)-fesmin+1))
 	else
 		SigmaSubRsp = 0
 		SigmaSubRep = 0
@@ -484,9 +425,7 @@ function complexHeartModel(t,y,dydt,data_dict)
 		SigmaSubVuev = 0
 		SigmaSubVumv = 0
 	end
-	#@show SigmaSubRsp, deltaRsp
-	#@show SigmaSubRep, deltaRep
-	#@show SigmaSubRmp, deltaRmp
+
 	ddeltaRspdt = 1/tauRsp*(-deltaRsp+SigmaSubRsp)
 	ddeltaRepdt = 1/tauRep*(-deltaRep+SigmaSubRep)
 	ddeltaRmpdt = 1/tauRmp*(-deltaRmp+SigmaSubRmp)
@@ -494,45 +433,37 @@ function complexHeartModel(t,y,dydt,data_dict)
 	ddeltaVuevdt = 1/tauVuev*(-deltaVuev+SigmaSubVuev)
 	ddeltaVumvdt = 1/tauVumv*(-deltaVumv+SigmaSubVumv)
 
-
+	Rsp = deltaRsp+Rsp0
+	Rep = deltaRep + Rep0
+	Rmp = deltaRmp + Rmp0
+	Vusv = deltaVusv+Vusv0
+	Vuev = deltaVuev+Vuev0
+	Vumv = deltaVumv+Vumv0
 
 	#local effect of O2
 	#these flows may be incorrect
-	Fb = Psp/Rbp
+	Fb = Psp/Rhp
 	Fh = Psp/Rhp
-	Fm = Psp/Rmp
+	Fm = Fsa-Fb-Fh
 	FO2 = PaO2*(1+beta*PaCO2)/(K*(1+alpha*(PaCO2)))
 	CaO2 = C*(FO2)^(1/alpha)/(1+FO2^(1/alpha))	
 
-	Mdoth = Wh/Whn*Mdothn
-	wh = -Plv*dVlvdt-Prv*dVrvdt
-	dWhdt = 1/tauw*(wh-Wh)
-
 	CvbO2 = CaO2-Mdotb/Fb
-	CvhO2 = CaO2-Mdoth/Fh
+	CvhO2 = CaO2-Mdothn/Fh
 	CvmO2 = CaO2-Mdotm/Fm
+
 
 	dxbdt = 1/taub*(-xb-GbO2*(CvbO2-CvbO2n))
 	dxhdt = 1/tauh*(-xh-GhO2*(CvhO2-CvhO2n))
 	dxmdt = 1/taum*(-xm-GmO2*(CvmO2-CvmO2n))
-	#prevent xb, xh, xm from getting too negative
-	if(xb <-.99)
-		xb = -.99
-		dxbdt = 0
-	end
 
-	if(xh <-.99)
-		xh = -.99
-		dxhdt = 0.0
-	end
-	
-	if(xm < -.99)
-		xm = -.99
-		dxmdt = 0.0
-	end
-	@show xb, xh, xm, CvbO2-CvbO2n, CvhO2-CvhO2n, CvmO2-CvmO2n
+#	Rbp = Rbpn/(1+xb)
+#	Rhp = Rbhn/(1+xh)
+#	Rmp = Rbmn/(1+xm)
 
-	
+	Mdoth = Wh/Whn*Mdothn
+	wh = -Plv*dVlvdt-Prv*dVrvdt
+	dWhdt = 1/tauw*(wh-Wh)
 
 	dydt[1] = dPpadt
 	dydt[2] = dFpadt
@@ -574,7 +505,7 @@ function complexHeartModel(t,y,dydt,data_dict)
 	data_dict["HISTORICALDATA"] = storeData(t, fev, fes, fcs, fsp, fsh, fv, fac, data_dict["HISTORICALDATA"])
 	#bleed out at 10mL/min
 	#run for 2 minutes, then start bleeding out at 30 mL/min
-	tstartbleed = 120.0
+	tstartbleed = 700.0
 	if(t <tstartbleed)
 		data_dict["UNSTRESSEDVOLUME"][16] = data_dict["UNSTRESSEDVOLUME"][15]
 	else
@@ -583,20 +514,17 @@ function complexHeartModel(t,y,dydt,data_dict)
 	#induce hypoxia
 	tinduce = 120.0
 	tdecrease = 6.0
-#	if(t<tinduce)
-#		data_dict["CHEMOREFLEX"][6]= data_dict["CHEMOREFLEX"][6]
-#	elseif(t > tinduce && t< tinduce + tdecrease)
-#		data_dict["CHEMOREFLEX"][6]=25.0
-#	elseif(t>tinduce+tdecrease && data_dict["CHEMOREFLEX"][6]<=95.0)
-#		data_dict["CHEMOREFLEX"][6] = 25.0*exp((t-(tinduce+tdecrease))/3.0)		
-#	end
-##	
+	if(t<tinduce)
+		data_dict["CHEMOREFLEX"][6]= data_dict["CHEMOREFLEX"][6]
+	elseif(t > tinduce && t< tinduce + tdecrease)
+		data_dict["CHEMOREFLEX"][6]=25.0
+	elseif(t>tinduce+tdecrease && data_dict["CHEMOREFLEX"][6]<=95.0)
+		data_dict["CHEMOREFLEX"][6] = 25.0*exp((t-(tinduce+tdecrease))/3.0)		
+	end
+	
 
-	##@show dydt
-	#@show t, data_dict["CHEMOREFLEX"][6], PaO2, fap, dfapdt 
-	#@show Fsa - (Psp/Rsp + Psp/Rep + Psp/Rmp + Psp/Rbp + Psp/Rhp) #should be close to zero
-	#@show Fol, Fsa
-	#@show For, Fpa
+	#@show dydt
+	@show t, data_dict["CHEMOREFLEX"][6], PaO2, fsh, fsp
 	return dydt
 
 end
@@ -613,13 +541,14 @@ function main()
 	res = Sundials.cvode(fedeqns, vec(initial_conditions), t, integrator=:Adams, reltol=1E-1, abstol=1E-1)
 	toc()
 	#psi = [a[14] for a in res]
-	##@show res
+	#@show res
 	#psi = res[:, 14]
 	#plot(tout, mod(psi,1), "kx")
-	plotEverything(t, res, data_dict, "figures/TestingNov11Everything200sLimitedXToPoint99WithHemorhorrhage.pdf")
-	plotPretty(t, res, data_dict, "figures/TestingNov11Pretty200sLimitedXToPoint99Hemorhorrhage.pdf")
-	#writedlm("results/Nov9results200sAttemptToRecreateFig13.txt", res)
-	attemptToRecreateFig13(t[1000:end],res[1000:end, :],data_dict, "AttemptedFig13LimitedXToPoint99Hemorhorrhage.pdf")
+	plotEverything(t, res, data_dict, "figures/EverythingStep.1absrel1E-1AttemptToRecreateFig13Everything.pdf")
+	plotPretty(t, res, data_dict, "figures/PrettyStep.1absrel1E-1200sNoBleeAttemptToRecreateFig13Pretty.pdf")
+	writedlm("results/Nov9/results200sAttemptToRecreateFig13.txt", res)
+	attemptToRecreateFig13(t[1000:end],res[1000:end, :],data_dict, "AttemptedFig13.pdf")
+	writedlm("results/Nov9/results200sAttemptToRecreateFig13.txt", res)
 	return t, res, data_dict
 end
 

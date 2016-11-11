@@ -4,15 +4,16 @@ function storeData(time, fev, fes, fcs, fsp, fsh, fv, fac,historicaldata)
 	return newdata
 end
 
-function lookUpValue(historicaldata, item, desiredtime)
-	data = historicaldata[2:end, :] # remove row of ones used to initiate the array
+function lookUpValue(data, item, desiredtime)
+	#data = historicaldata[2:end, :] # remove row of ones used to initiate the array
 	#let's linearly interpolate to find items
 	#@show desiredtime
+	defaultvalue = 10.0
 	if(desiredtime <0)
-		return .1
+		return defaultvalue
 	elseif(abs(desiredtime) > data[end,1])
-		println("got here")
-		return .1
+		#println("got here")
+		return defaultvalue
 	end
 
 	item = AbstractString(item)
@@ -37,7 +38,7 @@ function lookUpValue(historicaldata, item, desiredtime)
 	else
 		println("Fell through")
 		@show item
-		return .1
+		return defaultvalue
 	end
 
 	
@@ -100,7 +101,7 @@ function plotEverything(tout, res, data_dict, outputfn)
 	names[36]="Wh"
 	figure(figsize=(30,20))
 	PyPlot.hold(true)
-	plt[:tight_layout]()
+	#plt[:tight_layout]()
 	@show size(res)
 	for j in collect(1:size(res,2))
 		plt[:subplot](6,6,j)
@@ -224,4 +225,64 @@ function plotPrettyWithOverlaidData(tout,res, data_dict, lowFdata, highFdata, ou
 #	plot(tout, fsh, "k")
 #	ylabel("Efferent activity in heart")
 	savefig(outputfn)
+end
+
+function attemptToRecreateFig13(t,res, data_dict, outputfn)
+	close("all")
+	resistances = data_dict["RESISTANCE"]
+	Rsa=resistances[1]
+	Rsp=resistances[2]
+	Rep=resistances[3]
+	Rmp=resistances[4]
+	Rbp=resistances[5]
+	Rhp=resistances[6]
+	Rsv=resistances[7]
+	Rev=resistances[8]
+	Rmv=resistances[9]
+	Rbv=resistances[10]
+	Rhv=resistances[11]
+	Rpa=resistances[12]
+	Rpp=resistances[13]
+	Rpv=resistances[14]
+	Rsp0 = data_dict["REFLEX"][33]
+	Rep0 =data_dict["REFLEX"][34]
+	
+
+
+	Ts = res[:, 31]
+	Tv = res[:, 32]
+	Psa = res[:, 5]
+	Fsa =res[:, 6]
+	Psp = res[:, 7]
+	deltaRsp = res[:, 25]
+	deltaRep = res[:, 26]
+	#Rsp = deltaRsp+Rsp0
+	#Rep = deltaRep + Rep0
+	@show Rsp
+	@show Rep
+
+	T = Ts+Tv+data_dict["REFLEX"][end]
+	Fs = Psp/Rsp0
+	Fe = Psp/Rep0
+	figure(figsize=(30,20))
+	plt[:subplot](2,2,1)
+	#axis([0,100,60,160])
+	plot(t, Psa, "k", linewidth = .5)
+	ylabel("Arterial Pressure, mmHg")
+	plt[:subplot](2,2,2)
+	#axis([0,100,60,160])
+	plot(t, 1./T*60, "k", linewidth = .5)
+	ax = gca()
+	ax[:ticklabel_format](useOffset=false)
+	ylabel("Heart Rate, bpm")
+	plt[:subplot](2,2,3)
+	#axis([0,100,0,40])
+	plot(t, Fs, linewidth = .5, "k")
+	ylabel("Splanchic Flow")
+	plt[:subplot](2,2,4)
+	#axis([0,100,0,40])
+	plot(t, Fe, linewidth = .5, "k")
+	ylabel("Extrasplanchic Flow")
+	savefig(outputfn)
+
 end
