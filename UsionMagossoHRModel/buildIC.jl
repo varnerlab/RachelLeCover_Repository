@@ -36,24 +36,25 @@ function buildIC(size)
 #	xm = y[35]
 #	Wh = y[36]
 	ic_arr = fill(0.0,1,size)
-	#now using steady state values
-	ic_arr[1] = 20 #PPA = 25 mmHg, from http://www.rnceus.com/hemo/term.htm
+	#now using steady state values from running out model for 3600 sec (1 hr)
+	ic_arr[1] = 10 #PPA = 25 mmHg, from http://www.rnceus.com/hemo/term.htm
 	ic_arr[2] =100 #Fpa is 100 mL/min
-	ic_arr[3] = 80 #Ppp
-	ic_arr[4] = 5#Ppv from http://www.acbrown.com/lung/Lectures/RsCrcl/RsCrclFlow.htm
-	ic_arr[5] = 20# Psa from http://www.acbrown.com/lung/Lectures/RsCrcl/RsCrclFlow.htm
-	ic_arr[6] = 100# Fsa is 100 mL/min
-	ic_arr[7]= 5 #Psp
-	ic_arr[8] = 5 #veins Psv 
-	ic_arr[9] = 5 #Pmv veins
-	ic_arr[10] = 5 #Pbv veins
-	ic_arr[11] = 5 #Phv veins
+	ic_arr[3] = 10 #Ppp
+	ic_arr[4] = 2#Ppv from http://www.acbrown.com/lung/Lectures/RsCrcl/RsCrclFlow.htm
+	ic_arr[5] = 100# Psa from http://www.acbrown.com/lung/Lectures/RsCrcl/RsCrclFlow.htm
+	ic_arr[6] = 500# Fsa is 100 mL/min
+	ic_arr[7]= 70 #Psp
+	ic_arr[8] = 5 #veins Psv-doesn't appear to reach ss' 
+	ic_arr[9] = 3 #Pmv veins
+	ic_arr[10] = 4 #Pbv veins
+	ic_arr[11] = 4 #Phv veins
 	ic_arr[12] = 1.5 #left atrium
 	ic_arr[13]=16.77 #using unstressed conditions
 	ic_arr[16]=40.8
 	ic_arr[15]= 1.5 #right atrium 
 	ic_arr[14] =.5 #Psi
-	ic_arr[19] = 1.0 #fap
+	ic_arr[18] = 1.6 #fac
+	ic_arr[19] = 7.0 #fap
 	ic_arr[25] = -2.0
 	ic_arr[26] = -2.0
 	ic_arr[27] = -2.0

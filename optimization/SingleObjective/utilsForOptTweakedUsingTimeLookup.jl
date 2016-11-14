@@ -1,6 +1,6 @@
 using DataFrames
 using Optim
-include("OlufsenModel2011calcHRtweaked.jl")
+include("OOModelWithTimeLookUp.jl")
 
 function processNumericalData(filename)
 	df=readtable(filename, separator=',',nastrings=["-"])
@@ -33,8 +33,10 @@ end
 function calculatetotalMSE(params)
 	tic()
 	outputdir = "moretesting/2016_11_14/"
-	inputdir = "/home/rachel/Documents/optimization/SingleObjective/LinkedRecordsTimeData10min/"
-	allpatients = readdir(inputdir)
+	inputdir = "/home/rachel/Documents/work/optimization/LinkedRecordsTimeData10min/"
+	c1patients = readdlm("/home/rachel/Documents/work/optimization/multiobjective/usingPOETs/cluster1subjectIDs")
+	c2patients = readdlm("/home/rachel/Documents/work/optimization/multiobjective/usingPOETs/cluster1subjectIDs")
+	allpatients = [c1patients, c2patients]
 	touch(string(outputdir, "usefuldatatol1E-4.txt"))
 	touch(string(outputdir, "paramstol1E-4.txt"))
 	totalMSE = 0.0
@@ -75,7 +77,7 @@ end
 function attemptOptimization()
 	params0 = [75,1.5,.5,250, .5, .5, 1.67,.96, .7]
 	#params0=[78.97582761404169,-1.8864140993276886,0.00142967813114446,251.60453882677203,2.648725296877113,-2.0547879774326403,0.9505848336074358,1.506601105672376,-0.43857878055469035]
-	res = optimize(calculatetotalMSE, params0,method = Optim.NelderMead(), show_trace = true, ftol = 1E-3)
+	res = optimize(calculatetotalMSE, params0,method = Optim.NelderMead(), show_trace = true, x_tol=1E-4, f_tol = 1E-4)
 	@show res
 	return res
 end

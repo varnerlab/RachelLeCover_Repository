@@ -262,7 +262,13 @@ function complexHeartModel(t,y,dydt,data_dict)
 	fcs0 = extraheartparams[8]
 
 	#conversation of mass
-
+	tstartbleed = 275.0
+#	if(t <tstartbleed)
+#		Vu = Vusa +Vusp +Vuep+Vump + Vubp+Vuhp+Vusv+Vuev+Vumv+Vubv+Vuhv+Vura+Vupa+Vupp+Vupv+Vula#eqn 13
+#	else
+#		Vu = Vusa +Vusp +Vuep+Vump + Vubp+Vuhp+Vusv+Vuev+Vumv+Vubv+Vuhv+Vura+Vupa+Vupp+Vupv+Vula-(t-tstartbleed)*(30.0/60.0)
+#	end
+#	@show t, Vu
 	Vu = Vusa +Vusp +Vuep+Vump + Vubp+Vuhp+Vusv+Vuev+Vumv+Vubv+Vuhv+Vura+Vupa+Vupp+Vupv+Vula#eqn 13
 	Vpp = Cpp*Ppp
 	Pev = 1/Cev*(Vtot-Csa*Psa-(Csp+Cep+Cmp+Cbp+Chp)*Psp-Csv*Psv -Cmv*Pmv -Cbv*Pbv-Chv*Phv-Cra*Pra-Vrv-Cpa*Ppa-Cpp*Vpp-Cpv*Ppv-Cla*Pla-Vlv-Vu)#eqn 12
@@ -361,8 +367,8 @@ function complexHeartModel(t,y,dydt,data_dict)
 	elseif(u>=Tsys/T && u<=1)
 		phi = 0.0
 	end
-	@show phi
-	@show u, Tsys/T
+#	@show phi
+#	@show u, Tsys/T
 	Pmaxlv = phi*Emaxlv*(Vlv*Vulv)+(1-phi)*P0lv*(exp(kelv*Vlv)-1)
 	Rlv = krlv*Pmaxlv
 	if(Pmaxlv<=Psa)
@@ -424,14 +430,14 @@ function complexHeartModel(t,y,dydt,data_dict)
 	data_dict["UNSTRESSEDVOLUME"][7] = Vusv
 	data_dict["UNSTRESSEDVOLUME"][8] = Vuev
 	data_dict["UNSTRESSEDVOLUME"][9] = Vumv
-	@show Rbp
-	@show Rhp
-	@show Rmp
-	@show Rsp
-	@show Rep
-	@show Vusv
-	@show Vuev
-	@show Vumv
+#	@show Rbp
+#	@show Rhp
+#	@show Rmp
+#	@show Rsp
+#	@show Rep
+#	@show Vusv
+#	@show Vuev
+#	@show Vumv
 	
 	#@show Rsp, Rsp0, Rep, Rep0, Rmp, Rmp0, Vusv, Vusv0, Vuev, Vuev0, Vumv, Vumv0
 	#force balances
@@ -575,11 +581,12 @@ function complexHeartModel(t,y,dydt,data_dict)
 	#bleed out at 10mL/min
 	#run for 2 minutes, then start bleeding out at 30 mL/min
 	tstartbleed = 120.0
-	if(t <tstartbleed)
-		data_dict["UNSTRESSEDVOLUME"][16] = data_dict["UNSTRESSEDVOLUME"][15]
-	else
-		data_dict["UNSTRESSEDVOLUME"][16] = data_dict["UNSTRESSEDVOLUME"][15]-(t-tstartbleed)*(30.0/60.0)
-	end
+#	if(t <tstartbleed)
+#		data_dict["UNSTRESSEDVOLUME"][16] = data_dict["UNSTRESSEDVOLUME"][15]
+#	else
+#		data_dict["UNSTRESSEDVOLUME"][16] = data_dict["UNSTRESSEDVOLUME"][15]-(t-tstartbleed)*(30.0/60.0)
+#	end
+#	@show t, data_dict["UNSTRESSEDVOLUME"][16]
 	#induce hypoxia
 	tinduce = 120.0
 	tdecrease = 6.0
@@ -590,7 +597,7 @@ function complexHeartModel(t,y,dydt,data_dict)
 #	elseif(t>tinduce+tdecrease && data_dict["CHEMOREFLEX"][6]<=95.0)
 #		data_dict["CHEMOREFLEX"][6] = 25.0*exp((t-(tinduce+tdecrease))/3.0)		
 #	end
-##	
+#	
 
 	##@show dydt
 	#@show t, data_dict["CHEMOREFLEX"][6], PaO2, fap, dfapdt 
@@ -602,7 +609,7 @@ function complexHeartModel(t,y,dydt,data_dict)
 end
 
 function main()
-	t = collect(0:.1:200)
+	t = collect(0:.1:400)
 	data_dict = DataFile()
 	initial_conditions = buildIC(36)
 	#need to actually figure out initial conditions
@@ -616,10 +623,10 @@ function main()
 	##@show res
 	#psi = res[:, 14]
 	#plot(tout, mod(psi,1), "kx")
-	plotEverything(t, res, data_dict, "figures/TestingNov11Everything200sLimitedXToPoint99WithHemorhorrhage.pdf")
-	plotPretty(t, res, data_dict, "figures/TestingNov11Pretty200sLimitedXToPoint99Hemorhorrhage.pdf")
-	#writedlm("results/Nov9results200sAttemptToRecreateFig13.txt", res)
-	attemptToRecreateFig13(t[1000:end],res[1000:end, :],data_dict, "AttemptedFig13LimitedXToPoint99Hemorhorrhage.pdf")
+	plotEverything(t, res, data_dict, "figures/TestingNov14Everything400sdefaultVal60.pdf")
+	plotPretty(t, res, data_dict, "figures/TestingNov14Pretty400sLimitedXToPoint99defaultVal60..pdf")
+	writedlm("results/Nov14/defaultVal60.txt", res)
+	#attemptToRecreateFig13(t[1000:end],res[1000:end, :],data_dict, "AttemptedFig13LimitedXToPoint99Hemorhorrhage.pdf")
 	return t, res, data_dict
 end
 

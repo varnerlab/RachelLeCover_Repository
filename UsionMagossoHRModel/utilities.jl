@@ -8,7 +8,7 @@ function lookUpValue(data, item, desiredtime)
 	#data = historicaldata[2:end, :] # remove row of ones used to initiate the array
 	#let's linearly interpolate to find items
 	#@show desiredtime
-	defaultvalue = 10.0
+	defaultvalue = 60.0 #value for fesmax
 	if(desiredtime <0)
 		return defaultvalue
 	elseif(abs(desiredtime) > data[end,1])
