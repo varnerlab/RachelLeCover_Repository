@@ -329,7 +329,7 @@ function complexHeartModel(t,y,dydt,data_dict)
 	#heart period
 	SigmaTs = 0.0
 	if(fsh >= fesmin)
-		SigmaTs = GTs*log(abs(lookUpValue(data_dict["HISTORICALDATA"], AbstractString("fsh"), t-DTs)-fesmin+1))
+		SigmaTs = GTs*log(lookUpValue(data_dict["HISTORICALDATA"], AbstractString("fsh"), t-DTs)-fesmin+1)
 	else
 		SigmaTs = 0.0
 	end
@@ -337,8 +337,7 @@ function complexHeartModel(t,y,dydt,data_dict)
 	SigmaTv = GTv*lookUpValue(data_dict["HISTORICALDATA"], AbstractString("fv"), t-DTv)#fev*(t-DTv)
 	ddeltaTvdt = 1/tauTv*(-deltaTv+SigmaTv)
 	T = deltaTs+deltaTv+T0
-	#@show deltaTs,deltaTv, T0, SigmaTs, SigmaTv
-
+	@show t, 1/(T)*60, deltaTs, deltaTv
 	#heart calculations
 	
 	Psi = mod(Psi, 1)
@@ -567,9 +566,9 @@ function complexHeartModel(t,y,dydt,data_dict)
 	CvhO2 = CaO2-Mdoth/Fh
 	CvmO2 = CaO2-Mdotm/Fm
 
-	if(CvbO2<0)
-		CvbO2 = 0.0
-	end
+#	if(CvbO2<0)
+#		CvbO2 = 0.0
+#	end
 
 	dxbdt = 1/taub*(-xb-GbO2*(CvbO2-CvbO2n))
 	dxhdt = 1/tauh*(-xh-GhO2*(CvhO2-CvhO2n))
@@ -656,7 +655,7 @@ function complexHeartModel(t,y,dydt,data_dict)
 	f = open("flowrates.txt", "a+")
 	writecsv(f,flowrow)
 	close(f)
-	@show t, Fol, Fsa, Fsp, Fep, Fmp, Fbp, Fhp, For, Fpa
+	#@show t, Fol, Fsa, Fsp, Fep, Fmp, Fbp, Fhp, For, Fpa
 	return dydt
 
 end
@@ -676,10 +675,10 @@ function main()
 	##@show res
 	#psi = res[:, 14]
 	#plot(tout, mod(psi,1), "kx")
-	plotEverything(t, res, data_dict, "figures/TestingNov16Everything.pdf")
-	plotPretty(t, res, data_dict, "figures/TestingNov16Pretty.pdf")
+	plotEverything(t, res, data_dict, "figures/TestingNov17Everything.pdf")
+	plotPretty(t, res, data_dict, "figures/TestingNov17Pretty.pdf")
 	writedlm("results/Nov16/Testing.txt", res)
-	attemptToRecreateFig13(t[1000:end],res[1000:end, :],data_dict, "AttemptedFig13LimitedXToPoint5Nov16.pdf", "flowrates.txt")
+	attemptToRecreateFig13(t[1000:end],res[1000:end, :],data_dict, "figures/AttemptedFig13LimitedXToPoint5Nov17.pdf", "flowrates.txt")
 	#return t, res, data_dict
 end
 

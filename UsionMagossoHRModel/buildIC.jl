@@ -40,10 +40,10 @@ function buildIC(size)
 	ic_arr[1] = 25 #PPA = 25 mmHg, from http://www.rnceus.com/hemo/term.htm
 	ic_arr[2] =100/60 #Fpa is 100 mL/min
 	ic_arr[3] = 10 #Ppp
-	ic_arr[4] = 2#Ppv from http://www.acbrown.com/lung/Lectures/RsCrcl/RsCrclFlow.htm
+	ic_arr[4] = 4#Ppv from http://www.acbrown.com/lung/Lectures/RsCrcl/RsCrclFlow.htm
 	ic_arr[5] = 150# Psa from http://www.acbrown.com/lung/Lectures/RsCrcl/RsCrclFlow.htm
 	ic_arr[6] = 75.6# Fsa is 75.6 mL/sec
-	ic_arr[7]= 70 #Psp
+	ic_arr[7]= 90 #Psp
 	ic_arr[8] = 5 #veins Psv-doesn't appear to reach ss' 
 	ic_arr[9] = 3 #Pmv veins
 	ic_arr[10] = 4 #Pbv veins
@@ -59,9 +59,10 @@ function buildIC(size)
 	ic_arr[25] = 0
 	ic_arr[26] = 0.0
 	ic_arr[27] = 0.0
-	ic_arr[33] = 3.0 #xb
-	ic_arr[34] = 3.0#xh
-	ic_arr[35] = 3.0#xm
+	ic_arr[33] = 0.0 #xb
+	ic_arr[34] = 0.0#xh
+	ic_arr[35] = 0.0#xm
+	ic_arr[36]= 8000
 	return (transpose(ic_arr))
 	
 end

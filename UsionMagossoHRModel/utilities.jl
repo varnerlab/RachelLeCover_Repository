@@ -8,9 +8,21 @@ function lookUpValue(data, item, desiredtime)
 	#data = historicaldata[2:end, :] # remove row of ones used to initiate the array
 	#let's linearly interpolate to find items
 	#@show desiredtime
-	defaultvalue = 10.0 #value for fesmax
+	defaultvalue = 20.0 #value for fesmax
 	if(desiredtime <0 && contains(item, AbstractString("fsp")))
-		return 10.0
+		return 16.11
+	elseif(desiredtime <0 && contains(item, AbstractString("fev")))
+		return 3.2 #fev0
+	elseif(desiredtime <0 && contains(item, AbstractString("fes")))
+		return 16.11 #fes0
+	elseif(desiredtime <0 && contains(item, AbstractString("fcs")))
+		return 25 #fcs0
+	elseif(desiredtime <0 && contains(item, AbstractString("fsh")))
+		return 16.11 #fcs0
+	elseif(desiredtime <0 && contains(item, AbstractString("fv")))
+		return 3.2 #fev0
+	elseif(desiredtime <0 && contains(item, AbstractString("fac")))
+		return 3.2 #between facmin and facmax 
 	elseif( desiredtime< 0)
 		return defaultvalue
 	elseif(abs(desiredtime) > data[end,1])
@@ -268,7 +280,7 @@ function attemptToRecreateFig13(t,res, data_dict, outputfn, pathtodata)
 	Ts = res[:, 31]
 	Tv = res[:, 32]
 	Psa = res[:, 5]
-	Fsa =res[:, 6]
+	#Fsa =res[:, 6]
 	Psp = res[:, 7]
 	deltaRsp = res[:, 25]
 	deltaRep = res[:, 26]
@@ -285,19 +297,26 @@ function attemptToRecreateFig13(t,res, data_dict, outputfn, pathtodata)
 	@show size(Psa)
 	plot(t, Psa, "k", linewidth = .5)
 	ylabel("Arterial Pressure, mmHg")
+	axis([100,200,60,160])
 	plt[:subplot](2,2,2)
-	#axis([0,100,60,160])
 	plot(t, 1./T*60, "k", linewidth = .5)
 	ax = gca()
 	ax[:ticklabel_format](useOffset=false)
 	ylabel("Heart Rate, bpm")
+	axis([100,200,60,100])
 	plt[:subplot](2,2,3)
 	#axis([0,100,0,40])
-	plot(tflow, Fsp, linewidth = .5, "k")
+	@show size(Fsp)
+	@show size(tflow)
+	@show size(Fsa)
+	startidx =size(tflow,1)-size(tflow[tflow.>=100],1)
+	plot(tflow, Fep, linewidth = .5, "k")
+	axis([100,200, 30, 50])
 	ylabel("Splanchic Flow")
 	plt[:subplot](2,2,4)
 	#axis([0,100,0,40])
-	plot(tflow, Fep, linewidth = .5, "k")
+	plot(tflow, Fsp, linewidth = .5, "k")
+	axis([100,200, 10, 30])
 	ylabel("Extrasplanchic Flow")
 	savefig(outputfn)
 

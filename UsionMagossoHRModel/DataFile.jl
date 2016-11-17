@@ -145,8 +145,8 @@ function DataFile()
 	push!(heart_array, Tsys0)
 
 	dvTerms = Float64[]
-	dVusudt = 15.0
-	dVumvdt = 15.0
+	dVusudt = 35.0
+	dVumvdt = 35.0
 
 	push!(dvTerms, dVusudt)
 	push!(dvTerms, dVumvdt)
@@ -294,7 +294,7 @@ function DataFile()
 	Vusv0 = 1435.4
 	Vuev0 = 640.73
 	Vumv0 =503.26
-	T0 = .58
+	T0 = .83#.58
 	push!(reflex, GEmaxlv)
 	push!(reflex, GEmaxrv)
 	push!(reflex, GRsp)
