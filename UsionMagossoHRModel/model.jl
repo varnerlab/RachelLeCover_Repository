@@ -263,34 +263,15 @@ function complexHeartModel(t,y,dydt,data_dict)
 
 	#conversation of mass
 	tstartbleed = 275.0
-#	if(t <tstartbleed)
-#		Vu = Vusa +Vusp +Vuep+Vump + Vubp+Vuhp+Vusv+Vuev+Vumv+Vubv+Vuhv+Vura+Vupa+Vupp+Vupv+Vula#eqn 13
-#	else
-#		Vu = Vusa +Vusp +Vuep+Vump + Vubp+Vuhp+Vusv+Vuev+Vumv+Vubv+Vuhv+Vura+Vupa+Vupp+Vupv+Vula-(t-tstartbleed)*(30.0/60.0)
-#	end
-#	@show t, Vu
-	Vu = Vusa +Vusp +Vuep+Vump + Vubp+Vuhp+Vusv+Vuev+Vumv+Vubv+Vuhv+Vura+Vupa+Vupp+Vupv+Vula#eqn 13
+	if(t <tstartbleed)
+		Vu = Vusa +Vusp +Vuep+Vump + Vubp+Vuhp+Vusv+Vuev+Vumv+Vubv+Vuhv+Vura+Vupa+Vupp+Vupv+Vula#eqn 13
+	else
+		Vu = Vusa +Vusp +Vuep+Vump + Vubp+Vuhp+Vusv+Vuev+Vumv+Vubv+Vuhv+Vura+Vupa+Vupp+Vupv+Vula-(t-tstartbleed)*(30.0/60.0)
+	end
+	#Vu = Vusa +Vusp +Vuep+Vump + Vubp+Vuhp+Vusv+Vuev+Vumv+Vubv+Vuhv+Vura+Vupa+Vupp+Vupv+Vula#eqn 13
 	Vpp = Cpp*Ppp
 	Pev = 1/Cev*(Vtot-Csa*Psa-(Csp+Cep+Cmp+Cbp+Chp)*Psp-Csv*Psv -Cmv*Pmv -Cbv*Pbv-Chv*Phv-Cra*Pra-Vrv-Cpa*Ppa-Cpp*Vpp-Cpv*Ppv-Cla*Pla-Vlv-Vu)#eqn 12
 
-
-	#@show Vu, Vpp, Pev
-	#@show Vtot
-	#@show Csa*Psa
-	#@show (Csp+Cep+Cmp+Cbp+Chp)*Psp
-	#@show Csv*Psv 
-	#@show Psv
-	#@show Cmv*Pmv 
-	#@show Cbv*Pbv
-	#@show Chv*Phv
-	#@show Cra*Pra
-	#@show Vrv
-	#@show Cpa*Ppa
-	#@show Cpp*Vpp
-	#@show Cpv*Ppv
-	#@show Cla*Pla
-	#@show Vlv
-	#@show Vu
 	#reflex regulation, cardiac elastances
 	SigmaSubEmaxlv = 0.0
 	SigmaSubEmaxrv = 0.0
@@ -327,12 +308,23 @@ function complexHeartModel(t,y,dydt,data_dict)
 	end
 	#@show fsh, fsp
 	##@show SigmaSubEmaxlv, SigmaSubEmaxrv
-	##@show deltaEmaxlv, deltaEmaxrv
+	percentchange = .2
+
 	ddeltaEmaxlvdt = 1/tauEmaxlv*(-deltaEmaxlv+SigmaSubEmaxlv)
 	ddeltaEmaxrvdt = 1/tauEmaxrv*(-deltaEmaxrv+SigmaSubEmaxrv)
 
 	Emaxlv = deltaEmaxlv+Emaxlv0
 	Emaxrv = deltaEmaxrv+Emaxrv0
+
+#	if(deltaEmaxlv>Emaxlv0*percentchange)
+#		deltaEmaxlv = Emaxlv0*percentchange
+#		ddeltaEmaxlvdt = 0
+#	end
+
+#	if(deltaEmaxrv>Emaxlv0*percentchange)
+#		deltaEmaxrv = Emaxrv0*percentchange
+#		ddeltaEmaxrvdt = 0
+#	end
 	#@show Emaxlv, Emaxrv
 	#heart period
 	SigmaTs = 0.0
@@ -355,11 +347,6 @@ function complexHeartModel(t,y,dydt,data_dict)
 		dPsidt = 0
 	end
 	u = mod(Psi,1) #equvalent to frac, reset when it gets to one
-	##@show t,T, Psi, dPsidt, deltaTs, deltaTv,u
-#	if(Psi >1) #reset, equvalent to frac
-#		Psi = 0.0
-#	end
-
 	Tsys = Tsys0-ksys*1/T
 	phi=0.0
 	if(u >= 0 && u<=Tsys/T)
@@ -367,15 +354,18 @@ function complexHeartModel(t,y,dydt,data_dict)
 	elseif(u>=Tsys/T && u<=1)
 		phi = 0.0
 	end
-#	@show phi
-#	@show u, Tsys/T
-	Pmaxlv = phi*Emaxlv*(Vlv*Vulv)+(1-phi)*P0lv*(exp(kelv*Vlv)-1)
+
+	Pmaxlv = phi*Emaxlv*(Vlv-Vulv)+(1-phi)*P0lv*(exp(kelv*Vlv)-1)
 	Rlv = krlv*Pmaxlv
 	if(Pmaxlv<=Psa)
 		Fol = 0.0
 	else
 		Fol = (Pmaxlv-Psa)/Rlv
 	end
+	if(Fol>1000)
+		Fol = 1000.0
+	end
+
 	Plv = Pmaxlv - Rlv*Fol
 	if(Pla<=Plv)
 		Fil = 0.0
@@ -386,6 +376,7 @@ function complexHeartModel(t,y,dydt,data_dict)
 	dPladt = 1/Cla*((Ppv-Pla)/Rpv-Fil)
 	dVlvdt = Fil-Fol
 	Pmaxrv = phi*Emaxrv*(Vrv-Vurv) + (1-phi)*P0rv*(exp(kErv*Vrv)-1)
+	#@show Pmaxrv
 	Rrv = krrv*Pmaxrv
 	if(Pmaxrv<=Ppa)
 		For=0.0
@@ -416,7 +407,7 @@ function complexHeartModel(t,y,dydt,data_dict)
 
 	Rsp = deltaRsp+Rsp0
 	Rep = deltaRep + Rep0
-	Rmp = deltaRmp + Rmp0
+	Rmp = deltaRmp + Rmp
 	Vusv = deltaVusv+Vusv0
 	Vuev = deltaVuev+Vuev0
 	Vumv = deltaVumv+Vumv0
@@ -430,16 +421,16 @@ function complexHeartModel(t,y,dydt,data_dict)
 	data_dict["UNSTRESSEDVOLUME"][7] = Vusv
 	data_dict["UNSTRESSEDVOLUME"][8] = Vuev
 	data_dict["UNSTRESSEDVOLUME"][9] = Vumv
-#	@show Rbp
-#	@show Rhp
-#	@show Rmp
-#	@show Rsp
-#	@show Rep
-#	@show Vusv
-#	@show Vuev
-#	@show Vumv
+
 	
-	#@show Rsp, Rsp0, Rep, Rep0, Rmp, Rmp0, Vusv, Vusv0, Vuev, Vuev0, Vumv, Vumv0
+	
+	Fsp = (Psp-Psv)/Rsp
+	Fep = (Psp-Pev)/Rep
+	Fmp = (Psp-Pmv)/Rmp
+	Fbp = (Psp-Pbv)/Rbp
+	Fhp = (Psp-Phv)/Rhp
+
+
 	#force balances
 	dPpadt = 1/Cpa*(For-Fpa) #eqn 1, conversation of mass at pulmonary arteries
 	dFpadt = 1/Lpa*(Ppa-Ppp-Rpa*Fpa)# eqn 2, balance of forces at pulmonary arteries
@@ -453,11 +444,26 @@ function complexHeartModel(t,y,dydt,data_dict)
 	dPbvdt = 1/Cbv*((Psp-Pbv)/Rbp-(Pbv-Pra)/Rbv) #eqn 10 Conservation of Mass at Brain Veins
 	dPhvdt = 1/Chv*((Psp-Phv)/Rhp-(Phv-Pra)/Rhv) #eqn 11 Conservation of Mass at Coronary Veins
 
+	#force Fsa to be positive (blood only can flow one way)
+	if(Fsa < 0)
+		Fsa =0.0
+		#dFsadt = 0.0
+	end
+
+	#force Fpa to be positive
+	if(Fpa<0)
+		Fpa = 0.0
+	end
+
 	#afferent baroreflex
 	Pb = Psa #for closed loop operation
 	dPbdt = dPsadt
 	dPsquiggledt = 1/taupb*(Pb+tauzb*dPbdt-Psquiggle)
 	fab = (fabmin+fabmax*exp((Psquiggle-Pn)/kab))/(1+exp((Psquiggle-Pn)/kab))
+	Gb = fab/Psquiggle
+	kab = (fabmax-fabmin)/(4*Gb)
+	fab = (fabmin+fabmax*exp((Psquiggle-Pn)/kab))/(1+exp((Psquiggle-Pn)/kab))
+	
 	
 	#afferent chemoreflex
 	Phiac = (facmax-facmin*exp((PaO2-PO2n)/kac))/(1+exp((PaO2-PO2n)/kac))
@@ -490,9 +496,7 @@ function complexHeartModel(t,y,dydt,data_dict)
 		SigmaSubVuev = 0
 		SigmaSubVumv = 0
 	end
-	#@show SigmaSubRsp, deltaRsp
-	#@show SigmaSubRep, deltaRep
-	#@show SigmaSubRmp, deltaRmp
+	#@show SigmaSubVusv, fsp, fesmin
 	ddeltaRspdt = 1/tauRsp*(-deltaRsp+SigmaSubRsp)
 	ddeltaRepdt = 1/tauRep*(-deltaRep+SigmaSubRep)
 	ddeltaRmpdt = 1/tauRmp*(-deltaRmp+SigmaSubRmp)
@@ -500,13 +504,58 @@ function complexHeartModel(t,y,dydt,data_dict)
 	ddeltaVuevdt = 1/tauVuev*(-deltaVuev+SigmaSubVuev)
 	ddeltaVumvdt = 1/tauVumv*(-deltaVumv+SigmaSubVumv)
 
+	percentage1 = .25
+	percentage2 = .25
+
+	if(abs(deltaVusv)>percentage1*Vusv0)
+		deltaVusv = -percentage1*Vusv0
+		ddeltaVusvdt = 0.0
+	end
+
+	if(abs(deltaVuev)>percentage1*Vuev)
+		deltaVuev = -percentage1*Vuev
+		ddeltaVuevdt = 0.0
+	end
+
+	if(abs(deltaVumv)>percentage1*Vumv)
+		deltaVumv = -percentage1*Vumv
+		ddeltaVumvdt = 0.0
+	end
+
+	if(abs(deltaRsp)> percentage2*Rsp)
+		if(deltaRsp> percentage2*Rsp)
+			deltaRsp = percentage2*Rsp
+		else
+			deltaRsp = -percentage2*Rsp
+		end
+		ddeltaRspdt = 0.0
+	end
+
+	if(abs(deltaRep)> percentage2*Rep)
+		if(deltaRep> percentage2*Rep)
+			deltaRep = percentage2*Rep
+		else
+			deltaRep = -percentage2*Rep
+		end
+		ddeltaRepdt = 0.0
+	end
+
+	if(abs(deltaRmp)> percentage2*Rmp)
+		if(deltaRmp> percentage2*Rmp)
+			deltaRmp = percentage2*Rmp
+		else
+			deltaRmp = -percentage2*Rmp
+		end
+		ddeltaRmpdt = 0.0
+	end
+
 
 
 	#local effect of O2
 	#these flows may be incorrect
-	Fb = Psp/Rbp
-	Fh = Psp/Rhp
-	Fm = Psp/Rmp
+	Fb = (Psp-Pbv)/Rbp
+	Fh = (Psp-Phv)/Rhp
+	Fm = (Psp-Pmv)/Rmp
 	FO2 = PaO2*(1+beta*PaCO2)/(K*(1+alpha*(PaCO2)))
 	CaO2 = C*(FO2)^(1/alpha)/(1+FO2^(1/alpha))	
 
@@ -518,25 +567,30 @@ function complexHeartModel(t,y,dydt,data_dict)
 	CvhO2 = CaO2-Mdoth/Fh
 	CvmO2 = CaO2-Mdotm/Fm
 
+	if(CvbO2<0)
+		CvbO2 = 0.0
+	end
+
 	dxbdt = 1/taub*(-xb-GbO2*(CvbO2-CvbO2n))
 	dxhdt = 1/tauh*(-xh-GhO2*(CvhO2-CvhO2n))
 	dxmdt = 1/taum*(-xm-GmO2*(CvmO2-CvmO2n))
 	#prevent xb, xh, xm from getting too negative
-	if(xb <-.99)
-		xb = -.99
+	xbound = -.5
+	if(xb <xbound)
+		xb = xbound
 		dxbdt = 0
 	end
 
-	if(xh <-.99)
-		xh = -.99
+	if(xh <xbound)
+		xh = xbound
 		dxhdt = 0.0
 	end
 	
-	if(xm < -.99)
-		xm = -.99
+	if(xm < xbound)
+		xm = xbound
 		dxmdt = 0.0
 	end
-	@show xb, xh, xm, CvbO2-CvbO2n, CvhO2-CvhO2n, CvmO2-CvmO2n
+	#@show t,CaO2, CvbO2, CvhO2, CvmO2, Fb, Fh, Fm
 
 	
 
@@ -579,37 +633,36 @@ function complexHeartModel(t,y,dydt,data_dict)
 	#store data
 	data_dict["HISTORICALDATA"] = storeData(t, fev, fes, fcs, fsp, fsh, fv, fac, data_dict["HISTORICALDATA"])
 	#bleed out at 10mL/min
-	#run for 2 minutes, then start bleeding out at 30 mL/min
-	tstartbleed = 120.0
+	#run for 275 sec, then start bleeding out at 30 mL/min
+	tstartbleed = 275.0
 #	if(t <tstartbleed)
 #		data_dict["UNSTRESSEDVOLUME"][16] = data_dict["UNSTRESSEDVOLUME"][15]
 #	else
 #		data_dict["UNSTRESSEDVOLUME"][16] = data_dict["UNSTRESSEDVOLUME"][15]-(t-tstartbleed)*(30.0/60.0)
 #	end
-#	@show t, data_dict["UNSTRESSEDVOLUME"][16]
+	#@show t, data_dict["UNSTRESSEDVOLUME"][16], Vu
 	#induce hypoxia
 	tinduce = 120.0
 	tdecrease = 6.0
-#	if(t<tinduce)
-#		data_dict["CHEMOREFLEX"][6]= data_dict["CHEMOREFLEX"][6]
-#	elseif(t > tinduce && t< tinduce + tdecrease)
-#		data_dict["CHEMOREFLEX"][6]=25.0
-#	elseif(t>tinduce+tdecrease && data_dict["CHEMOREFLEX"][6]<=95.0)
-#		data_dict["CHEMOREFLEX"][6] = 25.0*exp((t-(tinduce+tdecrease))/3.0)		
-#	end
-#	
-
-	##@show dydt
-	#@show t, data_dict["CHEMOREFLEX"][6], PaO2, fap, dfapdt 
-	#@show Fsa - (Psp/Rsp + Psp/Rep + Psp/Rmp + Psp/Rbp + Psp/Rhp) #should be close to zero
-	#@show Fol, Fsa
-	#@show For, Fpa
+	if(t<tinduce)
+		data_dict["CHEMOREFLEX"][6]= data_dict["CHEMOREFLEX"][6]
+	elseif(t > tinduce && t< tinduce + tdecrease)
+		data_dict["CHEMOREFLEX"][6]=25.0
+	elseif(t>tinduce+tdecrease && data_dict["CHEMOREFLEX"][6]<=95.0)
+		data_dict["CHEMOREFLEX"][6] = 25.0*exp((t-(tinduce+tdecrease))/3.0)		
+	end
+##	
+	flowrow = transpose([t, Fol, Fsa, Fsp, Fep, Fmp, Fbp, Fhp, For, Fpa])
+	f = open("flowrates.txt", "a+")
+	writecsv(f,flowrow)
+	close(f)
+	@show t, Fol, Fsa, Fsp, Fep, Fmp, Fbp, Fhp, For, Fpa
 	return dydt
 
 end
 
 function main()
-	t = collect(0:.1:400)
+	t = collect(0:.1:200)
 	data_dict = DataFile()
 	initial_conditions = buildIC(36)
 	#need to actually figure out initial conditions
@@ -623,11 +676,11 @@ function main()
 	##@show res
 	#psi = res[:, 14]
 	#plot(tout, mod(psi,1), "kx")
-	plotEverything(t, res, data_dict, "figures/TestingNov14Everything400sdefaultVal60.pdf")
-	plotPretty(t, res, data_dict, "figures/TestingNov14Pretty400sLimitedXToPoint99defaultVal60..pdf")
-	writedlm("results/Nov14/defaultVal60.txt", res)
-	#attemptToRecreateFig13(t[1000:end],res[1000:end, :],data_dict, "AttemptedFig13LimitedXToPoint99Hemorhorrhage.pdf")
-	return t, res, data_dict
+	plotEverything(t, res, data_dict, "figures/TestingNov16Everything.pdf")
+	plotPretty(t, res, data_dict, "figures/TestingNov16Pretty.pdf")
+	writedlm("results/Nov16/Testing.txt", res)
+	attemptToRecreateFig13(t[1000:end],res[1000:end, :],data_dict, "AttemptedFig13LimitedXToPoint5Nov16.pdf", "flowrates.txt")
+	#return t, res, data_dict
 end
 
 

@@ -32,7 +32,7 @@ end
 
 function calculatetotalMSE(params)
 	tic()
-	outputdir = "moretesting/2016_11_14/"
+	outputdir = "moretesting/2016_11_16/"
 	inputdir = "/home/rachel/Documents/work/optimization/LinkedRecordsTimeData10min/"
 	c1patients = readdlm("/home/rachel/Documents/work/optimization/multiobjective/usingPOETs/cluster1subjectIDs")
 	c2patients = readdlm("/home/rachel/Documents/work/optimization/multiobjective/usingPOETs/cluster1subjectIDs")
@@ -41,6 +41,14 @@ function calculatetotalMSE(params)
 	touch(string(outputdir, "paramstol1E-4.txt"))
 	totalMSE = 0.0
 	usefulpatients = 0.0
+	#force positivity on all parameters
+	lowerbound = 1E-9
+	for j in range(1,length(params))
+		if(params[j])<0
+			params[j] = lowerbound
+		end
+	end
+
 	@show params
 	for patient in allpatients
 		numericPatientID = patient[2:6]

@@ -8,8 +8,10 @@ function lookUpValue(data, item, desiredtime)
 	#data = historicaldata[2:end, :] # remove row of ones used to initiate the array
 	#let's linearly interpolate to find items
 	#@show desiredtime
-	defaultvalue = 60.0 #value for fesmax
-	if(desiredtime <0)
+	defaultvalue = 10.0 #value for fesmax
+	if(desiredtime <0 && contains(item, AbstractString("fsp")))
+		return 10.0
+	elseif( desiredtime< 0)
 		return defaultvalue
 	elseif(abs(desiredtime) > data[end,1])
 		#println("got here")
@@ -162,9 +164,9 @@ function plotPretty(tout, res,data_dict, outputfn)
 	plt[:subplot](2,4,5)
 	plot(tout, Fmp, "k")
 	ylabel("Muscle flow")
-#	plt[:subplot](2,4,6)
-#	plot(tout, fsh, "k")
-#	ylabel("Efferent activity in heart")
+	plt[:subplot](2,4,6)
+	plot(tout, Fbp, "k")
+	ylabel("Brain Flow")
 	savefig(outputfn)
 end
 
@@ -185,6 +187,10 @@ function plotPrettyWithOverlaidData(tout,res, data_dict, lowFdata, highFdata, ou
 	Rpp=resistances[13]
 	Rpv=resistances[14]
 
+	deltaRsp = res[:, 25]
+	deltaRep = res[:, 26]
+	deltaRmp = res[:,27]
+
 
 	Ts = res[:, 31]
 	Tv = res[:, 32]
@@ -193,9 +199,9 @@ function plotPrettyWithOverlaidData(tout,res, data_dict, lowFdata, highFdata, ou
 	fac =res[:, 18]
 	Psp = res[:, 7]
 
-	Fsp = Psp/Rsp
-	Fep = Psp/Rep
-	Fmp = Psp/Rmp
+	Fsp = Psp/(Rsp+deltaRsp)
+	Fep = Psp/(Rep+deltaRep)
+	Fmp = Psp/(Rmp+deltaRep)
 	Fbp = Psp/Rbp
 	Fhp = Rsp/Rhp
 
@@ -227,7 +233,7 @@ function plotPrettyWithOverlaidData(tout,res, data_dict, lowFdata, highFdata, ou
 	savefig(outputfn)
 end
 
-function attemptToRecreateFig13(t,res, data_dict, outputfn)
+function attemptToRecreateFig13(t,res, data_dict, outputfn, pathtodata)
 	close("all")
 	resistances = data_dict["RESISTANCE"]
 	Rsa=resistances[1]
@@ -247,7 +253,17 @@ function attemptToRecreateFig13(t,res, data_dict, outputfn)
 	Rsp0 = data_dict["REFLEX"][33]
 	Rep0 =data_dict["REFLEX"][34]
 	
-
+	fd = readdlm(pathtodata, ',')
+	tflow = fd[:,1]
+	Fol = fd[:,2]
+	Fsa = fd[:,3]
+	Fsp =fd[:,4]
+	Fep = fd[:,5]
+	Fmp = fd[:,6]
+	Fbp = fd[:,7]
+	Fhp = fd[:,8]
+	For =fd[:,9]
+	Fpa = fd[:,10]
 
 	Ts = res[:, 31]
 	Tv = res[:, 32]
@@ -256,17 +272,17 @@ function attemptToRecreateFig13(t,res, data_dict, outputfn)
 	Psp = res[:, 7]
 	deltaRsp = res[:, 25]
 	deltaRep = res[:, 26]
-	#Rsp = deltaRsp+Rsp0
-	#Rep = deltaRep + Rep0
-	@show Rsp
-	@show Rep
+	Rsp = deltaRsp+Rsp
+	Rep = deltaRep + Rep
+	#@show Rsp
+	#@show Rep
 
 	T = Ts+Tv+data_dict["REFLEX"][end]
-	Fs = Psp/Rsp0
-	Fe = Psp/Rep0
 	figure(figsize=(30,20))
 	plt[:subplot](2,2,1)
 	#axis([0,100,60,160])
+	@show size(t)
+	@show size(Psa)
 	plot(t, Psa, "k", linewidth = .5)
 	ylabel("Arterial Pressure, mmHg")
 	plt[:subplot](2,2,2)
@@ -277,11 +293,11 @@ function attemptToRecreateFig13(t,res, data_dict, outputfn)
 	ylabel("Heart Rate, bpm")
 	plt[:subplot](2,2,3)
 	#axis([0,100,0,40])
-	plot(t, Fs, linewidth = .5, "k")
+	plot(tflow, Fsp, linewidth = .5, "k")
 	ylabel("Splanchic Flow")
 	plt[:subplot](2,2,4)
 	#axis([0,100,0,40])
-	plot(t, Fe, linewidth = .5, "k")
+	plot(tflow, Fep, linewidth = .5, "k")
 	ylabel("Extrasplanchic Flow")
 	savefig(outputfn)
 

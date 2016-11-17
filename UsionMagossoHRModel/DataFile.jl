@@ -145,8 +145,8 @@ function DataFile()
 	push!(heart_array, Tsys0)
 
 	dvTerms = Float64[]
-	dVusudt = 10.0
-	dVumvdt = 10.0
+	dVusudt = 15.0
+	dVumvdt = 15.0
 
 	push!(dvTerms, dVusudt)
 	push!(dvTerms, dVumvdt)
@@ -412,7 +412,7 @@ function DataFile()
 	data_dictionary["VENTILATORY"] = vetilatory
 	data_dictionary["REFLEX"] = reflex
 	data_dictionary["LOCAL_METABOLIC"] = localmetabolic
-	data_dictionary["CO2_PRESSURE"] = 70.0 # 35 mmHg, from wikipedia
+	data_dictionary["CO2_PRESSURE"] = 35.0 # 35 mmHg, from wikipedia
 	data_dictionary["EXTRA_HEART_PARAMS"] = extraheartparams
 	data_dictionary["HISTORICALDATA"] = historicaldata
 
