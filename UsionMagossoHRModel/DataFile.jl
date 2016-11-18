@@ -145,8 +145,8 @@ function DataFile()
 	push!(heart_array, Tsys0)
 
 	dvTerms = Float64[]
-	dVusudt = 35.0
-	dVumvdt = 35.0
+	dVusudt = 0.0
+	dVumvdt = 0.0
 
 	push!(dvTerms, dVusudt)
 	push!(dvTerms, dVumvdt)
@@ -394,6 +394,8 @@ function DataFile()
 	push!(extraheartparams, fcs0)
 	
 	historicaldata =zeros(1,8)
+	Vusvhistoricaldata = zeros(1,2)
+	Vumvhistoricaldata = zeros(1,2)
 
 	data_dictionary = Dict()
 	data_dictionary["COMPLIANCE"] =compliance_array
@@ -415,6 +417,7 @@ function DataFile()
 	data_dictionary["CO2_PRESSURE"] = 35.0 # 35 mmHg, from wikipedia
 	data_dictionary["EXTRA_HEART_PARAMS"] = extraheartparams
 	data_dictionary["HISTORICALDATA"] = historicaldata
-
+	data_dictionary["VUSVHISTORICALDATA"]= Vusvhistoricaldata
+	data_dictionary["VUMVHISTORICALDATA"] = Vumvhistoricaldata
 	return data_dictionary	
 end

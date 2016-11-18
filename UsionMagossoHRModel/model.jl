@@ -137,7 +137,7 @@ function complexHeartModel(t,y,dydt,data_dict)
 	ksys = heart[17]
 	Tsys0 = heart[18]
 
-	dVusudt = dVterms[1]
+	dVusvdt = dVterms[1]
 	dVumvdt = dVterms[2]
 
 	tauzb = barroreflex[1]
@@ -316,15 +316,15 @@ function complexHeartModel(t,y,dydt,data_dict)
 	Emaxlv = deltaEmaxlv+Emaxlv0
 	Emaxrv = deltaEmaxrv+Emaxrv0
 
-#	if(deltaEmaxlv>Emaxlv0*percentchange)
-#		deltaEmaxlv = Emaxlv0*percentchange
-#		ddeltaEmaxlvdt = 0
-#	end
+	if(deltaEmaxlv>Emaxlv0*percentchange)
+		deltaEmaxlv = Emaxlv0*percentchange
+		ddeltaEmaxlvdt = 0
+	end
 
-#	if(deltaEmaxrv>Emaxlv0*percentchange)
-#		deltaEmaxrv = Emaxrv0*percentchange
-#		ddeltaEmaxrvdt = 0
-#	end
+	if(deltaEmaxrv>Emaxlv0*percentchange)
+		deltaEmaxrv = Emaxrv0*percentchange
+		ddeltaEmaxrvdt = 0
+	end
 	#@show Emaxlv, Emaxrv
 	#heart period
 	SigmaTs = 0.0
@@ -337,7 +337,7 @@ function complexHeartModel(t,y,dydt,data_dict)
 	SigmaTv = GTv*lookUpValue(data_dict["HISTORICALDATA"], AbstractString("fv"), t-DTv)#fev*(t-DTv)
 	ddeltaTvdt = 1/tauTv*(-deltaTv+SigmaTv)
 	T = deltaTs+deltaTv+T0
-	@show t, 1/(T)*60, deltaTs, deltaTv
+	#@show t, 1/(T)*60, deltaTs, deltaTv
 	#heart calculations
 	
 	Psi = mod(Psi, 1)
@@ -355,6 +355,11 @@ function complexHeartModel(t,y,dydt,data_dict)
 	end
 
 	Pmaxlv = phi*Emaxlv*(Vlv-Vulv)+(1-phi)*P0lv*(exp(kelv*Vlv)-1)
+	#bounds on Pmaxlv
+#	if(Pmaxlv>100)
+#		Pmaxlv=100.0
+#	end
+
 	Rlv = krlv*Pmaxlv
 	if(Pmaxlv<=Psa)
 		Fol = 0.0
@@ -431,6 +436,9 @@ function complexHeartModel(t,y,dydt,data_dict)
 
 
 	#force balances
+	#dVusvdt = calculate_dV(data_dict["VUSVHISTORICALDATA"], Vusv, t)
+	#dVumvdt = calculate_dV(data_dict["VUMVHISTORICALDATA"], Vumv, t)
+	#@show dVusvdt, dVumvdt
 	dPpadt = 1/Cpa*(For-Fpa) #eqn 1, conversation of mass at pulmonary arteries
 	dFpadt = 1/Lpa*(Ppa-Ppp-Rpa*Fpa)# eqn 2, balance of forces at pulmonary arteries
 	dPppdt = 1/Cpp*(Fpa -(Ppp-Ppv)/Rpp) #eqn 3, conversation of mass at pulmonary peripheral circulation
@@ -438,7 +446,7 @@ function complexHeartModel(t,y,dydt,data_dict)
 	dPsadt = 1/Csa*(Fol-Fsa)#eqn 5, conversation of mass at system arteries
 	dFsadt = 1/Lsa*(Psa-Psp-Rsa*Fsa) #eqn 6, balance of forces at system arteries
 	dPspdt = 1/(Csp+Cep+Cmp+Cbp+Chp)*(Fsa-(Psp-Psv)/Rsp-(Psp-Pev)/Rep-(Psp-Pmv)/Rmp-(Psp-Pbv)/Rbp-(Psp-Phv)/Rhp)#eqn 7 conversavation of mass at systemic perhipheral circulation
-	dPsvdt = 1/Csv*((Psp-Psv)/Rsp-(Psv-Pra)/Psv-dVusudt) #eqn 8 Conservation of Mass at Splanchnic Veins
+	dPsvdt = 1/Csv*((Psp-Psv)/Rsp-(Psv-Pra)/Psv-dVusvdt) #eqn 8 Conservation of Mass at Splanchnic Veins
 	dPmvdt = 1/Cmv*((Psp-Pmv)/Rmp-(Pmv-Pra)/Rmv-dVumvdt) #eqn 9 Conservation of Mass at Skeletal Muscle Veins
 	dPbvdt = 1/Cbv*((Psp-Pbv)/Rbp-(Pbv-Pra)/Rbv) #eqn 10 Conservation of Mass at Brain Veins
 	dPhvdt = 1/Chv*((Psp-Phv)/Rhp-(Phv-Pra)/Rhv) #eqn 11 Conservation of Mass at Coronary Veins
@@ -447,13 +455,15 @@ function complexHeartModel(t,y,dydt,data_dict)
 	if(Fsa < 0)
 		Fsa =0.0
 		#dFsadt = 0.0
+	elseif(Fsa>1000)
+		Fsa = 1000
 	end
 
 	#force Fpa to be positive
 	if(Fpa<0)
 		Fpa = 0.0
 	end
-
+	#@show (Fol-Fsa)
 	#afferent baroreflex
 	Pb = Psa #for closed loop operation
 	dPbdt = dPsadt
@@ -631,6 +641,8 @@ function complexHeartModel(t,y,dydt,data_dict)
 	dydt[36] = dWhdt
 	#store data
 	data_dict["HISTORICALDATA"] = storeData(t, fev, fes, fcs, fsp, fsh, fv, fac, data_dict["HISTORICALDATA"])
+	data_dict["VUSVHISTORICALDATA"] = updateHistoricalData(data_dict["VUSVHISTORICALDATA"], Vusv, t)
+	data_dict["VUMVHISTORICALDATA"] = updateHistoricalData(data_dict["VUMVHISTORICALDATA"], Vumv, t)
 	#bleed out at 10mL/min
 	#run for 275 sec, then start bleeding out at 30 mL/min
 	tstartbleed = 275.0
@@ -656,12 +668,13 @@ function complexHeartModel(t,y,dydt,data_dict)
 	writecsv(f,flowrow)
 	close(f)
 	#@show t, Fol, Fsa, Fsp, Fep, Fmp, Fbp, Fhp, For, Fpa
+	@show t, Plv, Vlv, Pla, Pmaxlv, Psa
 	return dydt
 
 end
 
 function main()
-	t = collect(0:.1:200)
+	t = collect(0:.1:130)
 	data_dict = DataFile()
 	initial_conditions = buildIC(36)
 	#need to actually figure out initial conditions
@@ -669,16 +682,16 @@ function main()
 	#tout, res = ode23s(fedeqns, initial_conditions, t)
 	tic()
 	fedeqns(t,y,ydot)= complexHeartModel(t,y,ydot,data_dict)
-	res = Sundials.cvode(fedeqns, vec(initial_conditions), t, integrator=:Adams, reltol=1E-1, abstol=1E-1)
+	res = Sundials.cvode(fedeqns, vec(initial_conditions), t, integrator=:Adams, reltol=1E-2, abstol=1E-2)
 	toc()
 	#psi = [a[14] for a in res]
 	##@show res
 	#psi = res[:, 14]
 	#plot(tout, mod(psi,1), "kx")
-	plotEverything(t, res, data_dict, "figures/TestingNov17Everything.pdf")
-	plotPretty(t, res, data_dict, "figures/TestingNov17Pretty.pdf")
-	writedlm("results/Nov16/Testing.txt", res)
-	attemptToRecreateFig13(t[1000:end],res[1000:end, :],data_dict, "figures/AttemptedFig13LimitedXToPoint5Nov17.pdf", "flowrates.txt")
+	plotEverything(t, res, data_dict, "figures/TestingNov18Everything.pdf")
+	plotPretty(t, res, data_dict, "figures/TestingNov18Pretty.pdf")
+	writedlm("results/Nov18/Testing.txt", res)
+	#attemptToRecreateFig13(t[1000:end],res[1000:end, :],data_dict, "figures/AttemptedFig13LimitedXToPoint5Nov18.pdf", "flowrates.txt")
 	#return t, res, data_dict
 end
 

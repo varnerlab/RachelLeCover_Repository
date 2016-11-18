@@ -75,6 +75,23 @@ function findBounds(time, data)
 	return index
 end
 
+function calculate_dV(historicaldata, currV, currt)
+	prevt = historicaldata[1]
+	prevV = historicaldata[2]
+	if(currt==prevt)
+		currt = prevt+10^10*eps()
+	end
+	@show prevt, currt, prevV, currV
+	dV = (currV-prevV)/(currt-prevt)
+	return dV
+end
+
+function updateHistoricalData(historicaldata, currV, currt)
+	historicaldata[1] = currt
+	historicaldata[2] = currV
+	return historicaldata
+end
+
 function plotEverything(tout, res, data_dict, outputfn)
 	names=fill("", 1, size(res,2))
 	names[1]="Ppa"
@@ -297,13 +314,13 @@ function attemptToRecreateFig13(t,res, data_dict, outputfn, pathtodata)
 	@show size(Psa)
 	plot(t, Psa, "k", linewidth = .5)
 	ylabel("Arterial Pressure, mmHg")
-	axis([100,200,60,160])
+	axis([100,200,20,160])
 	plt[:subplot](2,2,2)
 	plot(t, 1./T*60, "k", linewidth = .5)
 	ax = gca()
 	ax[:ticklabel_format](useOffset=false)
 	ylabel("Heart Rate, bpm")
-	axis([100,200,60,100])
+	axis([100,200,60,120])
 	plt[:subplot](2,2,3)
 	#axis([0,100,0,40])
 	@show size(Fsp)
@@ -311,12 +328,12 @@ function attemptToRecreateFig13(t,res, data_dict, outputfn, pathtodata)
 	@show size(Fsa)
 	startidx =size(tflow,1)-size(tflow[tflow.>=100],1)
 	plot(tflow, Fep, linewidth = .5, "k")
-	axis([100,200, 30, 50])
+	axis([100,200, 0, 50])
 	ylabel("Splanchic Flow")
 	plt[:subplot](2,2,4)
 	#axis([0,100,0,40])
 	plot(tflow, Fsp, linewidth = .5, "k")
-	axis([100,200, 10, 30])
+	axis([100,200, 0, 30])
 	ylabel("Extrasplanchic Flow")
 	savefig(outputfn)
 
