@@ -48,9 +48,9 @@ function buildIC(size)
 	ic_arr[9] = 3 #Pmv veins
 	ic_arr[10] = 4 #Pbv veins
 	ic_arr[11] = 4 #Phv veins
-	ic_arr[12] = 1.5 #left atrium
-	ic_arr[13]=50 #Vlv using unstressed conditions
-	ic_arr[16]=35 #Vrv
+	ic_arr[12] = 20 #P left atrium
+	ic_arr[13]=16.77 #Vlv using unstressed conditions
+	ic_arr[16]=40.8 #Vrv
 	ic_arr[15]= 1.5 #right atrium 
 	ic_arr[14] =0.0 #Psi
 	ic_arr[17] =70 #Psquiggle

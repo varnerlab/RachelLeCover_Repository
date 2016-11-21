@@ -136,7 +136,7 @@ function plotEverything(tout, res, data_dict, outputfn)
 	@show size(res)
 	for j in collect(1:size(res,2))
 		plt[:subplot](6,6,j)
-		plot(tout, res[:,j], "k")
+		plot(tout, res[:,j], "k", linewidth = .25)
 		ylabel(names[j])
 	end
 	savefig(outputfn)
@@ -284,15 +284,16 @@ function attemptToRecreateFig13(t,res, data_dict, outputfn, pathtodata)
 	
 	fd = readdlm(pathtodata, ',')
 	tflow = fd[:,1]
-	Fol = fd[:,2]
-	Fsa = fd[:,3]
-	Fsp =fd[:,4]
-	Fep = fd[:,5]
-	Fmp = fd[:,6]
-	Fbp = fd[:,7]
-	Fhp = fd[:,8]
-	For =fd[:,9]
-	Fpa = fd[:,10]
+	Fil = fd[:,2]
+	Fol = fd[:,3]
+	Fsa = fd[:,4]
+	Fsp =fd[:,5]
+	Fep = fd[:,6]
+	Fmp = fd[:,7]
+	Fbp = fd[:,8]
+	Fhp = fd[:,9]
+	For =fd[:,10]
+	Fpa = fd[:,11]
 
 	Ts = res[:, 31]
 	Tv = res[:, 32]
@@ -320,20 +321,19 @@ function attemptToRecreateFig13(t,res, data_dict, outputfn, pathtodata)
 	ax = gca()
 	ax[:ticklabel_format](useOffset=false)
 	ylabel("Heart Rate, bpm")
-	axis([100,200,60,120])
+	axis([100,200,40,100])
 	plt[:subplot](2,2,3)
 	#axis([0,100,0,40])
 	@show size(Fsp)
 	@show size(tflow)
 	@show size(Fsa)
 	startidx =size(tflow,1)-size(tflow[tflow.>=100],1)
-	plot(tflow, Fep, linewidth = .5, "k")
-	axis([100,200, 0, 50])
+	plot(tflow, Fsp, linewidth = .5, "k")
+	axis([100,200, 15, 40])
 	ylabel("Splanchic Flow")
 	plt[:subplot](2,2,4)
-	#axis([0,100,0,40])
-	plot(tflow, Fsp, linewidth = .5, "k")
-	axis([100,200, 0, 30])
+	axis([100,200, 10, 40])
+	plot(tflow, Fep, linewidth = .5, "k")
 	ylabel("Extrasplanchic Flow")
 	savefig(outputfn)
 

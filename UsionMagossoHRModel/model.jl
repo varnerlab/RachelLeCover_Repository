@@ -316,15 +316,15 @@ function complexHeartModel(t,y,dydt,data_dict)
 	Emaxlv = deltaEmaxlv+Emaxlv0
 	Emaxrv = deltaEmaxrv+Emaxrv0
 
-	if(deltaEmaxlv>Emaxlv0*percentchange)
-		deltaEmaxlv = Emaxlv0*percentchange
-		ddeltaEmaxlvdt = 0
-	end
+#	if(deltaEmaxlv>Emaxlv0*percentchange)
+#		deltaEmaxlv = Emaxlv0*percentchange
+#		ddeltaEmaxlvdt = 0
+#	end
 
-	if(deltaEmaxrv>Emaxlv0*percentchange)
-		deltaEmaxrv = Emaxrv0*percentchange
-		ddeltaEmaxrvdt = 0
-	end
+#	if(deltaEmaxrv>Emaxlv0*percentchange)
+#		deltaEmaxrv = Emaxrv0*percentchange
+#		ddeltaEmaxrvdt = 0
+#	end
 	#@show Emaxlv, Emaxrv
 	#heart period
 	SigmaTs = 0.0
@@ -377,8 +377,12 @@ function complexHeartModel(t,y,dydt,data_dict)
 		Fil = (Pla-Plv)/Rla
 	end
 
+	if(Fil>2000)
+		Fil = 2000
+	end
+
 	dPladt = 1/Cla*((Ppv-Pla)/Rpv-Fil)
-	dVlvdt = Fil-Fol
+	dVlvdt = (Fil-Fol)
 	Pmaxrv = phi*Emaxrv*(Vrv-Vurv) + (1-phi)*P0rv*(exp(kErv*Vrv)-1)
 	#@show Pmaxrv
 	Rrv = krrv*Pmaxrv
@@ -416,6 +420,8 @@ function complexHeartModel(t,y,dydt,data_dict)
 	Vuev = deltaVuev+Vuev0
 	Vumv = deltaVumv+Vumv0
 
+	@show t, Rbp, Rhp, Rmp, Rsp, Rep, xb, xh, xm
+
 	#update datadict
 	data_dict["RESISTANCE"][5] = Rbp
 	data_dict["RESISTANCE"][6]=Rhp
@@ -446,7 +452,7 @@ function complexHeartModel(t,y,dydt,data_dict)
 	dPsadt = 1/Csa*(Fol-Fsa)#eqn 5, conversation of mass at system arteries
 	dFsadt = 1/Lsa*(Psa-Psp-Rsa*Fsa) #eqn 6, balance of forces at system arteries
 	dPspdt = 1/(Csp+Cep+Cmp+Cbp+Chp)*(Fsa-(Psp-Psv)/Rsp-(Psp-Pev)/Rep-(Psp-Pmv)/Rmp-(Psp-Pbv)/Rbp-(Psp-Phv)/Rhp)#eqn 7 conversavation of mass at systemic perhipheral circulation
-	dPsvdt = 1/Csv*((Psp-Psv)/Rsp-(Psv-Pra)/Psv-dVusvdt) #eqn 8 Conservation of Mass at Splanchnic Veins
+	dPsvdt = 1/Csv*((Psp-Psv)/Rsp-(Psv-Pra)/Rsv-dVusvdt) #eqn 8 Conservation of Mass at Splanchnic Veins
 	dPmvdt = 1/Cmv*((Psp-Pmv)/Rmp-(Pmv-Pra)/Rmv-dVumvdt) #eqn 9 Conservation of Mass at Skeletal Muscle Veins
 	dPbvdt = 1/Cbv*((Psp-Pbv)/Rbp-(Pbv-Pra)/Rbv) #eqn 10 Conservation of Mass at Brain Veins
 	dPhvdt = 1/Chv*((Psp-Phv)/Rhp-(Phv-Pra)/Rhv) #eqn 11 Conservation of Mass at Coronary Veins
@@ -514,7 +520,9 @@ function complexHeartModel(t,y,dydt,data_dict)
 	ddeltaVumvdt = 1/tauVumv*(-deltaVumv+SigmaSubVumv)
 
 	percentage1 = .25
-	percentage2 = .25
+	percentage2 = .3
+	percentage3 = .6
+	percentage4 = .25
 
 	if(abs(deltaVusv)>percentage1*Vusv0)
 		deltaVusv = -percentage1*Vusv0
@@ -540,20 +548,20 @@ function complexHeartModel(t,y,dydt,data_dict)
 		ddeltaRspdt = 0.0
 	end
 
-	if(abs(deltaRep)> percentage2*Rep)
-		if(deltaRep> percentage2*Rep)
-			deltaRep = percentage2*Rep
+	if(abs(deltaRep)> percentage3*Rep)
+		if(deltaRep> percentage3*Rep)
+			deltaRep = percentage3*Rep
 		else
-			deltaRep = -percentage2*Rep
+			deltaRep = -percentage3*Rep
 		end
 		ddeltaRepdt = 0.0
 	end
 
-	if(abs(deltaRmp)> percentage2*Rmp)
-		if(deltaRmp> percentage2*Rmp)
-			deltaRmp = percentage2*Rmp
+	if(abs(deltaRmp)> percentage4*Rmp)
+		if(deltaRmp> percentage4*Rmp)
+			deltaRmp = percentage4*Rmp
 		else
-			deltaRmp = -percentage2*Rmp
+			deltaRmp = -percentage4*Rmp
 		end
 		ddeltaRmpdt = 0.0
 	end
@@ -562,9 +570,21 @@ function complexHeartModel(t,y,dydt,data_dict)
 
 	#local effect of O2
 	#these flows may be incorrect
-	Fb = (Psp-Pbv)/Rbp
-	Fh = (Psp-Phv)/Rhp
-	Fm = (Psp-Pmv)/Rmp
+	Fb = Fbp
+	Fh = Fhp
+	Fm = Fmp
+	if(Fb<0)
+		Fb = 0.0
+	end
+
+	if(Fh <0.0)
+		Fh = 0.0
+	end
+	if(Fm<0.0)
+		Fm = 0.0
+	end
+
+
 	FO2 = PaO2*(1+beta*PaCO2)/(K*(1+alpha*(PaCO2)))
 	CaO2 = C*(FO2)^(1/alpha)/(1+FO2^(1/alpha))	
 
@@ -584,7 +604,8 @@ function complexHeartModel(t,y,dydt,data_dict)
 	dxhdt = 1/tauh*(-xh-GhO2*(CvhO2-CvhO2n))
 	dxmdt = 1/taum*(-xm-GmO2*(CvmO2-CvmO2n))
 	#prevent xb, xh, xm from getting too negative
-	xbound = -.5
+	#@show t,CaO2, CvbO2, CvhO2, CvmO2, Fb, Fh, Fm, xb, xh, xm
+	xbound = -.98
 	if(xb <xbound)
 		xb = xbound
 		dxbdt = 0
@@ -599,7 +620,7 @@ function complexHeartModel(t,y,dydt,data_dict)
 		xm = xbound
 		dxmdt = 0.0
 	end
-	#@show t,CaO2, CvbO2, CvhO2, CvmO2, Fb, Fh, Fm
+	#@show t,CaO2, CvbO2, CvhO2, CvmO2, Fb, Fh, Fm, xb, xh, xm
 
 	
 
@@ -659,22 +680,30 @@ function complexHeartModel(t,y,dydt,data_dict)
 		data_dict["CHEMOREFLEX"][6]= data_dict["CHEMOREFLEX"][6]
 	elseif(t > tinduce && t< tinduce + tdecrease)
 		data_dict["CHEMOREFLEX"][6]=25.0
+		data_dict["CO2_PRESSURE"]=70.0 
 	elseif(t>tinduce+tdecrease && data_dict["CHEMOREFLEX"][6]<=95.0)
-		data_dict["CHEMOREFLEX"][6] = 25.0*exp((t-(tinduce+tdecrease))/3.0)		
+		data_dict["CHEMOREFLEX"][6] = 25.0*exp((t-(tinduce+tdecrease))/3.0)	
+		data_dict["CO2_PRESSURE"]=95.0-	data_dict["CHEMOREFLEX"][6]
 	end
 ##	
-	flowrow = transpose([t, Fol, Fsa, Fsp, Fep, Fmp, Fbp, Fhp, For, Fpa])
+	flowrow = transpose([t, Fil, Fol, Fsa, Fsp, Fep, Fmp, Fbp, Fhp, For, Fpa])
 	f = open("flowrates.txt", "a+")
 	writecsv(f,flowrow)
 	close(f)
+#	cardiaccycle= transpose([Vlv, Plv])
+#	f = open("cardiaccycle.txt", "a+")
+#	writecsv(f, cardiaccycle)
+#	close(f)
 	#@show t, Fol, Fsa, Fsp, Fep, Fmp, Fbp, Fhp, For, Fpa
-	@show t, Plv, Vlv, Pla, Pmaxlv, Psa
+	#@show t, Pmaxlv, Plv, phi, Emaxlv, Vlv
 	return dydt
 
 end
 
 function main()
-	t = collect(0:.1:130)
+	rm("flowrates.txt")
+	#rm("cardiaccycle.txt")
+	t = collect(0:.1:140)
 	data_dict = DataFile()
 	initial_conditions = buildIC(36)
 	#need to actually figure out initial conditions
@@ -682,16 +711,16 @@ function main()
 	#tout, res = ode23s(fedeqns, initial_conditions, t)
 	tic()
 	fedeqns(t,y,ydot)= complexHeartModel(t,y,ydot,data_dict)
-	res = Sundials.cvode(fedeqns, vec(initial_conditions), t, integrator=:Adams, reltol=1E-2, abstol=1E-2)
+	res = Sundials.cvode(fedeqns, vec(initial_conditions), t, integrator=:Adams, reltol=1E-1, abstol=1E-1)
 	toc()
 	#psi = [a[14] for a in res]
 	##@show res
 	#psi = res[:, 14]
 	#plot(tout, mod(psi,1), "kx")
-	plotEverything(t, res, data_dict, "figures/TestingNov18Everything.pdf")
-	plotPretty(t, res, data_dict, "figures/TestingNov18Pretty.pdf")
-	writedlm("results/Nov18/Testing.txt", res)
-	#attemptToRecreateFig13(t[1000:end],res[1000:end, :],data_dict, "figures/AttemptedFig13LimitedXToPoint5Nov18.pdf", "flowrates.txt")
+	plotEverything(t, res, data_dict, "figures/TestingNov21Everything.pdf")
+	plotPretty(t, res, data_dict, "figures/TestingNov21Pretty.pdf")
+	writedlm("results/Nov21/Testing.txt", res)
+	attemptToRecreateFig13(t[1000:end],res[1000:end, :],data_dict, "figures/AttemptedFig13LimitedXToPoint5Nov21.pdf", "flowrates.txt")
 	#return t, res, data_dict
 end
 

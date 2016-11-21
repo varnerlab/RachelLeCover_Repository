@@ -294,7 +294,7 @@ function DataFile()
 	Vusv0 = 1435.4
 	Vuev0 = 640.73
 	Vumv0 =503.26
-	T0 = .83#.58
+	T0 = .83 #.58
 	push!(reflex, GEmaxlv)
 	push!(reflex, GEmaxrv)
 	push!(reflex, GRsp)
@@ -343,9 +343,9 @@ function DataFile()
 	Mdotm = .86
 	Mdotb =.7917
 	Mdothn = .4
-	GmO2 = 30
-	GbO2 = 10
-	GhO2 = 35
+	GmO2 = 30*10.0^-3*2.5
+	GbO2 = (10)*10.0^-3*5
+	GhO2 = (35)*10.0^-3*2.5
 	tauw = 5
 	taum = 10
 	taub = 10

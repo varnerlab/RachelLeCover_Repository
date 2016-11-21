@@ -204,15 +204,24 @@ function lookUpValue(data, desiredtime)
 	defaultvalue = 0.0
 	if(desiredtime<0)
 		return defaultvalue
-	elseif(desiredtime>data[1,end]) #if we somehow get too far ahead in time, use last value
-		return data[2,end]
+	elseif(desiredtime>data[end,1]) #if we somehow get too far ahead in time, use last value
+		return data[end,2]
 	end
 	upperindex = findBounds(desiredtime,data)
+	
+	
 	if(upperindex ==1)
 		lowerindex = 1
 	else
 		lowerindex = upperindex -1
 	end
+
+	if(upperindex >= size(data,1)&& upperindex !=1)
+		upperindex = size(data,1)
+		lowerindex = upperindex-1
+	end
+
+	@show size(data), upperindex
 	return linInerp(data[lowerindex,2], data[upperindex,2], data[lowerindex,1], data[upperindex,1], desiredtime)
 end
 
@@ -531,7 +540,7 @@ function calculateHeartRatelowerFdata(data,params,savestr)
 	h = calculateHR2012(Cnor, Cach)
 #	plotPretty(tdata, Pdata, data[:_HR_], tout,h,Pbar,string(savestr, ".pdf"))
 #	plotall(tout, Pbar, n1, n2, n,fpar, fsym,Cnor, Cach,data[:_HR_], h, data[:_Elapsed_time_],string(savestr, "allvars.pdf"))
-#	saveDataToFile(tout,h,string(savestr,".txt"))
+	saveDataToFile(tout,h,string(savestr,".txt"))
 	MSE=calculateMSE(tdata, data[:_HR_], tout, h)
 	toc()
 	return MSE
