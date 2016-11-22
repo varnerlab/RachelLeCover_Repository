@@ -420,7 +420,7 @@ function complexHeartModel(t,y,dydt,data_dict)
 	Vuev = deltaVuev+Vuev0
 	Vumv = deltaVumv+Vumv0
 
-	@show t, Rbp, Rhp, Rmp, Rsp, Rep, xb, xh, xm
+	#@show t, Rbp, Rhp, Rmp, Rsp, Rep, xb, xh, xm
 
 	#update datadict
 	data_dict["RESISTANCE"][5] = Rbp
@@ -600,11 +600,19 @@ function complexHeartModel(t,y,dydt,data_dict)
 #		CvbO2 = 0.0
 #	end
 
+#	if(CvhO2<0)
+#		CvhO2 = 0.0
+#	end
+
+#	if(CvmO2<0)
+#		CvmO2 = 0.0
+#	end
+
 	dxbdt = 1/taub*(-xb-GbO2*(CvbO2-CvbO2n))
 	dxhdt = 1/tauh*(-xh-GhO2*(CvhO2-CvhO2n))
 	dxmdt = 1/taum*(-xm-GmO2*(CvmO2-CvmO2n))
 	#prevent xb, xh, xm from getting too negative
-	#@show t,CaO2, CvbO2, CvhO2, CvmO2, Fb, Fh, Fm, xb, xh, xm
+	@show t,FO2, CaO2, CvbO2, CvhO2, CvmO2 
 	xbound = -.98
 	if(xb <xbound)
 		xb = xbound
@@ -703,7 +711,7 @@ end
 function main()
 	rm("flowrates.txt")
 	#rm("cardiaccycle.txt")
-	t = collect(0:.1:140)
+	t = collect(0:.1:200)
 	data_dict = DataFile()
 	initial_conditions = buildIC(36)
 	#need to actually figure out initial conditions
@@ -717,9 +725,9 @@ function main()
 	##@show res
 	#psi = res[:, 14]
 	#plot(tout, mod(psi,1), "kx")
-	plotEverything(t, res, data_dict, "figures/TestingNov21Everything.pdf")
-	plotPretty(t, res, data_dict, "figures/TestingNov21Pretty.pdf")
-	writedlm("results/Nov21/Testing.txt", res)
+	plotEverything(t, res, data_dict, "figures/TestingNov22Everything.pdf")
+	plotPretty(t, res, data_dict, "figures/TestingNov22Pretty.pdf")
+	writedlm("results/Nov22/Testing.txt", res)
 	attemptToRecreateFig13(t[1000:end],res[1000:end, :],data_dict, "figures/AttemptedFig13LimitedXToPoint5Nov21.pdf", "flowrates.txt")
 	#return t, res, data_dict
 end

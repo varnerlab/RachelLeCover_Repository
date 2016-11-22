@@ -19,15 +19,15 @@ function plotFlowRates(pathtodata)
 		plt[:subplot](9,1,j)
 		plot(t, fd[:,j+1])
 		ylabel(names[j])
-		if(j in collect(6:7))
-			axis([0, 100, 0,20])
-		end
+#		if(j in collect(6:7))
+#			axis([0, 100, 0,20])
+#		end
 
-		if(j ==8)
-			axis([0, 100, 0,5])
-		end
+#		if(j ==8)
+#			axis([0, 100, 0,5])
+#		end
 	end
-	plt[:subplot](9,1,2)
-	plot(t, Fsp+Fep+Fmp+Fbp+Fhp, "kx")
+	#plt[:subplot](9,1,2)
+	#plot(t, Fsp+Fep+Fmp+Fbp+Fhp, "kx")
 	
 end
