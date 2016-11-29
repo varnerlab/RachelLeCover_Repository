@@ -4,13 +4,10 @@ include("/home/rachel/Documents/work/optimization/SingleObjective/OOModelWithTim
 using PyPlot
 
 function processNumericalData(filename)
-	@show filename
-	df=readtable(filename, separator=',',nastrings=["-"])
-	units = df[1,:]
-	deleterows!(df,1) #remove the row that had units
-	writetable("tempoutputTA.csv", df)
-	dfnew = readtable("tempoutputTA.csv", separator=',')
-	return dfnew, units
+	n=DataFrames.names(readtable(filename, separator=',',nastrings=["-"], nrows = 1, header=true))
+	df=readtable(filename, separator=',',nastrings=["-"], skipstart =2, header = false)
+	names!(df, n)
+	return df
 end
 
 function cleandata(data)
@@ -161,7 +158,7 @@ function generateData(patientID,outputdir)
 	#allparamsets = getClusterParams(pathtocluster2params)
 	
 	savestr = string(outputdir, "Id = ", patientID,"usingfewersteps", ".png")
-	data, units= processNumericalData(string(inputdir, patientID))
+	data= processNumericalData(string(inputdir, patientID))
 	sort!(data, cols = [order(:_Elapsed_time_)])
 	colnames = (names(data))
 	cleaneddata = cleandata(data)
@@ -189,7 +186,7 @@ function generateDataSingleObj(patientID,outputdir)
 	#allparamsets = getClusterParams(pathtocluster2params)
 	
 	savestr = string(outputdir, "Id = ", patientID)
-	data, units= processNumericalData(string(inputdir, patientID))
+	data= processNumericalData(string(inputdir, patientID))
 	sort!(data, cols = [order(:_Elapsed_time_)])
 	colnames = (names(data))
 	cleaneddata = cleandata(data)
@@ -214,7 +211,7 @@ function generateDataSingleObjHighF(patientID,outputdir)
 	#allparamsets = getClusterParams(pathtocluster2params)
 	
 	savestr = string(outputdir, patientID)
-	data, units= processNumericalData(string(inputdir, patientID))
+	data = processNumericalData(string(inputdir, patientID))
 	sort!(data, cols = [order(:_Elapsed_time_)])
 	colnames = (names(data))
 	cleaneddata = cleandata(data)
@@ -335,7 +332,7 @@ function mainforSingleObjective()
 	end
 	close(f)
 
-	for patientID in allpatients
+	for patientID in allpatients[1:3]
 		close("all")
 		@show patientID
 		

@@ -1,14 +1,13 @@
 using DataFrames
 using Optim
+#using NLopt
 include("OOModelWithTimeLookUp.jl")
 
 function processNumericalData(filename)
-	df=readtable(filename, separator=',',nastrings=["-"])
-	units = df[1,:]
-	deleterows!(df,1) #remove the row that had units
-	writetable("tempoutputT.csv", df)
-	dfnew = readtable("tempoutputT.csv", separator=',')
-	return dfnew, units
+	n=DataFrames.names(readtable(filename, separator=',',nastrings=["-"], nrows = 1, header=true))
+	df=readtable(filename, separator=',',nastrings=["-"], skipstart =2, header = false)
+	names!(df, n)
+	return df
 end
 
 function cleandata(data)
@@ -32,7 +31,7 @@ end
 
 function calculatetotalMSE(params)
 	tic()
-	outputdir = "moretesting/2016_11_16/"
+	outputdir = "moretesting/2016_11_28/"
 	inputdir = "/home/rachel/Documents/work/optimization/LinkedRecordsTimeData10min/"
 	c1patients = readdlm("/home/rachel/Documents/work/optimization/multiobjective/usingPOETs/cluster1subjectIDs")
 	c2patients = readdlm("/home/rachel/Documents/work/optimization/multiobjective/usingPOETs/cluster1subjectIDs")
@@ -42,7 +41,7 @@ function calculatetotalMSE(params)
 	totalMSE = 0.0
 	usefulpatients = 0.0
 	#force positivity on all parameters
-	lowerbound = 1E-9
+	lowerbound = 1E-4
 	for j in range(1,length(params))
 		if(params[j])<0
 			params[j] = lowerbound
@@ -55,7 +54,7 @@ function calculatetotalMSE(params)
 		date = patient[7:end-7]
 		#println(string("processing patient", patient))
 		savestr = string(outputdir, "Id = ", patient,"usingfewerstepsAndOptimizedParams", ".png")
-		data, units= processNumericalData(string(inputdir, patient))
+		data= processNumericalData(string(inputdir, patient))
 		sort!(data, cols = [order(:_Elapsed_time_)])
 		colnames = (names(data))
 		if(in(:_ABP_Mean_, colnames) && in(:_HR_, colnames)&& (length(data[:_Elapsed_time_])>2))
@@ -82,13 +81,12 @@ function calculatetotalMSE(params)
 	return MSE
 end
 
-function attemptOptimization()
+function attemptOptimizationOptim()
 	params0 = [75,1.5,.5,250, .5, .5, 1.67,.96, .7]
 	#params0=[78.97582761404169,-1.8864140993276886,0.00142967813114446,251.60453882677203,2.648725296877113,-2.0547879774326403,0.9505848336074358,1.506601105672376,-0.43857878055469035]
 	res = optimize(calculatetotalMSE, params0,method = Optim.NelderMead(), show_trace = true, x_tol=1E-4, f_tol = 1E-4)
 	@show res
 	return res
 end
-attemptOptimization()
 
 

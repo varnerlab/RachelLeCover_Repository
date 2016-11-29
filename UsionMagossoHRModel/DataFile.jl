@@ -294,7 +294,7 @@ function DataFile()
 	Vusv0 = 1435.4
 	Vuev0 = 640.73
 	Vumv0 =503.26
-	T0 = .83 #.58
+	T0 = .58
 	push!(reflex, GEmaxlv)
 	push!(reflex, GEmaxrv)
 	push!(reflex, GRsp)

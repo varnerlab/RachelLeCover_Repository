@@ -262,13 +262,13 @@ function complexHeartModel(t,y,dydt,data_dict)
 	fcs0 = extraheartparams[8]
 
 	#conversation of mass
-	tstartbleed = 275.0
-	if(t <tstartbleed)
-		Vu = Vusa +Vusp +Vuep+Vump + Vubp+Vuhp+Vusv+Vuev+Vumv+Vubv+Vuhv+Vura+Vupa+Vupp+Vupv+Vula#eqn 13
-	else
-		Vu = Vusa +Vusp +Vuep+Vump + Vubp+Vuhp+Vusv+Vuev+Vumv+Vubv+Vuhv+Vura+Vupa+Vupp+Vupv+Vula-(t-tstartbleed)*(30.0/60.0)
-	end
-	#Vu = Vusa +Vusp +Vuep+Vump + Vubp+Vuhp+Vusv+Vuev+Vumv+Vubv+Vuhv+Vura+Vupa+Vupp+Vupv+Vula#eqn 13
+#	tstartbleed = 275.0
+#	if(t <tstartbleed)
+#		Vu = Vusa +Vusp +Vuep+Vump + Vubp+Vuhp+Vusv+Vuev+Vumv+Vubv+Vuhv+Vura+Vupa+Vupp+Vupv+Vula#eqn 13
+#	else
+#		Vu = Vusa +Vusp +Vuep+Vump + Vubp+Vuhp+Vusv+Vuev+Vumv+Vubv+Vuhv+Vura+Vupa+Vupp+Vupv+Vula-(t-tstartbleed)*(30.0/60.0)
+#	end
+	Vu = Vusa +Vusp +Vuep+Vump + Vubp+Vuhp+Vusv+Vuev+Vumv+Vubv+Vuhv+Vura+Vupa+Vupp+Vupv+Vula#eqn 13
 	Vpp = Cpp*Ppp
 	Pev = 1/Cev*(Vtot-Csa*Psa-(Csp+Cep+Cmp+Cbp+Chp)*Psp-Csv*Psv -Cmv*Pmv -Cbv*Pbv-Chv*Phv-Cra*Pra-Vrv-Cpa*Ppa-Cpp*Vpp-Cpv*Ppv-Cla*Pla-Vlv-Vu)#eqn 12
 
@@ -612,8 +612,8 @@ function complexHeartModel(t,y,dydt,data_dict)
 	dxhdt = 1/tauh*(-xh-GhO2*(CvhO2-CvhO2n))
 	dxmdt = 1/taum*(-xm-GmO2*(CvmO2-CvmO2n))
 	#prevent xb, xh, xm from getting too negative
-	@show t,FO2, CaO2, CvbO2, CvhO2, CvmO2 
-	xbound = -.98
+	#@show t,FO2, CaO2, CvbO2, CvhO2, CvmO2 
+	xbound = -.75
 	if(xb <xbound)
 		xb = xbound
 		dxbdt = 0
@@ -674,44 +674,43 @@ function complexHeartModel(t,y,dydt,data_dict)
 	data_dict["VUMVHISTORICALDATA"] = updateHistoricalData(data_dict["VUMVHISTORICALDATA"], Vumv, t)
 	#bleed out at 10mL/min
 	#run for 275 sec, then start bleeding out at 30 mL/min
-	tstartbleed = 275.0
-#	if(t <tstartbleed)
-#		data_dict["UNSTRESSEDVOLUME"][16] = data_dict["UNSTRESSEDVOLUME"][15]
-#	else
-#		data_dict["UNSTRESSEDVOLUME"][16] = data_dict["UNSTRESSEDVOLUME"][15]-(t-tstartbleed)*(30.0/60.0)
-#	end
-	#@show t, data_dict["UNSTRESSEDVOLUME"][16], Vu
+	tstartbleed = 150.0
+	if(t <tstartbleed)
+		data_dict["UNSTRESSEDVOLUME"][16] = data_dict["UNSTRESSEDVOLUME"][15]
+	else
+		data_dict["UNSTRESSEDVOLUME"][16] = data_dict["UNSTRESSEDVOLUME"][15]-(t-tstartbleed)*(300.0/60.0)
+	end
+	@show t, data_dict["UNSTRESSEDVOLUME"][16], Vtot
 	#induce hypoxia
 	tinduce = 120.0
 	tdecrease = 6.0
-	if(t<tinduce)
-		data_dict["CHEMOREFLEX"][6]= data_dict["CHEMOREFLEX"][6]
-	elseif(t > tinduce && t< tinduce + tdecrease)
-		data_dict["CHEMOREFLEX"][6]=25.0
-		data_dict["CO2_PRESSURE"]=70.0 
-	elseif(t>tinduce+tdecrease && data_dict["CHEMOREFLEX"][6]<=95.0)
-		data_dict["CHEMOREFLEX"][6] = 25.0*exp((t-(tinduce+tdecrease))/3.0)	
-		data_dict["CO2_PRESSURE"]=95.0-	data_dict["CHEMOREFLEX"][6]
-	end
+#	if(t<tinduce)
+#		data_dict["CHEMOREFLEX"][6]= data_dict["CHEMOREFLEX"][6]
+#	elseif(t > tinduce && t< tinduce + tdecrease)
+#		data_dict["CHEMOREFLEX"][6]=25.0
+#		#data_dict["CO2_PRESSURE"]=70.0 
+#	elseif(t>tinduce+tdecrease && data_dict["CHEMOREFLEX"][6]<=95.0)
+#		data_dict["CHEMOREFLEX"][6] = 25.0*exp((t-(tinduce+tdecrease))/3.0)	
+#		#data_dict["CO2_PRESSURE"]=95.0-data_dict["CHEMOREFLEX"][6]
+#	end
 ##	
 	flowrow = transpose([t, Fil, Fol, Fsa, Fsp, Fep, Fmp, Fbp, Fhp, For, Fpa])
-	f = open("flowrates.txt", "a+")
+	f = open("flowratesBO600s.txt", "a+")
 	writecsv(f,flowrow)
 	close(f)
 #	cardiaccycle= transpose([Vlv, Plv])
 #	f = open("cardiaccycle.txt", "a+")
 #	writecsv(f, cardiaccycle)
 #	close(f)
-	#@show t, Fol, Fsa, Fsp, Fep, Fmp, Fbp, Fhp, For, Fpa
-	#@show t, Pmaxlv, Plv, phi, Emaxlv, Vlv
+
 	return dydt
 
 end
 
 function main()
-	rm("flowrates.txt")
+	rm("flowratesBO.txt")
 	#rm("cardiaccycle.txt")
-	t = collect(0:.1:200)
+	t = collect(0:.1:600)
 	data_dict = DataFile()
 	initial_conditions = buildIC(36)
 	#need to actually figure out initial conditions
@@ -725,10 +724,10 @@ function main()
 	##@show res
 	#psi = res[:, 14]
 	#plot(tout, mod(psi,1), "kx")
-	plotEverything(t, res, data_dict, "figures/TestingNov22Everything.pdf")
-	plotPretty(t, res, data_dict, "figures/TestingNov22Pretty.pdf")
-	writedlm("results/Nov22/Testing.txt", res)
-	attemptToRecreateFig13(t[1000:end],res[1000:end, :],data_dict, "figures/AttemptedFig13LimitedXToPoint5Nov21.pdf", "flowrates.txt")
+	plotEverything(t, res, data_dict, "figures/TestingNov29EverythingBleedOut600s300mLpermin.pdf")
+	plotPretty(t, res, data_dict, "figures/TestingNov29PrettyBleedOut600s300mLpermin.pdf")
+	writedlm("results/Nov29/Testing100s.txt", res)
+	#t = attemptToRecreateFig13(t[1000:end],res[1000:end, :],data_dict, "figures/AttemptedFig13Nov29BleedOut600s300mLpermin.pdf", "flowratesBO.txt")
 	#return t, res, data_dict
 end
 

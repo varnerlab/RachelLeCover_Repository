@@ -1,6 +1,13 @@
 function storeData(time, fev, fes, fcs, fsp, fsh, fv, fac,historicaldata)
-	row = [time, fev, fes, fcs, fsp, fsh, fv,fac]
-	newdata = [historicaldata; transpose(row)]
+	row = [time fev fes fcs fsp fsh fv fac]
+	newdata = [historicaldata; (row)]
+	#row = [time;fev;fes;fcs;fsp;fsh;fv;fac]
+#	@show size(historicaldata)
+#	@show size(row)
+#	@show typeof(row)
+#	@show row
+#	@show historicaldata
+	#newdata = vcat(historicaldata, row)
 	return newdata
 end
 
@@ -315,13 +322,13 @@ function attemptToRecreateFig13(t,res, data_dict, outputfn, pathtodata)
 	@show size(Psa)
 	plot(t, Psa, "k", linewidth = .5)
 	ylabel("Arterial Pressure, mmHg")
-	axis([100,200,20,160])
+	#axis([000,600,20,160])
 	plt[:subplot](2,2,2)
 	plot(t, 1./T*60, "k", linewidth = .5)
 	ax = gca()
-	ax[:ticklabel_format](useOffset=false)
+	#ax[:ticklabel_format](useOffset=false)
 	ylabel("Heart Rate, bpm")
-	axis([100,200,40,100])
+	#axis([00,600,40,100])
 	plt[:subplot](2,2,3)
 	#axis([0,100,0,40])
 	@show size(Fsp)
@@ -329,10 +336,10 @@ function attemptToRecreateFig13(t,res, data_dict, outputfn, pathtodata)
 	@show size(Fsa)
 	startidx =size(tflow,1)-size(tflow[tflow.>=100],1)
 	plot(tflow, Fsp, linewidth = .5, "k")
-	axis([100,200, 0, 40])
+	#axis([00,600, 0, 40])
 	ylabel("Splanchic Flow")
 	plt[:subplot](2,2,4)
-	axis([100,200, 0, 40])
+	#axis([00,600, 0, 40])
 	plot(tflow, Fep, linewidth = .5, "k")
 	ylabel("Extrasplanchic Flow")
 	savefig(outputfn)

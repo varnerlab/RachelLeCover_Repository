@@ -3,55 +3,6 @@ using ODE
 using PyPlot
 using DataFrames
 
-function eqns(t,y,PTframe)
-	ydot = Float64[]
-	#if(mod(t,.05)==0)
-		@show t
-	#end
-	cnor =y[1]
-	cach = y[2]
-	n1 = y[3]
-	n2 = y[4]
-	pbar =y[5]
-	n = n1+n2+N
-
-	if(cnor<0)
-		cnor =0.0
-	end
-
-	if(cach<0)
-		cach = 0.0
-	end
-
-	if(cach >10)
-		cach = 10.0
-	end
-
-	if(cnor >10)
-		cnor = 10.0
-	end
-
-	fpar =calculatefpar(n)
-	fsym =calculatefsym(n,t,fpar)	
-
-	dcnordt = (fsym-cnor)/taunor
-	dcachdt =(fpar-cach)/tauach
-	push!(ydot, dcnordt)
-	push!(ydot, dcachdt)
-	
-	currP = lookUpP(t,PTframe)
-	@show currP	
-
-	dpbardt = alpha*(currP-pbar)
-	dn1dt = k1.*dpbardt.*n.*(M-n)./(M/2)^2-n1./tau1
-	dn2dt = k2.*dpbardt.*n.*(M-n)./(M/2)^2-n2./tau2
-	
-	push!(ydot, dn1dt)
-	push!(ydot, dn2dt)
-	push!(ydot, dpbardt)
-
-	return ydot
-end
 
 function eqnsLowF(t,y,PTframe, lookUpDict)
 	ydot = Float64[]
@@ -63,22 +14,6 @@ function eqnsLowF(t,y,PTframe, lookUpDict)
 	n2 = y[4]
 	pbar =y[5]
 	n = n1+n2+N
-
-#	if(cnor<0)
-#		cnor =0.0
-#	end
-
-#	if(cach<0)
-#		cach = 0.0
-#	end
-
-#	if(cach >10)
-#		cach = 10.0
-#	end
-
-#	if(cnor >10)
-#		cnor = 10.0
-#	end
 
 	fpar =calculatefpar(n)
 	fsym =calculatefsym(n,t,fpar, lookUpDict["HISTORICAL"])	
@@ -103,52 +38,6 @@ function eqnsLowF(t,y,PTframe, lookUpDict)
 	return ydot
 end
 
-function eqnsSundials(t,y,ydot,PTframe)
-	ydot = Float64[]
-	@show t
-	cnor =y[1]
-	cach = y[2]
-	n1 = y[3]
-	n2 = y[4]
-	pbar =y[5]
-	n = n1+n2+N
-
-	if(cnor<0)
-		cnor =0.0
-	end
-
-	if(cach<0)
-		cach = 0.0
-	end
-
-	if(cach >10)
-		cach = 10.0
-	end
-
-	if(cnor >10)
-		cnor = 10.0
-	end
-
-	fpar =calculatefpar(n)
-	fsym =calculatefsym(n,t,fpar)	
-
-	dcnordt = (fsym-cnor)/taunor
-	dcachdt =(fpar-cach)/tauach
-	push!(ydot, dcnordt)
-	push!(ydot, dcachdt)
-	
-	currP = lookUpP(t,PTframe)	
-
-	dpbardt = alpha*(currP-pbar)
-	dn1dt = k1.*dpbardt.*n.*(M-n)./(M/2)^2-n1./tau1
-	dn2dt = k2.*dpbardt.*n.*(M-n)./(M/2)^2-n2./tau2
-	
-	push!(ydot, dn1dt)
-	push!(ydot, dn2dt)
-	push!(ydot, dpbardt)
-
-	return ydot
-end
 
 function calculatefpar(n)
 	fpar = n/M
@@ -190,8 +79,21 @@ function storeData(time, n, historical_data)
 	return newdata
 end
 
-function linInerp(lowerval, upperval, tstart, tend, tdesired)
+function linInerpfsym(lowerval, upperval, tstart, tend, tdesired)
+	#@show lowerval, upperval, tstart, tend, tdesired
 	val = lowerval +(upperval-lowerval)/(tend-tstart)*(tdesired-tstart)
+	if(isnan(val)) #if we get a NaN, default to initial value
+		val = (1-N/M)/(1+beta*N/M)
+	end
+	return val
+end
+
+function linInerpP(lowerval, upperval, tstart, tend, tdesired)
+	#@show lowerval, upperval, tstart, tend, tdesired
+	val = lowerval +(upperval-lowerval)/(tend-tstart)*(tdesired-tstart)
+	if(isnan(val)) #if we get a NaN, default to initial value
+		val = 120.0
+	end
 	return val
 end
 
@@ -221,58 +123,27 @@ function lookUpValue(data, desiredtime)
 		lowerindex = upperindex-1
 	end
 
-	@show size(data), upperindex
-	return linInerp(data[lowerindex,2], data[upperindex,2], data[lowerindex,1], data[upperindex,1], desiredtime)
+	#@show size(data), upperindex
+	return linInerpfsym(data[lowerindex,2], data[upperindex,2], data[lowerindex,1], data[upperindex,1], desiredtime)
 end
 
-
-
-function lookUpP(t,PTframe)
-	ff = 1.0/125.0
-	currP = PTframe[PTframe[:_Elapsed_time_].==t, :_ABP_]
-
-	if(length(currP)==0)
-		lowerlim = t-ff
-		upperlim = t+ff
-		tester= PTframe[((PTframe[:, :_Elapsed_time_].<upperlim)& (PTframe[:,:_Elapsed_time_].>lowerlim)),:]
-		#@show tester
-		while(size(tester,1)==0)
-			#@show currP
-			#println("In loop")
-			ff = ff+.05
-			lowerlim = t-ff
-			upperlim = t+ff
-			tester = PTframe[((PTframe[:, :_Elapsed_time_].<=upperlim)& (PTframe[:,:_Elapsed_time_].>=lowerlim)),:]
-		end
-		currP = PTframe[((PTframe[:, :_Elapsed_time_].<upperlim)& (PTframe[:,:_Elapsed_time_].>lowerlim)),:][:_ABP_][1]
-	else
-		currP = PTframe[PTframe[:_Elapsed_time_].==t, :_ABP_][1]
-	end
-	return currP
-end
 
 function lookUpPlowF(t,PTframe)
-	ff = 1.0/125.0
-	currP = PTframe[PTframe[:_Elapsed_time_].==t, :_ABP_Mean_]
-
-	if(length(currP)==0)
-		lowerlim = t-ff
-		upperlim = t+ff
-		tester= PTframe[((PTframe[:, :_Elapsed_time_].<upperlim)& (PTframe[:,:_Elapsed_time_].>lowerlim)),:]
-		#@show tester
-		while(size(tester,1)==0)
-			#@show currP
-			#println("In loop")
-			ff = ff+.05
-			lowerlim = t-ff
-			upperlim = t+ff
-			tester = PTframe[((PTframe[:, :_Elapsed_time_].<=upperlim)& (PTframe[:,:_Elapsed_time_].>=lowerlim)),:]
-		end
-		currP = PTframe[((PTframe[:, :_Elapsed_time_].<upperlim)& (PTframe[:,:_Elapsed_time_].>lowerlim)),:][:_ABP_Mean_][1]
+	upperindex = searchsortedfirst(PTframe[:_Elapsed_time_], t, by=abs)
+	
+	if(upperindex ==1)
+		lowerindex = 1
 	else
-		currP = PTframe[PTframe[:_Elapsed_time_].==t, :_ABP_Mean_][1]
+		lowerindex = upperindex -1
 	end
-	return currP
+
+	if(upperindex >= size(PTframe,1)&& upperindex !=1)
+		upperindex = size(PTframe,1)
+		lowerindex = upperindex-1
+	end
+
+	return linInerpP(PTframe[:_ABP_Mean_][lowerindex], PTframe[:_ABP_Mean_][upperindex], PTframe[:_Elapsed_time_][lowerindex], PTframe[:_Elapsed_time_][upperindex], t)
+
 end
 
 function calculateMSE(tdata, HRdata, tsim, HRsim)
@@ -471,14 +342,14 @@ function calculateHeartRateHigherFdata(data,lowfdata,params,savestr)
 #	Pbar = X[:,5]
 #	tout = lowFreqt
 
-	@show sizeof(lowFreqt)
-	@show sizeof(tout)
-	@show sizeof(Cnor)
+	#@show sizeof(lowFreqt)
+	#@show sizeof(tout)
+	#@show sizeof(Cnor)
 	n = n1+n2+N
 	fpar =  calculatefpar(n)
 	fsym = calculatefsymArr(n,tout,fpar)
 	h = calculateHR2012(Cnor, Cach)
-	@show size(h)
+	#@show size(h)
 	#plotPrettyHighF(lowfdata[:_Elapsed_time_], Pdata, lowfdata[:_HR_], tout,h,Pbar,string(savestr, ".pdf"))
 	plotall(tout, Pbar, n1, n2, n,fpar, fsym,Cnor, Cach,lowfdata[:_HR_], h, lowfdata[:_Elapsed_time_],string(savestr, "allvars.pdf"))
 	saveDataToFile(tout,h,string(savestr,".txt"))
@@ -541,6 +412,52 @@ function calculateHeartRatelowerFdata(data,params,savestr)
 #	plotPretty(tdata, Pdata, data[:_HR_], tout,h,Pbar,string(savestr, ".pdf"))
 #	plotall(tout, Pbar, n1, n2, n,fpar, fsym,Cnor, Cach,data[:_HR_], h, data[:_Elapsed_time_],string(savestr, "allvars.pdf"))
 	saveDataToFile(tout,h,string(savestr,".txt"))
+	MSE=calculateMSE(tdata, data[:_HR_], tout, h)
+	toc()
+	return MSE
+
+
+end
+
+function calculateHeartRate(data,params,savestr)
+	tic()
+	Pdata = data[:_ABP_Mean_]
+	tdata = data[:_Elapsed_time_]
+	#@show head(data)
+
+	lowFreqt = Array(data[:_Elapsed_time_])
+	global alpha =1.5
+	global beta = 6
+	global M = 120
+	global k2 = 1.5
+	global tauD = 7
+
+	global N = params[1]
+	global k1 = params[2]
+	global tau1 = params[3]
+	global tau2 = params[4]
+	global tauach = params[5]
+	global taunor = params[6]
+	global h0 = params[7]
+	global Mnor = params[8]
+	global Mach = params[9]
+	historical_data = zeros(1,2)
+	lookUpDict = Dict()
+	lookUpDict["HISTORICAL"] = historical_data
+
+	initialconditions = [(1-N/M)/(1+beta*N/M), N/M,0.0,0.0,115.0]
+	fedeqns(lowFreqt,y) = eqnsLowF(lowFreqt,y,data, lookUpDict)
+	tout,res = ODE.ode23s(fedeqns, initialconditions, lowFreqt,reltol = 6E-4, abstol =1E-4, points=:specified)
+
+
+	Cnor = [a[1] for a in res]
+	Cach = [a[2] for a in res]
+	n1 = [a[3] for a in res]
+	n2 = n1 = [a[4] for a in res]
+	Pbar = [a[5] for a in res]
+	h = calculateHR2012(Cnor, Cach)
+#	plotPretty(tdata, Pdata, data[:_HR_], tout,h,Pbar,string(savestr, ".pdf"))
+#	plotall(tout, Pbar, n1, n2, n,fpar, fsym,Cnor, Cach,data[:_HR_], h, data[:_Elapsed_time_],string(savestr, "allvars.pdf"))
 	MSE=calculateMSE(tdata, data[:_HR_], tout, h)
 	toc()
 	return MSE
