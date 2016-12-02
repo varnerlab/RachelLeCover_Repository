@@ -316,15 +316,15 @@ function complexHeartModel(t,y,dydt,data_dict)
 	Emaxlv = deltaEmaxlv+Emaxlv0
 	Emaxrv = deltaEmaxrv+Emaxrv0
 
-#	if(deltaEmaxlv>Emaxlv0*percentchange)
-#		deltaEmaxlv = Emaxlv0*percentchange
-#		ddeltaEmaxlvdt = 0
-#	end
+	if(deltaEmaxlv>Emaxlv0*percentchange)
+		deltaEmaxlv = Emaxlv0*percentchange
+		ddeltaEmaxlvdt = 0
+	end
 
-#	if(deltaEmaxrv>Emaxlv0*percentchange)
-#		deltaEmaxrv = Emaxrv0*percentchange
-#		ddeltaEmaxrvdt = 0
-#	end
+	if(deltaEmaxrv>Emaxlv0*percentchange)
+		deltaEmaxrv = Emaxrv0*percentchange
+		ddeltaEmaxrvdt = 0
+	end
 	#@show Emaxlv, Emaxrv
 	#heart period
 	SigmaTs = 0.0
@@ -695,7 +695,7 @@ function complexHeartModel(t,y,dydt,data_dict)
 #	end
 ##	
 	flowrow = transpose([t, Fil, Fol, Fsa, Fsp, Fep, Fmp, Fbp, Fhp, For, Fpa])
-	f = open("flowratesBO600s.txt", "a+")
+	f = open("flowrates.txt", "a+")
 	writecsv(f,flowrow)
 	close(f)
 #	cardiaccycle= transpose([Vlv, Plv])
@@ -708,9 +708,9 @@ function complexHeartModel(t,y,dydt,data_dict)
 end
 
 function main()
-	rm("flowratesBO.txt")
+	#rm("flowratesBO.txt")
 	#rm("cardiaccycle.txt")
-	t = collect(0:.1:600)
+	t = collect(0:.1:100)
 	data_dict = DataFile()
 	initial_conditions = buildIC(36)
 	#need to actually figure out initial conditions
@@ -724,9 +724,9 @@ function main()
 	##@show res
 	#psi = res[:, 14]
 	#plot(tout, mod(psi,1), "kx")
-	plotEverything(t, res, data_dict, "figures/TestingNov29EverythingBleedOut600s300mLpermin.pdf")
-	plotPretty(t, res, data_dict, "figures/TestingNov29PrettyBleedOut600s300mLpermin.pdf")
-	writedlm("results/Nov29/Testing100s.txt", res)
+	plotEverything(t, res, data_dict, "figures/TestingNov30Everything.pdf")
+	plotPretty(t, res, data_dict, "figures/TestingNov30Pretty.pdf")
+	writedlm("results/Nov30/Testing100s.txt", res)
 	#t = attemptToRecreateFig13(t[1000:end],res[1000:end, :],data_dict, "figures/AttemptedFig13Nov29BleedOut600s300mLpermin.pdf", "flowratesBO.txt")
 	#return t, res, data_dict
 end
