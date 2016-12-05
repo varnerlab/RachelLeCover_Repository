@@ -31,22 +31,22 @@ function buildCoagulationModelDictionary()
     kinetic_parameter_vector = Float64[]
     push!(kinetic_parameter_vector,7200)       # 0 k_trigger
     push!(kinetic_parameter_vector,1400)       # 1 K_FII_trigger
-    push!(kinetic_parameter_vector,4.5)        # 2 k_amplification
+    push!(kinetic_parameter_vector,4.5/(2*10))        # 2 k_amplification
     push!(kinetic_parameter_vector,1200)       # 3 K_FII_amplification
     push!(kinetic_parameter_vector,0.1)        # 4 k_APC_formation
-    push!(kinetic_parameter_vector,30)         # 5 K_PC_formation
-    push!(kinetic_parameter_vector,0.2)        # 6 k_inhibition
-    push!(kinetic_parameter_vector,1200)       # 7 K_FIIa_inhibition
-    push!(kinetic_parameter_vector,0.0001*2)     # 8 k_inhibition_ATIII
+    push!(kinetic_parameter_vector,30/10.0)         # 5 K_PC_formation
+    push!(kinetic_parameter_vector,0.2*10000)        # 6 k_inhibition
+    push!(kinetic_parameter_vector,1200/10.0)       # 7 K_FIIa_inhibition
+    push!(kinetic_parameter_vector,0.0001*.9)     # 8 k_inhibition_ATIII
     #push!(kinetic_parameter_vector,0.001)      # 9 K_inhibition_ATIII
     #push!(kinetic_parameter_vector,100.0)      # 10 K_inhibition_FIIa
-    push!(kinetic_parameter_vector, 2E7*60*10.0^-6*50) #9 k_FV_activation, from reaction 16 in Diamond 2010 paper
-    push!(kinetic_parameter_vector, 1E8*60*10.0^-6) #10 K_FV_activation 
+    push!(kinetic_parameter_vector, 2E7*60*10.0^-6) #9 k_FV_activation, from reaction 16 in Diamond 2010 paper
+    push!(kinetic_parameter_vector, 1E8*80*10.0^-6/100) #10 K_FV_activation 
     push!(kinetic_parameter_vector, 6.0) #11 k_FX_activation from reaction 6 in Diamond 2010 paper
     push!(kinetic_parameter_vector, 2.8E-7*10.0^6) #12 K_FX_activation
     push!(kinetic_parameter_vector, 4E8*60*10.0^-10) #13 k_complex
-    push!(kinetic_parameter_vector, 63.5*60 )#14 k_amp_prothombinase from reaction 18 in Diamond 2010
-    push!(kinetic_parameter_vector, 1.6E-6*10.0^6) #13 K_FII_amp_prothombinase
+    push!(kinetic_parameter_vector, 63.5*60*100 )#14 k_amp_prothombinase from reaction 18 in Diamond 2010
+    push!(kinetic_parameter_vector, 1.6E-6*10.0^6*10000) #13 K_FII_amp_prothombinase
 
 
     PROBLEM_DICTIONARY["KINETIC_PARAMETER_VECTOR"] = kinetic_parameter_vector
@@ -83,7 +83,7 @@ function buildCoagulationModelDictionary()
 
    #platlet controls
 	platelet_parameter_vector = Float64[]
-	push!(platelet_parameter_vector, .005) #1 rate constant
+	push!(platelet_parameter_vector, .005*10) #1 rate constant
 	push!(platelet_parameter_vector, 1.6123) #2 power for control function
 	push!(platelet_parameter_vector, 2.4279E-9) #3 adjustment in denominator
 	push!(platelet_parameter_vector, .01) #4 Epsmax0

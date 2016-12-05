@@ -1,12 +1,12 @@
-#using ODE
-using Sundials
+using ODE
+#using Sundials
 include("DataFile.jl")
 include("buildIC.jl")
 include("utilities.jl")
 using PyPlot
 
-#function complexHeartModel(t,y,data_dict)
-function complexHeartModel(t,y,dydt,data_dict)
+function complexHeartModel(t,y,data_dict)
+#function complexHeartModel(t,y,dydt,data_dict)
 	Ppa = y[1]
 	Fpa = y[2]
 	Ppp = y[3]
@@ -631,7 +631,7 @@ function complexHeartModel(t,y,dydt,data_dict)
 	#@show t,CaO2, CvbO2, CvhO2, CvmO2, Fb, Fh, Fm, xb, xh, xm
 
 	
-
+	dydt = zeros(size(y,1), 1)
 	dydt[1] = dPpadt
 	dydt[2] = dFpadt
 	dydt[3]= dPppdt
@@ -710,23 +710,23 @@ end
 function main()
 	#rm("flowratesBO.txt")
 	#rm("cardiaccycle.txt")
-	t = collect(0:.1:100)
+	t = collect(0:.1:200)
 	data_dict = DataFile()
 	initial_conditions = buildIC(36)
 	#need to actually figure out initial conditions
-	#fedeqns(t,y)= complexHeartModel(t,y,data_dict)
-	#tout, res = ode23s(fedeqns, initial_conditions, t)
+	fedeqns(t,y)= complexHeartModel(t,y,data_dict)
+	tout, res = ode23s(fedeqns, initial_conditions, t,reltol=1E-1, abstol=1E-1)
 	tic()
-	fedeqns(t,y,ydot)= complexHeartModel(t,y,ydot,data_dict)
-	res = Sundials.cvode(fedeqns, vec(initial_conditions), t, integrator=:Adams, reltol=1E-1, abstol=1E-1)
+	#fedeqns(t,y,ydot)= complexHeartModel(t,y,ydot,data_dict)
+	#res = Sundials.cvode(fedeqns, vec(initial_conditions), t, integrator=:Adams, reltol=1E-1, abstol=1E-1)
 	toc()
 	#psi = [a[14] for a in res]
 	##@show res
 	#psi = res[:, 14]
 	#plot(tout, mod(psi,1), "kx")
-	plotEverything(t, res, data_dict, "figures/TestingNov30Everything.pdf")
-	plotPretty(t, res, data_dict, "figures/TestingNov30Pretty.pdf")
-	writedlm("results/Nov30/Testing100s.txt", res)
+	#plotEverything(t, res, data_dict, "figures/TestingDec6Everything.pdf")
+	#plotPretty(t, res, data_dict, "figures/TestingDec6Pretty.pdf")
+	#writedlm("results/Dec6/Testing200s.txt", res)
 	#t = attemptToRecreateFig13(t[1000:end],res[1000:end, :],data_dict, "figures/AttemptedFig13Nov29BleedOut600s300mLpermin.pdf", "flowratesBO.txt")
 	#return t, res, data_dict
 end

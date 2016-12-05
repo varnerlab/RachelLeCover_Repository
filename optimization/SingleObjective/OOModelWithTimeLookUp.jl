@@ -6,8 +6,7 @@ using DataFrames
 
 function eqnsLowF(t,y,PTframe, lookUpDict)
 	ydot = Float64[]
-	#if(mod(t,.05)==0)
-	#end
+	#@show t
 	cnor =y[1]
 	cach = y[2]
 	n1 = y[3]
@@ -447,7 +446,7 @@ function calculateHeartRate(data,params,savestr)
 
 	initialconditions = [(1-N/M)/(1+beta*N/M), N/M,0.0,0.0,115.0]
 	fedeqns(lowFreqt,y) = eqnsLowF(lowFreqt,y,data, lookUpDict)
-	tout,res = ODE.ode23s(fedeqns, initialconditions, lowFreqt,reltol = 6E-4, abstol =1E-4, points=:specified)
+	tout,res = ODE.ode45(fedeqns, initialconditions, lowFreqt,reltol = 5E-4, abstol =5E-4)#, points=:specified)
 
 
 	Cnor = [a[1] for a in res]

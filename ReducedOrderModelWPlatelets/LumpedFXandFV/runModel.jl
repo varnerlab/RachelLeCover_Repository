@@ -63,7 +63,7 @@ function makePlots(t,x)
 end
 
 function makeLoopPlots(t,x)
-	names = ["FII", "FIIa", "PC", "APC", "ATII", "TM", "TRIGGER", "Fraction Activated Platelets", "FV_FX", "FV_FXa", "Prothombinase"]
+	names = ["FII", "FIIa", "PC", "APC", "ATIII", "TM", "TRIGGER", "Fraction Activated Platelets", "FV_FX", "FV_FXa", "Prothombinase"]
 	fig = figure(figsize = (15,15))
 #	y_formatter = PyPlot.ticker.ScalarFormatter(useOffset=false)
 #	ax = fig.gca()
@@ -76,7 +76,7 @@ function makeLoopPlots(t,x)
 		plot(t, [a[j] for a in x], "k")
 		title(names[j])
 	end
-	savefig("figures/Dec2.pdf")
+	savefig("figures/Dec5.pdf")
 end
 
 function makePlotsfromODE4s(t,x)
@@ -144,6 +144,8 @@ function plotFluxes(pathToData,t)
 	fig = figure(figsize = (15,15))
 	for j in collect(1:size(data,2))
 		plt[:subplot](size(data,2),1,j)
+		@show size(t)
+		@show size(data[:,j])
 		plot(t, data[:,j])
 		title(string("reaction ", j))
 	end
@@ -154,7 +156,7 @@ function main()
 	rm("ratevector.txt")
 	rm("modifiedratevector.txt")
 	rm("times.txt")
-	(t,x) = runModel(0.0, .02, 20)
+	(t,x) = runModel(0.0, .02, 60)
 	@show size(t)
 	#remove tiny elements that are causing plotting problems
 	#x[x.<=1E-20] = 0.0
@@ -169,12 +171,13 @@ end
 
 
 function plotThrombinWData(t,x,pathToData)
-	close("all")
+	#close("all")
 	expdata = readdlm(pathToData,',')
 	fig = figure(figsize = (15,15))
 	plot(t, [a[2] for a in x], "k-")
 	plot(expdata[:,1], expdata[:,2], ".k")
 	ylabel("Thrombin Concentration, nM")
 	xlabel("Time, in minutes")
+	#savefig("figures/notTooFarOff.pdf")
 end
 

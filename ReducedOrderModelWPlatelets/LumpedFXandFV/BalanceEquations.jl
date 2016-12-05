@@ -183,5 +183,5 @@ function BalanceEquations(t,x,PROBLEM_DICTIONARY)
 	dxdt_total[10] = modified_rate_vector[5]
 	dxdt_total[11] = modified_rate_vector[6]
 
-	return (dxdt_total)
+	return (dxdt_total)#/1.1#1/2.7
 end
