@@ -1,5 +1,6 @@
 include("BalanceEquations.jl")
 include("CoagulationModelFactory.jl")
+include("utilities.jl")
 #using Sundials
 using ODE
 using PyPlot
@@ -69,14 +70,14 @@ function makeLoopPlots(t,x)
 #	ax = fig.gca()
 #	println(ax)
 #	ax.yaxis.set_major_formatter(y_formatter)
-	@show size(t)
+	#@show size(t)
 	for j in collect(1:size(names,1))
 		plt[:subplot](4,3,j)
-		@show size([a[j] for a in x])
+		#@show size([a[j] for a in x])
 		plot(t, [a[j] for a in x], "k")
 		title(names[j])
 	end
-	savefig("figures/Dec5.pdf")
+	savefig("figures/Dec6.pdf")
 end
 
 function makePlotsfromODE4s(t,x)
@@ -146,27 +147,34 @@ function plotFluxes(pathToData,t)
 		plt[:subplot](size(data,2),1,j)
 		@show size(t)
 		@show size(data[:,j])
-		plot(t, data[:,j])
+		plot(t, data[:,j], ".k")
 		title(string("reaction ", j))
 	end
 end
 
+
 function main()
+	pathToData = "../data/ButenasFig1B60nMFVIIa.csv"
 	close("all")
 	rm("ratevector.txt")
 	rm("modifiedratevector.txt")
 	rm("times.txt")
-	(t,x) = runModel(0.0, .02, 60)
+	(t,x) = runModel(0.0, .01, 20.0)
 	@show size(t)
 	#remove tiny elements that are causing plotting problems
 	#x[x.<=1E-20] = 0.0
 	times = readdlm("times.txt")
-	plotFluxes("ratevector.txt",times)
+	#plotFluxes("ratevector.txt",times)
 	plotFluxes("modifiedratevector.txt",times)
 
 	#println(x)
-	makeLoopPlots(t,x)
-	plotThrombinWData(t,x,"../data/ButenasFig1B60nMFVIIa.csv")
+	#makeLoopPlots(t,x)
+	plotThrombinWData(t,x,pathToData)
+	MSE, interpolatedExperimentalData=calculateMSE(t, [a[2] for a in x], readdlm(pathToData, ','))
+	estimatedAUC = calculateAUC(t, [a[2] for a in x])
+	experimentalAUC = calculateAUC(t, interpolatedExperimentalData)
+	@show estimatedAUC, experimentalAUC
+	return MSE, abs(estimatedAUC-experimentalAUC)
 end
 
 
@@ -178,6 +186,6 @@ function plotThrombinWData(t,x,pathToData)
 	plot(expdata[:,1], expdata[:,2], ".k")
 	ylabel("Thrombin Concentration, nM")
 	xlabel("Time, in minutes")
-	#savefig("figures/notTooFarOff.pdf")
+	savefig("figures/UsingExponetialMixingDelay.pdf")
 end
 

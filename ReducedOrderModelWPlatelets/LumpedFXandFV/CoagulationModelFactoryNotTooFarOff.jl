@@ -31,7 +31,7 @@ function buildCoagulationModelDictionary()
     kinetic_parameter_vector = Float64[]
     push!(kinetic_parameter_vector,7200)       # 0 k_trigger
     push!(kinetic_parameter_vector,1400)       # 1 K_FII_trigger
-    push!(kinetic_parameter_vector,4.5/(2*10))        # 2 k_amplification
+    push!(kinetic_parameter_vector,4.5/(5*10))        # 2 k_amplification
     push!(kinetic_parameter_vector,1200)       # 3 K_FII_amplification
     push!(kinetic_parameter_vector,0.1)        # 4 k_APC_formation
     push!(kinetic_parameter_vector,30/10.0)         # 5 K_PC_formation
@@ -70,11 +70,11 @@ function buildCoagulationModelDictionary()
     push!(control_parameter_vector,2.0)        # 11 20 order_amplification_TFPI = control_parameter_vector[11]
     
     # APC generation -
-    push!(control_parameter_vector,2.0)        # 12 21 alpha_shutdown_APC = control_parameter_vector[12]
+    push!(control_parameter_vector,2.0/10)        # 12 21 alpha_shutdown_APC = control_parameter_vector[12]
     push!(control_parameter_vector,2.0)        # 13 22 order_shutdown_APC = control_parameter_vector[13]
 
     push!(control_parameter_vector,1.0) #14 alpha_FV_activation
-    push!(control_parameter_vector,1.0/10) #15 order_FV_activation
+    push!(control_parameter_vector,1.0) #15 order_FV_activation
     push!(control_parameter_vector,1.0) #16 alpha_FX_activation
     push!(control_parameter_vector,1.0) #17 order_FX_activation
     push!(control_parameter_vector,4.0) #14 alpha_FX_inhibition

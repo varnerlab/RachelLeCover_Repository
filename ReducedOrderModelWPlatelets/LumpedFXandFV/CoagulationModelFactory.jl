@@ -23,21 +23,21 @@ function buildCoagulationModelDictionary()
     push!(initial_condition_vector,25.0E-3)          # 6 TRIGGER
     push!(initial_condition_vector, .01) #Fraction of platelets activated
     push!(initial_condition_vector,100.0)          #  FV+FX
-    push!(initial_condition_vector,0.0)          #  FVa+FXa
-    push!(initial_condition_vector,0.0)         #  prothombinase complex
+    push!(initial_condition_vector,0.001)          #  FVa+FXa
+    push!(initial_condition_vector,0.001)         #  prothombinase complex
     PROBLEM_DICTIONARY["INITIAL_CONDITION_VECTOR"] = initial_condition_vector
     
     # Kinetic parameters -
     kinetic_parameter_vector = Float64[]
-    push!(kinetic_parameter_vector,7200)       # 0 k_trigger
+    push!(kinetic_parameter_vector,7200*1/10)       #  k_trigger
     push!(kinetic_parameter_vector,1400)       # 1 K_FII_trigger
-    push!(kinetic_parameter_vector,4.5/(2*10))        # 2 k_amplification
+    push!(kinetic_parameter_vector,4.5*.8)        # 2 k_amplification
     push!(kinetic_parameter_vector,1200)       # 3 K_FII_amplification
-    push!(kinetic_parameter_vector,0.1)        # 4 k_APC_formation
+    push!(kinetic_parameter_vector,0.1*.95)        # 4 k_APC_formation
     push!(kinetic_parameter_vector,30/10.0)         # 5 K_PC_formation
     push!(kinetic_parameter_vector,0.2*10000)        # 6 k_inhibition
     push!(kinetic_parameter_vector,1200/10.0)       # 7 K_FIIa_inhibition
-    push!(kinetic_parameter_vector,0.0001*.9)     # 8 k_inhibition_ATIII
+    push!(kinetic_parameter_vector,0.0001*1.2)     # 8 k_inhibition_ATIII
     #push!(kinetic_parameter_vector,0.001)      # 9 K_inhibition_ATIII
     #push!(kinetic_parameter_vector,100.0)      # 10 K_inhibition_FIIa
     push!(kinetic_parameter_vector, 2E7*60*10.0^-6) #9 k_FV_activation, from reaction 16 in Diamond 2010 paper
@@ -83,11 +83,12 @@ function buildCoagulationModelDictionary()
 
    #platlet controls
 	platelet_parameter_vector = Float64[]
-	push!(platelet_parameter_vector, .005*10) #1 rate constant
+	push!(platelet_parameter_vector, .005*12) #1 rate constant
 	push!(platelet_parameter_vector, 1.6123) #2 power for control function
 	push!(platelet_parameter_vector, 2.4279E-9) #3 adjustment in denominator
 	push!(platelet_parameter_vector, .01) #4 Epsmax0
-	push!(platelet_parameter_vector, .01)  #5 aida
+	push!(platelet_parameter_vector, .01*1.05)  #5 aida
+	push!(platelet_parameter_vector, .2) #koffplatelets
 	PROBLEM_DICTIONARY["PLATELET_PARAMS"] = platelet_parameter_vector
     
     # Experimental output scaling -
@@ -101,6 +102,11 @@ function buildCoagulationModelDictionary()
     PROBLEM_DICTIONARY["SCALING_PARAMETER_VECTOR"] = scaling_parameter_vector
 
    PROBLEM_DICTIONARY["ALEPH"] = initial_condition_vector[2]
+
+	timing = Float64[]
+	push!(timing, 4.25) #time_delay
+	push!(timing, .35) #coeff
+	PROBLEM_DICTIONARY["TIME_DELAY"]=timing
     
     # QFactor vector - from simulateFig3Butenas2002
     qualitative_factor_vector =Float64[]

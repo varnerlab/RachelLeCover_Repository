@@ -1,8 +1,15 @@
 function BalanceEquations(t,x,PROBLEM_DICTIONARY)
-	@show t
+	
+	#@show t
 	# Correct nagative x's = throws errors in control even if small - 
 	idx = find(x->(x<0),x);
 	x[idx] = 0.0;
+#	for j = 1:length(x)
+#		if(isnan(x[j]) || !isfinite(x[j]))
+#			println("Found NAN at x $j")
+#			x[j] = 0.0
+#		end
+#	end
 	
 	# Alias the species -
 	FII	 = x[1]
@@ -22,6 +29,7 @@ function BalanceEquations(t,x,PROBLEM_DICTIONARY)
 	control_parameter_vector = PROBLEM_DICTIONARY["CONTROL_PARAMETER_VECTOR"]
 	qualitative_factor_level_vector = PROBLEM_DICTIONARY["FACTOR_LEVEL_VECTOR"]
 	platelet_parameter_vector = PROBLEM_DICTIONARY["PLATELET_PARAMS"]
+	timing = PROBLEM_DICTIONARY["TIME_DELAY"]
 
 #@show kinetic_parameter_vector
 #@show typeof(kinetic_parameter_vector)
@@ -69,6 +77,7 @@ function BalanceEquations(t,x,PROBLEM_DICTIONARY)
 	platelet_denom = platelet_parameter_vector[3] #3 adjustment in denominator
 	EpsMax0 = platelet_parameter_vector[4] #4 Epsmax0
 	aida = platelet_parameter_vector[5] #5 aida
+	koffplatelets = platelet_parameter_vector[6]
 
 	#platelet control
 	#update aleph so that it holds the maximum value of FIIa
@@ -79,6 +88,10 @@ function BalanceEquations(t,x,PROBLEM_DICTIONARY)
 	aleph = PROBLEM_DICTIONARY["ALEPH"]
 	faleph = aleph^platelet_pwr/(aleph^platelet_pwr + platelet_denom^platelet_pwr)
 	EpsMax = EpsMax0+(1+EpsMax0)*faleph
+
+	#timing
+	time_delay = timing[1]
+	time_coeff = timing[2]
 
 	# Initiation model -
     initiation_trigger_term = ((alpha_trigger_activation*TRIGGER)^order_trigger_activation)/(1 + ((alpha_trigger_activation*TRIGGER)^order_trigger_activation))
@@ -128,20 +141,22 @@ function BalanceEquations(t,x,PROBLEM_DICTIONARY)
     K_FII_amp_prothombinase=kinetic_parameter_vector[16]	
     
 #@show kinetic_parameter_vector
-    rate_vector = ones(1,7)
-    rate_vector[1] = k_trigger*TRIGGER*(FII/(K_FII_trigger + FII))
-    rate_vector[2] = k_amplification*FIIa*(FII/(K_FII_amplification + FII))
-    rate_vector[3] = k_APC_formation*TM*(Float64(PC)/Float64(K_PC_formation + PC))
-    #rate_vector[3] = k_inhibition*APC*(FIIa/(FIIa + K_FIIa_inhibition)) + k_inhibition_ATIII*(ATIII)*pow(FIIa,1.26)
-    rate_vector[4] = Float64(k_inhibition_ATIII)*Float64(ATIII)*(Float64(FIIa)^1.26)
-    rate_vector[5]= k_FV_X_activation*TRIGGER*FV_FX/(K_FV_X_actiation+FV_FX)
-    rate_vector[6] = k_complex*FV_FXA*aida/Eps
-    rate_vector[7] = k_amp_prothombinase*PROTHOMBINASE*FII/(K_FII_amp_prothombinase + FII)
+    rate_vector = zeros(1,7)
+	#if(t>time_delay)
+	    rate_vector[1] = k_trigger*TRIGGER*(FII/(K_FII_trigger + FII))
+	    rate_vector[2] = k_amplification*FIIa*(FII/(K_FII_amplification + FII))
+	    rate_vector[3] = k_APC_formation*TM*(Float64(PC)/Float64(K_PC_formation + PC))
+	    #rate_vector[3] = k_inhibition*APC*(FIIa/(FIIa + K_FIIa_inhibition)) + k_inhibition_ATIII*(ATIII)*pow(FIIa,1.26)
+	    rate_vector[4] = Float64(k_inhibition_ATIII)*Float64(ATIII)*(Float64(FIIa)^1.26)
+	    rate_vector[5]= k_FV_X_activation*TRIGGER*FV_FX/(K_FV_X_actiation+FV_FX)
+	    rate_vector[6] = k_complex*FV_FXA*aida/Eps
+	    rate_vector[7] = k_amp_prothombinase*PROTHOMBINASE*FII/(K_FII_amp_prothombinase + FII)
+	#end
 	f = open("ratevector.txt", "a+")
 	writedlm(f, rate_vector)
 	close(f)
 
-
+	#@show t, x, rate_vector, control_vector
 	#remove nans
 	for j = 1:length(rate_vector)
 		if(isnan(rate_vector[j]) || !isfinite(rate_vector[j]))
@@ -154,7 +169,7 @@ function BalanceEquations(t,x,PROBLEM_DICTIONARY)
 	for j = 1:length(control_vector)
 		if(isnan(control_vector[j])|| !isfinite(control_vector[j]))
 			println("Found NAN at control_vector $j")
-			control_vector[j] = 0.0
+			control_vector[j] = 1.0
 		end
 	end
 
@@ -171,17 +186,37 @@ function BalanceEquations(t,x,PROBLEM_DICTIONARY)
 
 	# calculate dxdt_reaction -
 	dxdt_total = zeros(size(x,1),1)
-	dxdt_total[1] = -1*modified_rate_vector[2] - modified_rate_vector[1] -modified_rate_vector[7]	# 0 FII
-	dxdt_total[2] = modified_rate_vector[2] + modified_rate_vector[1] - modified_rate_vector[4]+modified_rate_vector[7]	 # 1 FIIa
-	dxdt_total[3] = -1*modified_rate_vector[3] # 2 PC
-	dxdt_total[4] = 1*modified_rate_vector[3]  # 3 APC
-	dxdt_total[5] = -1*k_inhibition_ATIII*(ATIII)*(FIIa^1.26)# 4 ATIII
-	dxdt_total[6] = 0.0 # 5 TM (acts as enzyme, so no change)
-	dxdt_total[7] = -0.0*TRIGGER	# 6 TRIGGER
-	dxdt_total[8] = kplatelts*(EpsMax-Eps)
-	dxdt_total[9] = -1*modified_rate_vector[5]
-	dxdt_total[10] = modified_rate_vector[5]
-	dxdt_total[11] = modified_rate_vector[6]
+	#if(t>time_delay)
+		dxdt_total[1] = -1*modified_rate_vector[2] - modified_rate_vector[1] -modified_rate_vector[7]	# 0 FII
+		dxdt_total[2] = modified_rate_vector[2] + modified_rate_vector[1] - modified_rate_vector[4]+modified_rate_vector[7]	 # 1 FIIa
+		dxdt_total[3] = -1*modified_rate_vector[3] # 2 PC
+		dxdt_total[4] = 1*modified_rate_vector[3]  # 3 APC
+		dxdt_total[5] = -1*k_inhibition_ATIII*(ATIII)*(FIIa^1.26)# 4 ATIII
+		dxdt_total[6] = 0.0 # 5 TM (acts as enzyme, so no change)
+		dxdt_total[7] = -0.0*TRIGGER	# 6 TRIGGER
+		dxdt_total[8] = kplatelts*(EpsMax-Eps)-koffplatelets*Eps
+		dxdt_total[9] = -1*modified_rate_vector[5]
+		dxdt_total[10] = modified_rate_vector[5]
+		dxdt_total[11] = modified_rate_vector[6]
+	#end
 
-	return (dxdt_total)#/1.1#1/2.7
+	tau = time_coeff*(1-FIIa/aleph)
+	time_scale =1-1*exp(-tau*(t-time_delay))
+	if(t<time_delay)
+		time_scale = 0.0
+	end
+	if(isnan(time_scale))
+		time_scale = 1.0
+	end
+#	@show x
+#	@show rate_vector
+#	@show control_vector
+#	@show modified_rate_vector
+#	@show time_scale
+#	@show t, dxdt_total.*time_scale
+#	@show size(x), size(dxdt_total), size(dxdt_total.*time_scale)
+	@show time_scale
+	return (dxdt_total.*time_scale)
+	
+	#return (dxdt_total)
 end
