@@ -168,7 +168,7 @@ function main()
 	plotFluxes("modifiedratevector.txt",times)
 
 	#println(x)
-	#makeLoopPlots(t,x)
+	makeLoopPlots(t,x)
 	plotThrombinWData(t,x,pathToData)
 	MSE, interpolatedExperimentalData=calculateMSE(t, [a[2] for a in x], readdlm(pathToData, ','))
 	estimatedAUC = calculateAUC(t, [a[2] for a in x])
@@ -186,6 +186,41 @@ function plotThrombinWData(t,x,pathToData)
 	plot(expdata[:,1], expdata[:,2], ".k")
 	ylabel("Thrombin Concentration, nM")
 	xlabel("Time, in minutes")
-	savefig("figures/UsingExponetialMixingDelay.pdf")
+	savefig("figures/UsingNealderMeadEstimatedParametersWithPlatelets.pdf")
 end
 
+function runModelWithMultipleParams(pathToParams)
+	allparams = readdlm(pathToParams, ',')
+	TSTART = 0.0
+	Ts = .02
+	TSTOP = 20.0
+	TSIM = collect(TSTART:Ts:TSTOP)
+	pathToData = "../data/ButenasFig1B60nMFVIIa.csv"
+	fig = figure(figsize = (15,15))
+	
+	for j in collect(1:size(allparams,1))
+		currparams = allparams[j,:]
+		dict = buildDictFromOneVector(currparams)
+		initial_condition_vector = dict["INITIAL_CONDITION_VECTOR"]
+		reshaped_IC = vec(reshape(initial_condition_vector,11,1))
+		fbalances(t,y)= BalanceEquations(t,y,dict) 
+		t,X = ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-8, reltol = 1E-8)
+		plotThrombinWData(t,X,pathToData)
+	end
+end
+
+function runModelWithParams(params)
+	TSTART = 0.0
+	Ts = .02
+	TSTOP = 20.0
+	TSIM = collect(TSTART:Ts:TSTOP)
+	pathToData = "../data/ButenasFig1B60nMFVIIa.csv"
+	#pathToData = "../data/Buentas1999Fig4100PercentProthrombin.txt"
+	fig = figure(figsize = (15,15))
+	
+	dict = buildDictFromOneVector(params)
+	initial_condition_vector = dict["INITIAL_CONDITION_VECTOR"]
+	fbalances(t,y)= BalanceEquations(t,y,dict) 
+	t,X = ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-8, reltol = 1E-8)
+	plotThrombinWData(t,X,pathToData)
+end

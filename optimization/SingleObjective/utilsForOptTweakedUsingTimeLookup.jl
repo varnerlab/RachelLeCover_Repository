@@ -32,7 +32,7 @@ end
 function calculatetotalMSE(params::Vector, grad::Vector)
 #function calculatetotalMSE(params)
 	tic()
-	outputdir = "moretesting/2016_12_05/"
+	outputdir = "moretesting/2016_12_15/"
 	inputdir = "/home/rachel/Documents/work/optimization/LinkedRecordsTimeData10min/"
 	c1patients = readdlm("/home/rachel/Documents/work/optimization/multiobjective/usingPOETs/cluster1subjectIDs")
 	c2patients = readdlm("/home/rachel/Documents/work/optimization/multiobjective/usingPOETs/cluster1subjectIDs")
@@ -45,7 +45,7 @@ function calculatetotalMSE(params::Vector, grad::Vector)
 	@show params
 	for patient in allpatients
 		numericPatientID = patient[2:6]
-		date = patient[7:end-7]
+		date = patient[7:end-7]attem
 		#println(string("processing patient", patient))
 		savestr = string(outputdir, "Id = ", patient,"usingfewerstepsAndOptimizedParams", ".png")
 		data= processNumericalData(string(inputdir, patient))
@@ -94,7 +94,11 @@ end
 function attemptOptimizationNLOpt()
 	numvars = 9
 	opt = Opt(:LN_NELDERMEAD,numvars)
-	lower_bounds!(opt, vec(fill(.1,1,numvars)))
+	lb =fill(1E-5, 1, numvars)
+	lb[numvars] = .1
+	lb[(numvars-1)] =.1
+	@show lb
+	lower_bounds!(opt, vec(lb))
 	#upper_bounds!(opt, vec[])
 	min_objective!(opt, calculatetotalMSE)
 	params0 = [75 1.5 .5 250 .5 .5 1.67 .96 .7]

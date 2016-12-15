@@ -195,6 +195,7 @@ function BalanceEquations(t,x,PROBLEM_DICTIONARY)
 		dxdt_total[6] = 0.0 # 5 TM (acts as enzyme, so no change)
 		dxdt_total[7] = -0.0*TRIGGER	# 6 TRIGGER
 		dxdt_total[8] = kplatelts*(EpsMax-Eps)-koffplatelets*Eps
+		#dxdt_total[8] = 0.0 #if no platelets, they can't be activated
 		dxdt_total[9] = -1*modified_rate_vector[5]
 		dxdt_total[10] = modified_rate_vector[5]
 		dxdt_total[11] = modified_rate_vector[6]
@@ -208,14 +209,6 @@ function BalanceEquations(t,x,PROBLEM_DICTIONARY)
 	if(isnan(time_scale))
 		time_scale = 1.0
 	end
-#	@show x
-#	@show rate_vector
-#	@show control_vector
-#	@show modified_rate_vector
-#	@show time_scale
-#	@show t, dxdt_total.*time_scale
-#	@show size(x), size(dxdt_total), size(dxdt_total.*time_scale)
-	@show time_scale
 	return (dxdt_total.*time_scale)
 	
 	#return (dxdt_total)

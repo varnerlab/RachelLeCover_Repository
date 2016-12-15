@@ -180,7 +180,7 @@ end
 
 function generateDataSingleObj(patientID,outputdir)
 	inputdir = "/home/rachel/Documents/work/optimization/LinkedRecordsTimeData10min/"
-	pathtoparams = "/home/rachel/Documents/work/optimization/SingleObjective/moretesting/2016_11_28/bestParamsNov_28_Opt.txt"
+	pathtoparams = "/home/rachel/Documents/work/optimization/SingleObjective/moretesting/2016_12_05/bestParamsDec_05_Opt.txt"
 	datasavestr = string(outputdir, patientID, ".txt")
 	allparamsets = getClusterParams(pathtoparams)
 	#allparamsets = getClusterParams(pathtocluster2params)
@@ -337,7 +337,7 @@ function mainforSingleObjective()
 		close("all")
 		@show patientID
 		
-		mainoutputdir = "/home/rachel/Documents/work/optimization/SingleObjective/figsUsingLookUp/bounded1E-4/"
+		mainoutputdir = "/home/rachel/Documents/work/optimization/SingleObjective/figsUsingLookUp/bounded1E-1/"
 		MIMICdata = generateDataSingleObj(patientID,mainoutputdir)
 		curroutput = string(mainoutputdir, "Id = ",patientID, ".txt")
 		times =getTimes(curroutput)

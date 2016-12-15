@@ -21,7 +21,7 @@ function buildCoagulationModelDictionary()
     push!(initial_condition_vector,3400)       # 4 ATIII
     push!(initial_condition_vector,12)         # 5 TM
     push!(initial_condition_vector,25.0E-3)          # 6 TRIGGER
-    push!(initial_condition_vector, .01) #Fraction of platelets activated
+    push!(initial_condition_vector, 0.0) #Fraction of platelets activated
     push!(initial_condition_vector,100.0)          #  FV+FX
     push!(initial_condition_vector,0.001)          #  FVa+FXa
     push!(initial_condition_vector,0.001)         #  prothombinase complex
@@ -106,6 +106,68 @@ function buildCoagulationModelDictionary()
 	timing = Float64[]
 	push!(timing, 4.25) #time_delay
 	push!(timing, .35) #coeff
+	PROBLEM_DICTIONARY["TIME_DELAY"]=timing
+    
+    # QFactor vector - from simulateFig3Butenas2002
+    qualitative_factor_vector =Float64[]
+   push!(qualitative_factor_vector,2.5)           # 0 TFPI
+   push!(qualitative_factor_vector,20.0)          # 1 FV
+   push!(qualitative_factor_vector,0.7)           # 2 FVIII
+   push!(qualitative_factor_vector,90.0)           # 3 FIX
+   push!(qualitative_factor_vector,170.0)         # 4 FX
+   push!(qualitative_factor_vector,1.0)           # 5 Platelets
+    PROBLEM_DICTIONARY["FACTOR_LEVEL_VECTOR"] = qualitative_factor_vector
+    
+    return PROBLEM_DICTIONARY
+end
+
+function buildCoagulationModelDictionary(kinetic_parameter_vector, control_parameter_vector, platelet_parameter_vector,timing)
+    
+    # Initialize -
+    PROBLEM_DICTIONARY = Dict()
+    
+    # FII     = local_state_vector[0]
+    # FIIa    = local_state_vector[1]
+    # PC      = local_state_vector[2]
+    # APC     = local_state_vector[3]
+    # ATIII   = local_state_vector[4]
+    # TM      = local_state_vector[5]
+    # TRIGGER = local_state_vector[6]
+    
+    # Initial condition -
+	#from simulateFig3Butenas2002
+    initial_condition_vector = Float64[]
+    push!(initial_condition_vector,1400)       # 0 FII
+    push!(initial_condition_vector,0.0)        # 1 FIIa
+    push!(initial_condition_vector,60.0)        # 2 PC
+    push!(initial_condition_vector,0.0)        # 3 APC
+    push!(initial_condition_vector,3400)       # 4 ATIII
+    push!(initial_condition_vector,12)         # 5 TM
+    push!(initial_condition_vector,25.0E-3)          # 6 TRIGGER
+    push!(initial_condition_vector, 0.01) #Fraction of platelets activated
+    push!(initial_condition_vector,100.0)          #  FV+FX
+    push!(initial_condition_vector,0.001)          #  FVa+FXa
+    push!(initial_condition_vector,0.001)         #  prothombinase complex
+    PROBLEM_DICTIONARY["INITIAL_CONDITION_VECTOR"] = initial_condition_vector
+
+    PROBLEM_DICTIONARY["KINETIC_PARAMETER_VECTOR"] = kinetic_parameter_vector
+    
+    PROBLEM_DICTIONARY["CONTROL_PARAMETER_VECTOR"] = control_parameter_vector
+
+   #platlet controls
+	PROBLEM_DICTIONARY["PLATELET_PARAMS"] = platelet_parameter_vector
+    
+    # Experimental output scaling -
+    # Fig 5A scaling (3.20,1.0)
+    # Fig 3 scaling (-1.0,1.0)
+    # Fig 2 scaling (1.8)
+    # Fig 1 allen scaling (4.0,1.0)
+    scaling_parameter_vector =Float64[]
+    push!(scaling_parameter_vector,4.0)        # 0 Time scale 
+    push!(scaling_parameter_vector,1.0)        # 1 Abundance scale
+    PROBLEM_DICTIONARY["SCALING_PARAMETER_VECTOR"] = scaling_parameter_vector
+
+   PROBLEM_DICTIONARY["ALEPH"] = initial_condition_vector[2]
 	PROBLEM_DICTIONARY["TIME_DELAY"]=timing
     
     # QFactor vector - from simulateFig3Butenas2002
