@@ -186,7 +186,7 @@ function plotThrombinWData(t,x,pathToData)
 	plot(expdata[:,1], expdata[:,2], ".k")
 	ylabel("Thrombin Concentration, nM")
 	xlabel("Time, in minutes")
-	savefig("figures/UsingNealderMeadEstimatedParametersWithPlatelets.pdf")
+	savefig("figures/UsingNealderMeadEstimatedParametersLaunFig5Adata.pdf")
 end
 
 function runModelWithMultipleParams(pathToParams)
@@ -212,10 +212,11 @@ end
 function runModelWithParams(params)
 	TSTART = 0.0
 	Ts = .02
-	TSTOP = 20.0
+	TSTOP = 60.0
 	TSIM = collect(TSTART:Ts:TSTOP)
-	pathToData = "../data/ButenasFig1B60nMFVIIa.csv"
+	#pathToData = "../data/ButenasFig1B60nMFVIIa.csv"
 	#pathToData = "../data/Buentas1999Fig4100PercentProthrombin.txt"
+	pathToData = "../data/Laun2010Fig5A.csv"
 	fig = figure(figsize = (15,15))
 	
 	dict = buildDictFromOneVector(params)
