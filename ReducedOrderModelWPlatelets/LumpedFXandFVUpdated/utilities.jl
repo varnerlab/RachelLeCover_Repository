@@ -17,11 +17,14 @@ function calculateMSE(t,predictedThrobin, experimentalData)
 		val = linearInterp(experimentalData[lowerindex,2], experimentalData[upperindex,2],experimentalData[lowerindex,1], experimentalData[upperindex,1], currt)
 		push!(interpolatedExperimentalData,val)
 	end
-	#@show size(predictedThrobin), size(interpolatedExperimentalData)
+	@show size(predictedThrobin), size(interpolatedExperimentalData)
 	sum = 0.0
 	for j in collect(1:size(predictedThrobin,1))
 		sum = sum +(predictedThrobin[j]-interpolatedExperimentalData[j])^2
 	end
+	#figure()
+	#plot(t, interpolatedExperimentalData)
+	#@show sum, size(predictedThrobin,1)
 	return sum/size(predictedThrobin,1), interpolatedExperimentalData#MSE
 end
 
@@ -49,10 +52,10 @@ function calculateAUC(t,y)
 end
 
 function buildDictFromOneVector(vector)
-	kinetic_parameter_vector = vector[1:16]
-	control_parameter_vector=vector[17:36]
-	platelet_parameter_vector=vector[37:42]
-	timing = vector[43:44]
+	kinetic_parameter_vector = vector[1:18]
+	control_parameter_vector=vector[19:38]
+	platelet_parameter_vector=vector[39:44]
+	timing = vector[45:46]
 	dict = buildCoagulationModelDictionary(kinetic_parameter_vector, control_parameter_vector, platelet_parameter_vector, timing)
 	return dict
 end

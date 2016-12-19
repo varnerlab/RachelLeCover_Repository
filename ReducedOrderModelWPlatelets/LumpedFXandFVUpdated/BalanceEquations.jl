@@ -22,7 +22,7 @@ function BalanceEquations(t,x,PROBLEM_DICTIONARY)
 	Eps = x[8] #frac platelets acativated
 	FV_FX = x[9]
 	FV_FXA = x[10]
-	PROTHOMBINASE = x[11] 
+	PROTHOMBINASE_PLATELETS = x[11] 
 
 	# Grab the kinetic parameetrs from the problem dictionary -
 	kinetic_parameter_vector = PROBLEM_DICTIONARY["KINETIC_PARAMETER_VECTOR"]
@@ -101,7 +101,7 @@ function BalanceEquations(t,x,PROBLEM_DICTIONARY)
     activation_term = ((alpha_amplification_FIIa*FIIa)^order_amplification_FIIa)/(1 + ((alpha_amplification_FIIa*FIIa)^order_amplification_FIIa))
     inhibition_term = 1 - ((alpha_amplification_APC*APC)^order_amplification_APC)/(1 + ((alpha_amplification_APC*APC)^order_amplification_APC))
     inhibition_term_TFPI = 1 - ((alpha_amplification_TFPI*TFPI)^order_amplification_TFPI)/(1 + ((alpha_amplification_TFPI*TFPI)^order_amplification_TFPI))
-    factor_product = FIX*FVIII
+    factor_product = FIX*FVIII*FV_FX
     factor_amplification_term = ((0.1*factor_product)^2)/(1+((0.1*factor_product)^2))
     
     # Shutdown phase -
@@ -113,18 +113,18 @@ function BalanceEquations(t,x,PROBLEM_DICTIONARY)
     inhibition_of_FX_by_ATIII=1-(alpha_FX_inhibition*ATIII)^order_FX_inhibition/(1+(alpha_FX_inhibition*ATIII)^order_FX_inhibition)
 
     control_vector = ones(1,7)
-    control_vector[1] = min(initiation_trigger_term,initiation_TFPI_term)
-    control_vector[2] = min(inhibition_term,inhibition_term_TFPI,factor_amplification_term)
+    control_vector[1] = min(initiation_trigger_term,initiation_TFPI_term, inhibition_term)
+    control_vector[2] = min(inhibition_term,inhibition_term_TFPI)
     control_vector[3] = shutdown_term
     control_vector[4] = 1
-    control_vector[5] = min(max(activation_FV_by_thrombin,activation_FX_by_trigger), inhibition_of_FX_by_ATIII)
-    control_vector[6] = 1
-    control_vector[7] = 1
+    control_vector[5] = 1
+    control_vector[6] = min(inhibition_term,inhibition_term_TFPI)
+    control_vector[7] = min(inhibition_term,inhibition_term_TFPI,factor_amplification_term)
 		#@show control_vector[5], activation_FV_by_thrombin, activation_FX_by_trigger, inhibition_of_FX_by_ATIII
 
     # Calculate the kinetics -
     k_trigger = kinetic_parameter_vector[1]
-    K_FII_trigger = kinetic_parameter_vector[2]
+    K_trigger = kinetic_parameter_vector[2]
     k_amplification = kinetic_parameter_vector[3]
     K_FII_amplification = kinetic_parameter_vector[4]
     k_APC_formation = kinetic_parameter_vector[5]
@@ -138,23 +138,25 @@ function BalanceEquations(t,x,PROBLEM_DICTIONARY)
     #K_FX_activation = kinetic_parameter_vector[13]
     k_complex = kinetic_parameter_vector[14]
     k_amp_prothombinase = kinetic_parameter_vector[15]
-    K_FII_amp_prothombinase=kinetic_parameter_vector[16]	
+    K_FII_amp_prothombinase=kinetic_parameter_vector[16]
+    k_amp_active_factors= kinetic_parameter_vector[17]
+    K_amp_active_factors = kinetic_parameter_vector[18]	
     
 #@show kinetic_parameter_vector
     rate_vector = zeros(1,7)
 	#if(t>time_delay)
-	    rate_vector[1] = k_trigger*TRIGGER*(FII/(K_FII_trigger + FII))
+	    rate_vector[1] = k_trigger*TRIGGER*(FV_FX/(K_trigger + FV_FX))
 	    rate_vector[2] = k_amplification*FIIa*(FII/(K_FII_amplification + FII))
 	    rate_vector[3] = k_APC_formation*TM*(Float64(PC)/Float64(K_PC_formation + PC))
 	    #rate_vector[3] = k_inhibition*APC*(FIIa/(FIIa + K_FIIa_inhibition)) + k_inhibition_ATIII*(ATIII)*pow(FIIa,1.26)
 	    rate_vector[4] = Float64(k_inhibition_ATIII)*Float64(ATIII)*(Float64(FIIa)^1.26)
-	    rate_vector[5]= k_FV_X_activation*TRIGGER*FV_FX/(K_FV_X_actiation+FV_FX)
-	    rate_vector[6] = k_complex*FV_FXA*aida/Eps
-	    rate_vector[7] = k_amp_prothombinase*PROTHOMBINASE*FII/(K_FII_amp_prothombinase + FII)
+	    rate_vector[5] = k_complex*FV_FXA*aida/Eps
+	    rate_vector[6] = k_amp_prothombinase*PROTHOMBINASE_PLATELETS*FII/(K_FII_amp_prothombinase + FII)
+	    rate_vector[7] = k_amp_active_factors*FV_FXA*FII/(K_amp_active_factors+FII)
 	#end
-	f = open("ratevector.txt", "a+")
-	writedlm(f, rate_vector)
-	close(f)
+#	f = open("ratevector.txt", "a+")
+#	writedlm(f, rate_vector)
+#	close(f)
 
 	#@show t, x, rate_vector, control_vector
 	#remove nans
@@ -175,31 +177,35 @@ function BalanceEquations(t,x,PROBLEM_DICTIONARY)
 
 	 # modified rate vector -
 	modified_rate_vector = (rate_vector).*(control_vector);
-	f = open("modifiedratevector.txt", "a+")
-	writedlm(f, modified_rate_vector)
-	close(f)
+#	f = open("modifiedratevector.txt", "a+")
+#	writedlm(f, modified_rate_vector)
+#	close(f)
 
-	f = open("times.txt", "a+")
-	writedlm(f, t)
-	close(f)
+#	f = open("times.txt", "a+")
+#	writedlm(f, t)
+#	close(f)
 
 
 	# calculate dxdt_reaction -
 	dxdt_total = zeros(size(x,1),1)
-	#if(t>time_delay)
-		dxdt_total[1] = -1*modified_rate_vector[2] - modified_rate_vector[1] -modified_rate_vector[7]	# 0 FII
-		dxdt_total[2] = modified_rate_vector[2] + modified_rate_vector[1] - modified_rate_vector[4]+modified_rate_vector[7]	 # 1 FIIa
-		dxdt_total[3] = -1*modified_rate_vector[3] # 2 PC
-		dxdt_total[4] = 1*modified_rate_vector[3]  # 3 APC
-		dxdt_total[5] = -1*k_inhibition_ATIII*(ATIII)*(FIIa^1.26)# 4 ATIII
-		dxdt_total[6] = 0.0 # 5 TM (acts as enzyme, so no change)
-		dxdt_total[7] = -0.0*TRIGGER	# 6 TRIGGER
-		dxdt_total[8] = kplatelts*(EpsMax-Eps)-koffplatelets*Eps
-		#dxdt_total[8] = 0.0 #if no platelets, they can't be activated
-		dxdt_total[9] = -1*modified_rate_vector[5]
-		dxdt_total[10] = modified_rate_vector[5]
-		dxdt_total[11] = modified_rate_vector[6]
-	#end
+	
+	dxdt_total[1] = -1*modified_rate_vector[2] -modified_rate_vector[7]-modified_rate_vector[6]	# 1 FII
+	dxdt_total[2] = modified_rate_vector[2] - modified_rate_vector[4]+modified_rate_vector[7]+modified_rate_vector[6]	 # 2 FIIa
+	dxdt_total[3] = -1*modified_rate_vector[3] # 3 PC
+	dxdt_total[4] = 1*modified_rate_vector[3]  # 4 APC
+	dxdt_total[5] = -1*k_inhibition_ATIII*(ATIII)*(FIIa^1.26)# 5 ATIII
+	dxdt_total[6] = 0.0 # 6 TM (acts as enzyme, so no change)
+	dxdt_total[7] = -0.0*TRIGGER	# 7 TRIGGER
+	dxdt_total[8] = kplatelts*(EpsMax-Eps)-koffplatelets*Eps#-rate_vector[5] #frac active platelets
+	#dxdt_total[8] = 0.0 #if no platelets, they can't be activated
+	dxdt_total[9] = -1*modified_rate_vector[1] #FV_FX
+	dxdt_total[10] = modified_rate_vector[1] -rate_vector[5]#FV_FXa
+	dxdt_total[11] = modified_rate_vector[5] #Prothromibase_platelets
+
+	idx = find(x->(x<0),x);
+	x[idx] = 0.0;
+	dxdt_total[idx]= 0.0
+
 
 	tau = time_coeff*(1-FIIa/aleph)
 	time_scale =1-1*exp(-tau*(t-time_delay))

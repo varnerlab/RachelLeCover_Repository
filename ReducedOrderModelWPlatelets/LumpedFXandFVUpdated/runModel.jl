@@ -1,5 +1,5 @@
 include("BalanceEquations.jl")
-include("CoagulationModelFactory.jl")
+include("CoagulationModelFactoryDecentFit.jl")
 include("utilities.jl")
 #using Sundials
 using ODE
@@ -64,7 +64,7 @@ function makePlots(t,x)
 end
 
 function makeLoopPlots(t,x)
-	names = ["FII", "FIIa", "PC", "APC", "ATIII", "TM", "TRIGGER", "Fraction Activated Platelets", "FV_FX", "FV_FXa", "Prothombinase"]
+	names = ["FII", "FIIa", "PC", "APC", "ATIII", "TM", "TRIGGER", "Fraction Activated Platelets", "FV_FX", "FV_FXa", "Prothombinase-Platelets"]
 	fig = figure(figsize = (15,15))
 #	y_formatter = PyPlot.ticker.ScalarFormatter(useOffset=false)
 #	ax = fig.gca()
@@ -77,7 +77,7 @@ function makeLoopPlots(t,x)
 		plot(t, [a[j] for a in x], "k")
 		title(names[j])
 	end
-	savefig("figures/Dec6.pdf")
+	savefig("figures/Dec19_BeforeOpt.pdf")
 end
 
 function makePlotsfromODE4s(t,x)
@@ -156,16 +156,16 @@ end
 function main()
 	pathToData = "../data/ButenasFig1B60nMFVIIa.csv"
 	close("all")
-	rm("ratevector.txt")
-	rm("modifiedratevector.txt")
-	rm("times.txt")
+	#rm("ratevector.txt")
+	#rm("modifiedratevector.txt")
+	#rm("times.txt")
 	(t,x) = runModel(0.0, .01, 20.0)
 	@show size(t)
 	#remove tiny elements that are causing plotting problems
 	#x[x.<=1E-20] = 0.0
-	times = readdlm("times.txt")
+	#times = readdlm("times.txt")
 	#plotFluxes("ratevector.txt",times)
-	plotFluxes("modifiedratevector.txt",times)
+	#plotFluxes("modifiedratevector.txt",times)
 
 	#println(x)
 	makeLoopPlots(t,x)
@@ -186,7 +186,7 @@ function plotThrombinWData(t,x,pathToData)
 	plot(expdata[:,1], expdata[:,2], ".k")
 	ylabel("Thrombin Concentration, nM")
 	xlabel("Time, in minutes")
-	savefig("figures/UsingNealderMeadEstimatedParametersLaunFig5Adata.pdf")
+	savefig("figures/UsingNMParameters.pdf")
 end
 
 function runModelWithMultipleParams(pathToParams)
@@ -210,13 +210,14 @@ function runModelWithMultipleParams(pathToParams)
 end
 
 function runModelWithParams(params)
+	close("all")
 	TSTART = 0.0
 	Ts = .02
-	TSTOP = 60.0
+	TSTOP = 20.0
 	TSIM = collect(TSTART:Ts:TSTOP)
-	#pathToData = "../data/ButenasFig1B60nMFVIIa.csv"
+	pathToData = "../data/ButenasFig1B60nMFVIIa.csv"
 	#pathToData = "../data/Buentas1999Fig4100PercentProthrombin.txt"
-	pathToData = "../data/Laun2010Fig5A.csv"
+	#pathToData = "../data/Laun2010Fig5A.csv"
 	fig = figure(figsize = (15,15))
 	
 	dict = buildDictFromOneVector(params)
@@ -224,4 +225,6 @@ function runModelWithParams(params)
 	fbalances(t,y)= BalanceEquations(t,y,dict) 
 	t,X = ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-8, reltol = 1E-8)
 	plotThrombinWData(t,X,pathToData)
+	MSE, interpolatedExperimentalData=calculateMSE(t, [a[2] for a in X], readdlm(pathToData, ','))
+	return MSE
 end
