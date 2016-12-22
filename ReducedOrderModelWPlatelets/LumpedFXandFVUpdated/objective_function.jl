@@ -8,12 +8,15 @@ using ODE
 BIG = 1e10
 SMALL = 1e-6
 
-pathToData = "../data/ButenasFig1B60nMFVIIa.csv"
+#globally load data so that we don't have to reload on each iteration
+pathsToData = ["../data/Luan2010Fig5A.csv", "../data/Luan2010Fig5B.csv","../data/Luan2010Fig5C.csv", "../data/Luan2010Fig5D.csv", "../data/Luan2010Fig5E.csv","../data/Luan2010Fig5F.csv"]
+allexperimentaldata = Array[]
+for j in collect(1:size(pathsToData,1))
+	currdata = readdlm(pathsToData[j], ',')
+	push!(allexperimentaldata, currdata)
+end
 
-# Globally load data so we don't have load on each iteration -
-MEASURED_ARRAY = readdlm(pathToData, ',')
-
-function objective_function(parameter_array)
+function objective_function(parameter_array, selected_sets)
 	#write to file current parameters
 	for j in collect(1:size(parameter_array,1)) #enforce lower bound
 		if(parameter_array[j]<SMALL)
@@ -25,22 +28,24 @@ function objective_function(parameter_array)
 #	writedlm(f, string(parameter_array))
 #	close(f)
 
-	obj_array = BIG*ones(2,1)
-	dict = buildDictFromOneVector(parameter_array)
+	obj_array = BIG*ones(5,1)
+	
 	TSTART = 0.0
 	Ts = .02
-	TSTOP = 20.0
+	TSTOP = 60.0
 	TSIM = collect(TSTART:Ts:TSTOP)
-	initial_condition_vector = dict["INITIAL_CONDITION_VECTOR"]
-	reshaped_IC = vec(reshape(initial_condition_vector,11,1))
-	fbalances(t,y)= BalanceEquations(t,y,dict) 
-	t,X = ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-8, reltol = 1E-8)
-	FIIa = [a[2] for a in X]
-	MSE, interpolatedExperimentalData=calculateMSE(t, FIIa, MEASURED_ARRAY)
-	estimatedAUC = calculateAUC(t, FIIa)
-	experimentalAUC = calculateAUC(t, interpolatedExperimentalData)
-	obj_array[1,1] = MSE
-	obj_array[2,1] = abs(estimatedAUC-experimentalAUC)
+	counter = 1
+	for j in selected_sets
+		dict = buildDictFromOneVector(parameter_array)
+		dict = createCorrectDict(dict, j)
+		initial_condition_vector = dict["INITIAL_CONDITION_VECTOR"]
+		fbalances(t,y)= BalanceEquations(t,y,dict) 
+		t,X = ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-4, reltol = 1E-4)
+		FIIa = [a[2] for a in X]
+		MSE, interpolatedExperimentalData=calculateMSE(t, FIIa, allexperimentaldata[j])
+		obj_array[counter,1] = MSE
+		counter = counter+1
+	end
 	return obj_array
 end
 

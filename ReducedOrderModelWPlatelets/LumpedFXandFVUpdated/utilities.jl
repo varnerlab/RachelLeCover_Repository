@@ -17,7 +17,6 @@ function calculateMSE(t,predictedThrobin, experimentalData)
 		val = linearInterp(experimentalData[lowerindex,2], experimentalData[upperindex,2],experimentalData[lowerindex,1], experimentalData[upperindex,1], currt)
 		push!(interpolatedExperimentalData,val)
 	end
-	@show size(predictedThrobin), size(interpolatedExperimentalData)
 	sum = 0.0
 	for j in collect(1:size(predictedThrobin,1))
 		sum = sum +(predictedThrobin[j]-interpolatedExperimentalData[j])^2
@@ -85,7 +84,7 @@ function cooling_function(temperature)
 
   # define my new temperature -
   alpha = 0.9
-	#@show temperature
+	@show temperature
   return alpha*temperature
 end
 
@@ -111,4 +110,39 @@ function parameter_bounds_function(parameter_array,lower_bound_array,upper_bound
   end
 
   return new_parameter_array
+end
+
+function createCorrectDict(basic_dict, exp_index)
+	if(exp_index==1)
+		
+	elseif(exp_index==2)
+		basic_dict["FACTOR_LEVEL_VECTOR"][3] =basic_dict["FACTOR_LEVEL_VECTOR"][3]*1.06 
+	elseif(exp_index==3)
+		basic_dict["FACTOR_LEVEL_VECTOR"][3] =basic_dict["FACTOR_LEVEL_VECTOR"][3]*.39
+	elseif(exp_index==4)
+		basic_dict["FACTOR_LEVEL_VECTOR"][3] =basic_dict["FACTOR_LEVEL_VECTOR"][3]*.07  
+	elseif(exp_index==5)
+		basic_dict["FACTOR_LEVEL_VECTOR"][3] =basic_dict["FACTOR_LEVEL_VECTOR"][3]*.01
+	elseif(exp_index==6)
+		basic_dict["FACTOR_LEVEL_VECTOR"][3] =basic_dict["FACTOR_LEVEL_VECTOR"][3]*.00
+	end
+	return basic_dict
+end
+
+function generateBestNparameters(n, ec_array, pc_array)
+	#calculate error
+	best_params = Array[]
+	total_error = sum(ec_array[:,2:end],1)
+	for k in collect(1:n)
+		min_index = indmin(total_error)
+		curr_best_params = pc_array[:,min_index]
+		push!(best_params, curr_best_params)
+		@show min_index
+		@show curr_best_params
+		#delete the best ones we've found
+		pc_array[1:size(pc_array,1) .!= min_index,: ]
+		deleteat!(vec(total_error),min_index)
+	end
+	return best_params
+
 end

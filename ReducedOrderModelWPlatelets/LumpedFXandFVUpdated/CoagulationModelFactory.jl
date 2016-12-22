@@ -145,11 +145,11 @@ function buildCoagulationModelDictionary(kinetic_parameter_vector, control_param
     push!(initial_condition_vector,0.0)        # 3 APC
     push!(initial_condition_vector,3400)       # 4 ATIII
     push!(initial_condition_vector,12)         # 5 TM
-    push!(initial_condition_vector,25.0E-3)          # 6 TRIGGER
+    push!(initial_condition_vector,1.0E-3)          # 6 TRIGGER
     push!(initial_condition_vector, 0.01) #Fraction of platelets activated
     push!(initial_condition_vector,100.0)          #  FV+FX
-    push!(initial_condition_vector,0.001)          #  FVa+FXa
-    push!(initial_condition_vector,0.001)         #  prothombinase complex
+    push!(initial_condition_vector,0.00)          #  FVa+FXa
+    push!(initial_condition_vector,0.00)         #  prothombinase complex
     PROBLEM_DICTIONARY["INITIAL_CONDITION_VECTOR"] = initial_condition_vector
 
     PROBLEM_DICTIONARY["KINETIC_PARAMETER_VECTOR"] = kinetic_parameter_vector
@@ -176,7 +176,7 @@ function buildCoagulationModelDictionary(kinetic_parameter_vector, control_param
     qualitative_factor_vector =Float64[]
    push!(qualitative_factor_vector,2.5)           # 0 TFPI
    push!(qualitative_factor_vector,20.0)          # 1 FV
-   push!(qualitative_factor_vector,0.7)           # 2 FVIII
+   push!(qualitative_factor_vector,0.0)           # 2 FVIII
    push!(qualitative_factor_vector,90.0)           # 3 FIX
    push!(qualitative_factor_vector,170.0)         # 4 FX
    push!(qualitative_factor_vector,1.0)           # 5 Platelets

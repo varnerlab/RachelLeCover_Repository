@@ -32,7 +32,7 @@ end
 function calculatetotalMSE(params::Vector, grad::Vector)
 #function calculatetotalMSE(params)
 	tic()
-	outputdir = "moretesting/2016_12_16/"
+	outputdir = "moretesting/2016_12_22/"
 	inputdir = "/home/rachel/Documents/work/optimization/LinkedRecordsTimeData10min/"
 	c1patients = readdlm("/home/rachel/Documents/work/optimization/multiobjective/usingPOETs/cluster1subjectIDs")
 	c2patients = readdlm("/home/rachel/Documents/work/optimization/multiobjective/usingPOETs/cluster1subjectIDs")
