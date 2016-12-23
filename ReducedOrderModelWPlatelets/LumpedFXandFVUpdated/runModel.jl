@@ -189,7 +189,7 @@ function plotThrombinWData(t,x,pathToData)
 	#savefig("figures/UsingNMParameters.pdf")
 end
 
-function plotAverageThrobinWData(t,meanThrombin,stdThrombin,pathToData)
+function plotAverageThrobinWData(t,meanThrombin,stdThrombin,pathToData,MSE, savestr)
 	expdata = readdlm(pathToData,',')
 	fig = figure(figsize = (15,15))
 	plot(expdata[:,1], expdata[:,2], ".k")
@@ -204,10 +204,18 @@ function plotAverageThrobinWData(t,meanThrombin,stdThrombin,pathToData)
 	@show size(vec(upper))
 	@show size(vec(lower))
 	fill_between((t), vec(upper), vec(lower), color = ".5")
-	savefig("figures/AveragePerformanceBest10ParamSetsAfterLCOOVOnFig5FdataTold1E-4.pdf")
+	annotate(string("MSE=", MSE),
+	xy=[.85;.85],
+	xycoords="figure fraction",
+	xytext=[0,0],
+	textcoords="offset points",
+	ha="right",
+	va="top")
+	savefig(savestr)
 end
 
-function runModelWithMultipleParams(pathToParams)
+
+function runModelWithMultipleParams(pathToParams,pathToData,savestr)
 	close("all")
 	allparams = readdlm(pathToParams, ',')
 	TSTART = 0.0
@@ -215,7 +223,7 @@ function runModelWithMultipleParams(pathToParams)
 	TSTOP = 60.0
 	TSIM = collect(TSTART:Ts:TSTOP)
 	#pathToData = "../data/ButenasFig1B60nMFVIIa.csv"
-	pathToData = "../data/Luan2010Fig5F.csv"
+	#pathToData = "../data/Luan2010Fig5F.csv"
 	fig = figure(figsize = (15,15))
 	alldata = zeros(1,size(TSIM,1))
 	
@@ -226,7 +234,7 @@ function runModelWithMultipleParams(pathToParams)
 		reshaped_IC = vec(reshape(initial_condition_vector,11,1))
 		fbalances(t,y)= BalanceEquations(t,y,dict) 
 		t,X = ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-4, reltol = 1E-4,points=:specified)
-		plotThrombinWData(t,X,pathToData)
+		#plotThrombinWData(t,X,pathToData)
 		#@show alldata
 		#@show size([a[2] for a in X])
 		alldata=vcat(alldata,transpose([a[2] for a in X]))
@@ -235,7 +243,41 @@ function runModelWithMultipleParams(pathToParams)
 	alldata = map(Float64,alldata)
 	meanThrombin = mean(alldata,1)
 	stdThrombin = std(alldata,1)
-	plotAverageThrobinWData(TSIM, meanThrombin, stdThrombin, pathToData)
+	plotAverageThrobinWData(TSIM, meanThrombin, stdThrombin, pathToData,savestr)
+	return alldata
+end
+
+function runModelWithMultipleParams(pathToParams,pathToData,index,savestr)
+	close("all")
+	allparams = readdlm(pathToParams, ',')
+	TSTART = 0.0
+	Ts = .02
+	TSTOP = 60.0
+	TSIM = collect(TSTART:Ts:TSTOP)
+	#pathToData = "../data/ButenasFig1B60nMFVIIa.csv"
+	#pathToData = "../data/Luan2010Fig5F.csv"
+	fig = figure(figsize = (15,15))
+	alldata = zeros(1,size(TSIM,1))
+	
+	for j in collect(1:size(allparams,1))
+		currparams = allparams[j,:]
+		dict = buildDictFromOneVector(currparams)
+		dict = createCorrectDict(dict, index)
+		initial_condition_vector = dict["INITIAL_CONDITION_VECTOR"]
+		fbalances(t,y)= BalanceEquations(t,y,dict) 
+		t,X = ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-4, reltol = 1E-4,points=:specified)
+		#plotThrombinWData(t,X,pathToData)
+		#@show alldata
+		#@show size([a[2] for a in X])
+		alldata=vcat(alldata,transpose([a[2] for a in X]))
+	end
+	alldata = alldata[2:end, :] #remove row of zeros
+	alldata = map(Float64,alldata)
+	meanThrombin = mean(alldata,1)
+	stdThrombin = std(alldata,1)
+	MSE, interpolatedExperimentalData=calculateMSE(TSIM, transpose(meanThrombin), readdlm(pathToData, ','))
+	@show MSE
+	plotAverageThrobinWData(TSIM, meanThrombin, stdThrombin, pathToData, MSE,savestr)
 	return alldata
 end
 
@@ -258,3 +300,6 @@ function runModelWithParams(params)
 	MSE, interpolatedExperimentalData=calculateMSE(t, [a[2] for a in X], readdlm(pathToData, ','))
 	return MSE
 end
+
+
+

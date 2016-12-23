@@ -46,6 +46,7 @@ function objective_function(parameter_array, selected_sets)
 		obj_array[counter,1] = MSE
 		counter = counter+1
 	end
+	@show obj_array
 	return obj_array
 end
 

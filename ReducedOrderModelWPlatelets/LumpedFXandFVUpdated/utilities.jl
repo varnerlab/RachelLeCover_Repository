@@ -70,10 +70,15 @@ function neighbor_function(parameter_array)
 
   # Check the bound constraints -
   LOWER_BOUND = SMALL
-  UPPER_BOUND = 3.0
+  UPPER_BOUND = 1E9
+  lb_arr= LOWER_BOUND*ones(number_of_parameters)
+  up_arr =UPPER_BOUND*ones(number_of_parameters)
+	lb_arr[45]= 3.0 #lower bound on time delay, 3 minutes
+	#up_arr[46]= .01 #upper bound on scaling for tau
+	up_arr[3] = 10.0 #upper bound on the k_cat for self activation of thrombin
 
   # return the corrected parameter arrays -
-  return parameter_bounds_function(new_parameter_array,LOWER_BOUND*ones(number_of_parameters),UPPER_BOUND*ones(number_of_parameters))
+  return parameter_bounds_function(new_parameter_array,lb_arr, up_arr)
 end
 
 function acceptance_probability_function(rank_array,temperature)
@@ -145,4 +150,14 @@ function generateBestNparameters(n, ec_array, pc_array)
 	end
 	return best_params
 
+end
+
+function analyzeParams()
+	allparams = zeros(1,46)
+	for j in collect(1:6)
+		currparams = readdlm(string("parameterEstimation/LOOCVSavingAllParams_2016_12_23/bestParamSetsFromLOOCV",j,"excluded.txt"), ',')
+		meancurrparams = mean(currparams,1)
+		allparams = vcat(allparams, meancurrparams)
+	end
+	return allparams[2:end,:]
 end
