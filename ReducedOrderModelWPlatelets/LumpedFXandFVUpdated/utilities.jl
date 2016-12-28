@@ -73,6 +73,7 @@ function neighbor_function(parameter_array)
   UPPER_BOUND = 1E9
   lb_arr= LOWER_BOUND*ones(number_of_parameters)
   up_arr =UPPER_BOUND*ones(number_of_parameters)
+	lb_arr[9] = 10.0 #lower bound on k_inhibition_ATIII
 	lb_arr[45]= 3.0 #lower bound on time delay, 3 minutes
 	#up_arr[46]= .01 #upper bound on scaling for tau
 	up_arr[3] = 10.0 #upper bound on the k_cat for self activation of thrombin
@@ -152,10 +153,26 @@ function generateBestNparameters(n, ec_array, pc_array)
 
 end
 
+function generateNbestPerObjective(n,ec_array, pc_array)
+	best_params=Array[]
+	num_objectives =size(ec_array,1)
+	for k in collect(1:n)
+		for j in collect(1:num_objectives)
+			curr_error=ec_array[j,:]
+			min_index = indmin(curr_error)
+			curr_best_params = pc_array[:,min_index]
+			push!(best_params, curr_best_params)
+			pc_array[1:size(pc_array,1) .!= min_index,: ]
+			deleteat!(vec(curr_error),min_index)
+		end
+	end
+	return best_params
+end
+
 function analyzeParams()
 	allparams = zeros(1,46)
 	for j in collect(1:6)
-		currparams = readdlm(string("parameterEstimation/LOOCVSavingAllParams_2016_12_23/bestParamSetsFromLOOCV",j,"excluded.txt"), ',')
+		currparams = readdlm(string("parameterEstimation/LOOCVSavingAllParams_2016_12_23_Take2/bestParamSetsFromLOOCV",j,"excluded.txt"), ',')
 		meancurrparams = mean(currparams,1)
 		allparams = vcat(allparams, meancurrparams)
 	end

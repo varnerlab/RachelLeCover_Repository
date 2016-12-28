@@ -32,7 +32,7 @@ end
 function calculatetotalMSE(params::Vector, grad::Vector)
 #function calculatetotalMSE(params)
 	tic()
-	outputdir = "moretesting/2016_12_22/"
+	outputdir = "moretesting/2016_12_27/"
 	inputdir = "/home/rachel/Documents/work/optimization/LinkedRecordsTimeData10min/"
 	c1patients = readdlm("/home/rachel/Documents/work/optimization/multiobjective/usingPOETs/cluster1subjectIDs")
 	c2patients = readdlm("/home/rachel/Documents/work/optimization/multiobjective/usingPOETs/cluster1subjectIDs")
@@ -94,7 +94,9 @@ end
 function attemptOptimizationNLOpt()
 	numvars = 9
 	opt = Opt(:LN_NELDERMEAD,numvars)
-	lb =fill(1E-4, 1, numvars)
+	xtol_rel!(opt,1E-4)
+	xtol_abs!(opt, 1E-4)
+	lb =fill(1E-2, 1, numvars)
 	lb[numvars] = .1
 	lb[(numvars-1)] =.1
 	@show lb

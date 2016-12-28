@@ -8,8 +8,8 @@ function parsePOETsoutputmakegraphs(filename)
 	close(f)
 
 	outputname = "parameterEstimation/textparsing.txt"
-	number_of_parameters = 44
-  	number_of_objectives = 2
+	number_of_parameters = 46
+  	number_of_objectives = 5
 	ec_array = zeros(number_of_objectives)
   	pc_array = zeros(number_of_parameters)
 	rank_array = zeros(1)	
@@ -49,21 +49,22 @@ function parsePOETsoutputmakegraphs(filename)
 	#@show size(rerankedarray)
 	#make trade off surface
 	#plt.rc("font", family="")
-	figure()
-	PyCall.PyDict(matplotlib["rcParams"])["font.sans-serif"] = ["Helvetica"]
-	hold("on")
-	#@show size(ec_array,2)
-	for j in collect(2:size(ec_array,2))
-		if(rank_array[j]==0)
-			plot(ec_array[1,j], ec_array[2,j], linewidth = .3,"ko", markersize = 2.5,markeredgewidth=0.0)
-		else
-			plot(ec_array[1,j], ec_array[2,j], linewidth = .3,"o", color = ".75", markersize = 2.5,markeredgewidth=0.0)
-		end
-	end
-	xlabel("Objective 2", fontsize=18)
-	ylabel("Objective 1", fontsize=18)
-	savefig("parameterEstimation/TradeOffCurveNoPeturb.png")
-	generateBestNparameters(5, ec_array, pc_array)
+#	figure()
+#	PyCall.PyDict(matplotlib["rcParams"])["font.sans-serif"] = ["Helvetica"]
+#	hold("on")
+#	#@show size(ec_array,2)
+#	for j in collect(2:size(ec_array,2))
+#		if(rank_array[j]==0)
+#			plot(ec_array[1,j], ec_array[2,j], linewidth = .3,"ko", markersize = 2.5,markeredgewidth=0.0)
+#		else
+#			plot(ec_array[1,j], ec_array[2,j], linewidth = .3,"o", color = ".75", markersize = 2.5,markeredgewidth=0.0)
+#		end
+#	end
+#	xlabel("Objective 2", fontsize=18)
+#	ylabel("Objective 1", fontsize=18)
+#	savefig("parameterEstimation/TradeOffCurveNoPeturb.png")
+#	generateBestNparameters(5, ec_array, pc_array)
+	return ec_array[:,2:end], rerankedarray, pc_array[:,2:end]
 end
 
 function generateBestNparameters(n, ec_array, pc_array)
