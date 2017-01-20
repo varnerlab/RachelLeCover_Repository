@@ -178,3 +178,14 @@ function analyzeParams()
 	end
 	return allparams[2:end,:]
 end
+
+function dict_to_vec(d)
+    v = Array(Float64, 0)
+	selectedkeys = ["FACTOR_LEVEL_VECTOR","CONTROL_PARAMETER_VECTOR","PLATELET_PARAMS", "TIME_DELAY","KINETIC_PARAMETER_VECTOR"]
+    for k in selectedkeys
+	for j in collect(1:length(d[k]))
+        	push!(v, d[k][j])
+	end
+    end
+    return v
+end
