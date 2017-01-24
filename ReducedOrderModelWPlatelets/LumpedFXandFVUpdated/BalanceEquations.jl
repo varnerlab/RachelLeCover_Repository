@@ -26,9 +26,9 @@ function BalanceEquations(t,x,PROBLEM_DICTIONARY)
 
 	# Grab the kinetic parameetrs from the problem dictionary -
 	kinetic_parameter_vector = PROBLEM_DICTIONARY["KINETIC_PARAMETER_VECTOR"]
-	p = PROBLEM_DICTIONARY["p"]
+	control_parameter_vector = PROBLEM_DICTIONARY["CONTROL_PARAMETER_VECTOR"]
 	qualitative_factor_level_vector = PROBLEM_DICTIONARY["FACTOR_LEVEL_VECTOR"]
-	p = PROBLEM_DICTIONARY["PLATELET_PARAMS"]
+	platelet_parameter_vector = PROBLEM_DICTIONARY["PLATELET_PARAMS"]
 	timing = PROBLEM_DICTIONARY["TIME_DELAY"]
 
 #@showp
@@ -40,44 +40,43 @@ function BalanceEquations(t,x,PROBLEM_DICTIONARY)
 	FVIII = qualitative_factor_level_vector[3]
 	FIX = qualitative_factor_level_vector[4]
 	#FX = qualitative_factor_level_vector[5]
-	PL = qualitative_factor_level_vector[6]
+	Platelets = qualitative_factor_level_vector[6]
 
-	# Calculate the control vector -
-	# Trigger -
-	alpha_trigger_activation = p[1]
-	order_trigger_activation = p[2]
-	alpha_trigger_inhibition_APC = p[3]
-	order_trigger_inhibition_APC = p[4]
-	alpha_trigger_inhibition_TFPI = p[5]
-	order_trigger_inhibition_TFPI = p[6]
+	alpha_trigger_activation = control_parameter_vector[1]
+	order_trigger_activation = control_parameter_vector[2]
+	alpha_trigger_inhibition_APC = control_parameter_vector[3]
+	order_trigger_inhibition_APC = control_parameter_vector[4]
+	alpha_trigger_inhibition_TFPI = control_parameter_vector[5]
+	order_trigger_inhibition_TFPI = control_parameter_vector[6]
 	
 	# Amplification -
-	alpha_amplification_FIIa = p[7]
-	order_amplification_FIIa = p[8]
-	alpha_amplification_APC = p[9]
-	order_amplification_APC = p[10]
-	alpha_amplification_TFPI = p[11]
-	order_amplification_TFPI = p[12]
+	alpha_amplification_FIIa = control_parameter_vector[7]
+	order_amplification_FIIa = control_parameter_vector[8]
+	alpha_amplification_APC = control_parameter_vector[9]
+	order_amplification_APC = control_parameter_vector[10]
+	alpha_amplification_TFPI = control_parameter_vector[11]
+	order_amplification_TFPI = control_parameter_vector[12]
 	
 	# APC generation -
-	alpha_shutdown_APC = p[13]
-	order_shutdown_APC = p[14]
+	alpha_shutdown_APC = control_parameter_vector[13]
+	order_shutdown_APC = control_parameter_vector[14]
 
 	#prothomibase complex
-	alpha_FV_activation=p[15]
-	order_FV_activation=p[16]
- 	alpha_FX_activation=p[17]
-    	order_FX_activation=p[18]
-        alpha_FX_inhibition=p[19]
-        order_FX_inhibition=p[20]
+	alpha_FV_activation=control_parameter_vector[15]
+	order_FV_activation=control_parameter_vector[16]
+ 	alpha_FX_activation=control_parameter_vector[17]
+    	order_FX_activation=control_parameter_vector[18]
+        alpha_FX_inhibition=control_parameter_vector[19]
+        order_FX_inhibition=control_parameter_vector[20]
 	
 	#platelets
-	kplatelts = p[1]#1 rate constant
-	platelet_pwr = p[2] #2 power for control function
-	platelet_denom = p[3] #3 adjustment in denominator
-	EpsMax0 = p[4] #4 Epsmax0
-	aida = p[5] #5 aida
-	koffplatelets = p[6]
+	kplatelts = platelet_parameter_vector[1]#1 rate constant
+	platelet_pwr = platelet_parameter_vector[2] #2 power for control function
+	platelet_denom = platelet_parameter_vector[3] #3 adjustment in denominator
+	EpsMax0 = platelet_parameter_vector[4] #4 Epsmax0
+	aida = platelet_parameter_vector[5] #5 aida
+	koffplatelets = platelet_parameter_vector[6]
+
 
 	#platelet control
 	#update aleph so that it holds the maximum value of FIIa
@@ -123,28 +122,27 @@ function BalanceEquations(t,x,PROBLEM_DICTIONARY)
 		#@show control_vector[5], activation_FV_by_thrombin, activation_FX_by_trigger, inhibition_of_FX_by_ATIII
 
     # Calculate the kinetics -
-    k_trigger =p[1]
-    K_trigger =p[2]
-    k_amplification =p[3]
-    K_FII_amplification =p[4]
-    k_APC_formation =p[5]
-    K_PC_formation =p[6]
-    k_inhibition =p[7]
-    K_FIIa_inhibition =p[8]
-    k_inhibition_ATIII =p[9]
-    k_FV_X_activation =p[10]
-    K_FV_X_actiation =p[11]
-    #k_FX_activation =p[12]
-    #K_FX_activation =p[13]
-    k_complex =p[14]
-    k_amp_prothombinase =p[15]
+    k_trigger = kinetic_parameter_vector[1]
+    K_trigger = kinetic_parameter_vector[2]
+    k_amplification = kinetic_parameter_vector[3]
+    K_FII_amplification = kinetic_parameter_vector[4]
+    k_APC_formation = kinetic_parameter_vector[5]
+    K_PC_formation = kinetic_parameter_vector[6]
+    k_inhibition = kinetic_parameter_vector[7]
+    K_FIIa_inhibition = kinetic_parameter_vector[8]
+    k_inhibition_ATIII = kinetic_parameter_vector[9]
+    k_FV_X_activation = kinetic_parameter_vector[10]
+    K_FV_X_actiation = kinetic_parameter_vector[11]
+    #k_FX_activation = kinetic_parameter_vector[12]
+    #K_FX_activation = kinetic_parameter_vector[13]
+    k_complex = kinetic_parameter_vector[14]
+    k_amp_prothombinase = kinetic_parameter_vector[15]
     K_FII_amp_prothombinase=kinetic_parameter_vector[16]
-    k_amp_active_factors=p[17]
-    K_amp_active_factors =p[18]	
+    k_amp_active_factors= kinetic_parameter_vector[17]
+    K_amp_active_factors = kinetic_parameter_vector[18]
     
-#@showp
+
     rate_vector = zeros(1,7)
-	#if(t>time_delay)
 	    rate_vector[1] = k_trigger*TRIGGER*(FV_FX/(K_trigger + FV_FX))
 	    rate_vector[2] = k_amplification*FIIa*(FII/(K_FII_amplification + FII))
 	    rate_vector[3] = k_APC_formation*TM*(Float64(PC)/Float64(K_PC_formation + PC))
@@ -153,14 +151,8 @@ function BalanceEquations(t,x,PROBLEM_DICTIONARY)
 	    rate_vector[5] = k_complex*FV_FXA*aida/Eps
 	    rate_vector[6] = k_amp_prothombinase*PROTHOMBINASE_PLATELETS*FII/(K_FII_amp_prothombinase + FII)
 	    rate_vector[7] = k_amp_active_factors*FV_FXA*FII/(K_amp_active_factors+FII)
-	#end
-#	f = open("ratevector.txt", "a+")
-#	writedlm(f, rate_vector)
-#	close(f)
 
-	#@show t, x, rate_vector, control_vector
-	#remove nans
-	for j = 1:length(rate_vector)
+	for j in collect(1:length(rate_vector))
 		if(isnan(rate_vector[j]) || !isfinite(rate_vector[j]))
 			println("Found NAN at rate_vector $j")
 			rate_vector[j] = 0.0
@@ -168,7 +160,7 @@ function BalanceEquations(t,x,PROBLEM_DICTIONARY)
 	end
 
 	#remove nans
-	for j = 1:length(control_vector)
+	for j in collect(1:length(rate_vector))
 		if(isnan(control_vector[j])|| !isfinite(control_vector[j]))
 			println("Found NAN at control_vector $j")
 			control_vector[j] = 1.0
@@ -209,6 +201,7 @@ function BalanceEquations(t,x,PROBLEM_DICTIONARY)
 
 	tau = time_coeff*(1-FIIa/aleph)
 	time_scale =1-1*exp(-tau*(t-time_delay))
+	#@show t
 	if(t<time_delay)
 		time_scale = 0.0
 	end
@@ -217,9 +210,7 @@ function BalanceEquations(t,x,PROBLEM_DICTIONARY)
 	end
 	#@show dxdt_total.*time_scale
 	#@show convert(Array{Float64,2},dxdt_total.*time_scale)
-	return (dxdt_total.*time_scale)
-	#@show t
-	#return convert(Array{Float64,2},dxdt_total.*time_scale)
+	(dxdt_total.*time_scale)
 
 end
 
@@ -289,11 +280,12 @@ function BalanceEquationsDE(t,x,p,dx)
 
 	#platelet control
 	#update aleph so that it holds the maximum value of FIIa
-	if(FIIa>PROBLEM_DICTIONARY["ALEPH"])
-		PROBLEM_DICTIONARY["ALEPH"]=FIIa
+	#now stored in p[53]
+	if(FIIa>p[53])
+		p[53]=FIIa
 	end
 
-	aleph = PROBLEM_DICTIONARY["ALEPH"]
+	aleph = p[53]
 	faleph = aleph^platelet_pwr/(aleph^platelet_pwr + platelet_denom^platelet_pwr)
 	EpsMax = EpsMax0+(1+EpsMax0)*faleph
 
@@ -321,6 +313,8 @@ function BalanceEquationsDE(t,x,p,dx)
     inhibition_of_FX_by_ATIII=1-(alpha_FX_inhibition*ATIII)^order_FX_inhibition/(1+(alpha_FX_inhibition*ATIII)^order_FX_inhibition)
 
     control_vector = ones(1,7)
+	#@show min(initiation_trigger_term,initiation_TFPI_term, inhibition_term)
+	#@show typeof(min(initiation_trigger_term,initiation_TFPI_term, inhibition_term))
     control_vector[1] = min(initiation_trigger_term,initiation_TFPI_term, inhibition_term)
     control_vector[2] = min(inhibition_term,inhibition_term_TFPI)
     control_vector[3] = shutdown_term
@@ -346,7 +340,7 @@ function BalanceEquationsDE(t,x,p,dx)
     #K_FX_activation =p[47]
     k_complex =p[48]
     k_amp_prothombinase =p[49]
-    K_FII_amp_prothombinase=kinetic_parameter_vector[50]
+    K_FII_amp_prothombinase=p[50]
     k_amp_active_factors=p[51]
     K_amp_active_factors =p[52]	
     
@@ -385,6 +379,9 @@ function BalanceEquationsDE(t,x,p,dx)
 
 	 # modified rate vector -
 	modified_rate_vector = (rate_vector).*(control_vector);
+	@show rate_vector
+	@show control_vector
+	@show modified_rate_vector
 #	f = open("modifiedratevector.txt", "a+")
 #	writedlm(f, modified_rate_vector)
 #	close(f)
@@ -425,7 +422,11 @@ function BalanceEquationsDE(t,x,p,dx)
 	end
 	#@show dxdt_total.*time_scale
 	#@show convert(Array{Float64,2},dxdt_total.*time_scale)
+	@show dxdt_total
+	@show time_scale
+	@show t
 	dx=(dxdt_total.*time_scale)
-	
+	@show dx
+	return dx
 
 end

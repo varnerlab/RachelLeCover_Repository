@@ -181,7 +181,7 @@ end
 
 function dict_to_vec(d)
     v = Array(Float64, 0)
-	selectedkeys = ["FACTOR_LEVEL_VECTOR","CONTROL_PARAMETER_VECTOR","PLATELET_PARAMS", "TIME_DELAY","KINETIC_PARAMETER_VECTOR"]
+	selectedkeys = ["FACTOR_LEVEL_VECTOR","CONTROL_PARAMETER_VECTOR","PLATELET_PARAMS", "TIME_DELAY","KINETIC_PARAMETER_VECTOR", "ALEPH"] 
     for k in selectedkeys
 	for j in collect(1:length(d[k]))
         	push!(v, d[k][j])

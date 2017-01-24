@@ -140,7 +140,7 @@ function buildCoagulationModelDictionary(kinetic_parameter_vector, control_param
 	#from simulateFig3Butenas2002
     initial_condition_vector = Float64[]
     push!(initial_condition_vector,1400)       # 0 FII
-    push!(initial_condition_vector,0.0)        # 1 FIIa
+    push!(initial_condition_vector,0.001)        # 1 FIIa
     push!(initial_condition_vector,60.0)        # 2 PC
     push!(initial_condition_vector,0.0)        # 3 APC
     push!(initial_condition_vector,3400)       # 4 ATIII

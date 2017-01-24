@@ -11,7 +11,7 @@ function runModel(TSTART,Ts,TSTOP)
 	#TSTOP = 1.0
 	PROBLEM_DICTIONARY = Dict()
 	PROBLEM_DICTIONARY = buildCoagulationModelDictionary()
-	TSIM = [TSTART:Ts:TSTOP]
+	TSIM = TSTART:Ts:TSTOP
 	initial_condition_vector = PROBLEM_DICTIONARY["INITIAL_CONDITION_VECTOR"]
 	reshaped_IC = vec(reshape(initial_condition_vector,11,1)) #may need to cast to vector for Sundials
 
@@ -19,7 +19,7 @@ function runModel(TSTART,Ts,TSTOP)
 #	fbalances(t,y,ydot)=BalanceEquations(t,y,ydot,PROBLEM_DICTIONARY)
 #	X = Sundials.cvode(fbalances,reshaped_IC,TSIM, abstol =1E-4, reltol=1E-4);
 	fbalances(t,y)= BalanceEquations(t,y,PROBLEM_DICTIONARY) 
-	t,X = ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-8, reltol = 1E-8)
+	t,X = ODE.ode23s(fbalances,(initial_condition_vector),TSIM; abstol = 1E-8, reltol = 1E-8,points=:specified)
 #	println("got here")
 	return (t,X);
 end
