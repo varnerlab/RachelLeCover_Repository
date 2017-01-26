@@ -1,11 +1,11 @@
 using ParameterizedFunctions
 using DifferentialEquations
 using Plots
-f = @ode_def testing begin
-  dy[1] = -k1*y[1]+k3*y[2]*y[3]
-  dy[2]=  k1*y[1]-k2*y[2]^2-k3*y[2]*y[3]
-  dy[3] =  k2*y[1]^2
-end 
+#f = @ode_def testing begin
+#  dy[1] = -k1*y[1]+k3*y[2]*y[3]
+#  dy[2]=  k1*y[1]-k2*y[2]^2-k3*y[2]*y[3]
+#  dy[3] =  k2*y[1]^2
+#end  k1=>11 k2=>2 k3=>3 
 
 #coagulation = @ode_def coag begin
 #	FII	 = x[1]
@@ -154,14 +154,21 @@ end
 #	(dxdt_total.*time_scale)
 #end alpha_trigger_activation =>1 order_trigger_activation=>
 
+pf_func = function (t,u,p,du)
+  du[1] = p[1] * u[1] - p[2] * u[1]*u[2]
+  du[2] = -3 * u[2] + u[1]*u[2]
+end
+
 
 function SampleProblem()
 
-	#pf = ParameterizedFunction(f,[1.5,1.0,1.0])
+	pf = ParameterizedFunction(pf_func,[1.5,1.0,1.0])
 
-	prob = ODELocalSensitivityProblem(f,[1.0;1.0;1.0],(0.0,10.0))
+	prob = ODEProblem(pf, [1.0;1.0],(0.0,10.0))
 
-	sol = solve(prob,DP8())
+	sol = solve(prob,Rosenbrock23())
 
 	plot(sol)
 end
+
+

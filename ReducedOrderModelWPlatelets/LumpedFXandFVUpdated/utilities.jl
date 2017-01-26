@@ -189,3 +189,12 @@ function dict_to_vec(d)
     end
     return v
 end
+
+function extractValueFromDual(input)
+	# to get the value of a dual as Float64 that can be used by min/max
+	if(contains(string(typeof(input)), "Dual"))
+		return input.value
+	else
+		return input
+	end
+end
