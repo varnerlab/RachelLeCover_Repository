@@ -159,16 +159,38 @@ pf_func = function (t,u,p,du)
   du[2] = -3 * u[2] + u[1]*u[2]
 end
 
+pf_func2 = function (t,u,p,dx)
+	a = p[1]
+	b = p[2]
+	x1= u[1]
+	x2 = u[2]
+	dx = Array(Any, size(u,1),1)
+	dx[1] = a * x1 - b * x1*x2
+	dx[2] = -3 * x2 + x1*x2
+	return dx
+end
+
+
 
 function SampleProblem()
 
-	pf = ParameterizedFunction(pf_func,[1.5,1.0,1.0])
+	pf = ParameterizedFunction(pf_func,[1.5,1.0])
+	@show typeof(pf)
 
-	prob = ODEProblem(pf, [1.0;1.0],(0.0,10.0))
+	#prob = ODEProblem(pf, [1.0;1.0],(0.0,10.0))
+	prob = ODELocalSensitivityProblem(pf, [1.0; 1.0], (0.0, 10.0))
 
 	sol = solve(prob,Rosenbrock23())
 
 	plot(sol)
 end
 
+function construction_function(t,x)
+	
+
+end
+
+function test_construction()
+
+end
 
