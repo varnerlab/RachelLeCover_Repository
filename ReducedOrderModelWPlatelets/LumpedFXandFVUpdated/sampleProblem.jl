@@ -1,6 +1,7 @@
 using ParameterizedFunctions
 using DifferentialEquations
 using Plots
+using DiffEqSensitivity
 #f = @ode_def testing begin
 #  dy[1] = -k1*y[1]+k3*y[2]*y[3]
 #  dy[2]=  k1*y[1]-k2*y[2]^2-k3*y[2]*y[3]
@@ -185,12 +186,26 @@ function SampleProblem()
 	plot(sol)
 end
 
-function construction_function(t,x)
-	
+function ChrisSolution()
 
-end
+	v = rand(4)
+	params = Expr[:(a=>$(v[1]));:(b=>$(v[2]));:(c=>$(v[3]));:(d=$(v[4]))]
+	f=ParameterizedFunctions.ode_def_opts(:LVE,Dict{Symbol,Bool}(
+	    :build_tgrad => false,
+	    :build_jac => true,
+	    :build_expjac => false,
+	    :build_invjac => false,
+	    :build_invW => false,
+	    :build_hes => false,
+	    :build_invhes => false,
+	    :build_dpfuncs => false),:(begin
+	      dx = a*x - b*x*y
+	      dy = -c*y + d*x*y
+	    end),params...)
 
-function test_construction()
+	prob = ODELocalSensitivityProblem(f,[1.0;1.0],(0.0,10.0))
+	sol = solve(prob,Euler(), dt = .02)
 
+	plot(sol)
 end
 

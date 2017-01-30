@@ -32,27 +32,26 @@ function ModelSensitivity()
 	PROBLEM_DICTIONARY = buildCoagulationModelDictionary()
 	initial_condition_vector = PROBLEM_DICTIONARY["INITIAL_CONDITION_VECTOR"]
 	problem_vec = dict_to_vec(PROBLEM_DICTIONARY)
-	prob_expr_vec = Expr[]
-	for j in collect(1:size(problem_vec,1))
-		push!(prob_expr_vec,parse("p_$(j) => $(problem_vec[j])"))
-	end
-	
-	opts = Dict{Symbol,Bool}(
-	      :build_tgrad => true,
-	      :build_jac => true,
-	      :build_expjac => false,
-	      :build_invjac => true,
-	      :build_invW => true,
-	      :build_invW_t => true,
-	      :build_hes => true,
-	      :build_invhes => true,
-	      :build_dpfuncs => true)
-	pf = ParameterizedFunction(BalanceEquationsDE_f, problem_vec)
-	pf_def = ode_def_opts(:pf, opts, Meta.quot(pf), prob_expr_vec...)
-	@show pf
-	@show pf.p
-	prob = ODELocalSensitivityProblem(pf,initial_condition_vector,(TSTART, TSTOP))
+	correct_dict = build_param_dict(problem_vec)
+	@show correct_dict
+	@show typeof(correct_dict)
+	f = balance_equations_using_ode_macro(correct_dict)
+	@show f
+#	opts = Dict{Symbol,Bool}(
+#	      :build_tgrad => true,
+#	      :build_jac => true,
+#	      :build_expjac => false,
+#	      :build_invjac => true,
+#	      :build_invW => true,
+#	      :build_invW_t => true,
+#	      :build_hes => true,
+#	      :build_invhes => true,
+#	      :build_dpfuncs => true)
+	#pf = ParameterizedFunction(BalanceEquationsDE_f, problem_vec)
+	#pf_def = ode_def_opts(:pf, opts, Meta.quot(pf), prob_expr_vec...)
+	#prob = ODELocalSensitivityProblem(pf,initial_condition_vector,(TSTART, TSTOP))
 	#prob = ODEProblem(pf,initial_condition_vector,(TSTART, TSTOP))
+	prob = ODELocalSensitivityProblem(f, initial_condition_vector, (TSTART,TSTOP))
 	@show prob
 	sol = solve(prob,Rosenbrock23(), dtmax = .01)#,abstol = 1E-4, reltol = 1E-8)#, dtmax=.001,abstol = 1E-4, reltol = 1E-8)#alg_hints=[:stiff])#, abstol = 1E-4, reltol = 1E-8)
 	#@show sol[:,1]

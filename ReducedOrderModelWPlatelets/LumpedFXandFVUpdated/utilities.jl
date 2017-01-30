@@ -198,3 +198,8 @@ function extractValueFromDual(input)
 		return input
 	end
 end
+
+function build_param_dict(problem_vec)
+	params = Expr[:(p_1=>$(problem_vec[1])); :(p_2=>$(problem_vec[2])); :(p_3=>$(problem_vec[3])); :(p_4=>$(problem_vec[4])); :(p_5=>$(problem_vec[5])); :(p_6=>$(problem_vec[6])); :(p_7=>$(problem_vec[7])); :(p_8=>$(problem_vec[8])); :(p_9=>$(problem_vec[9])); :(p_10=>$(problem_vec[10])); :(p_11=>$(problem_vec[11])); :(p_12=>$(problem_vec[12])); :(p_13=>$(problem_vec[13])); :(p_14=>$(problem_vec[14])); :(p_15=>$(problem_vec[15])); :(p_16=>$(problem_vec[16])); :(p_17=>$(problem_vec[17])); :(p_18=>$(problem_vec[18])); :(p_19=>$(problem_vec[19])); :(p_20=>$(problem_vec[20])); :(p_21=>$(problem_vec[21])); :(p_22=>$(problem_vec[22])); :(p_23=>$(problem_vec[23])); :(p_24=>$(problem_vec[24])); :(p_25=>$(problem_vec[25])); :(p_26=>$(problem_vec[26])); :(p_27=>$(problem_vec[27])); :(p_28=>$(problem_vec[28])); :(p_29=>$(problem_vec[29])); :(p_30=>$(problem_vec[30])); :(p_31=>$(problem_vec[31])); :(p_32=>$(problem_vec[32])); :(p_33=>$(problem_vec[33])); :(p_34=>$(problem_vec[34])); :(p_35=>$(problem_vec[35])); :(p_36=>$(problem_vec[36])); :(p_37=>$(problem_vec[37])); :(p_38=>$(problem_vec[38])); :(p_39=>$(problem_vec[39])); :(p_40=>$(problem_vec[40])); :(p_41=>$(problem_vec[41])); :(p_42=>$(problem_vec[42])); :(p_43=>$(problem_vec[43])); :(p_44=>$(problem_vec[44])); :(p_45=>$(problem_vec[45])); :(p_46=>$(problem_vec[46])); :(p_47=>$(problem_vec[47])); :(p_48=>$(problem_vec[48])); :(p_49=>$(problem_vec[49])); :(p_50=>$(problem_vec[50])); :(p_51=>$(problem_vec[51])); :(p_52=>$(problem_vec[52])); :(p_53=>$(problem_vec[53]))]
+	return params
+end
