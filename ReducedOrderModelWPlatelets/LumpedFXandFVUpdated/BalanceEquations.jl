@@ -143,7 +143,7 @@ function BalanceEquations(t,x,PROBLEM_DICTIONARY)
     k_amp_active_factors= kinetic_parameter_vector[17]
     K_amp_active_factors = kinetic_parameter_vector[18]
     
-	@show FIIa, FII, PROTHOMBINASE_PLATELETS, FV_FXA
+	#@show FIIa, FII, PROTHOMBINASE_PLATELETS, FV_FXA
     rate_vector = zeros(1,7)
 	rate_vector[1] = k_trigger*TRIGGER*(FV_FX/(K_trigger + FV_FX))
 	rate_vector[2] = k_amplification*FIIa*(FII/(K_FII_amplification + FII))
@@ -210,9 +210,10 @@ function BalanceEquations(t,x,PROBLEM_DICTIONARY)
 	if(isnan(time_scale))
 		time_scale = 1.0
 	end
-	@show time_scale
+	#@show time_scale
 	#@show convert(Array{Float64,2},dxdt_total.*time_scale)
-	(dxdt_total.*time_scale)
+	dxdt_total = dxdt_total.*time_scale
+	 return dxdt_total
 
 end
 
@@ -404,18 +405,18 @@ end
 function balance_equations_using_ode_macro(params)
 
 	f= ParameterizedFunctions.ode_def_opts(:BalanceEquations_DE,Dict{Symbol,Bool}(
-	    :build_tgrad => false,
-	    :build_jac => false,
+	    :build_tgrad => true,
+	    :build_jac => true,
 	    :build_expjac => false,
-	    :build_invjac => false,
-	    :build_invW => false,
-	    :build_hes => false,
-	    :build_invhes => false,
-	    :build_dpfuncs => false),:(begin
+	    :build_invjac => true,
+	    :build_invW => true,
+	    :build_hes => true,
+	    :build_invhes => true,
+	    :build_dpfuncs => true),:(begin
 		#@show t
 		# Correct nagative x's = throws errors in control even if small - 
-		idx = find(u->(u<0),u);
-		u[idx] = 0.0;
+#		idx = find(u->(u<0),u);
+#		u[idx] = 0.0;
 		t = extractValueFromDual(t)
 	
 		FII	 = u[1]
@@ -582,8 +583,6 @@ function balance_equations_using_ode_macro(params)
 		end
 		
 		du = du*time_scale
-		@show du
-		du
 	end), params...) 
 	return f
 end

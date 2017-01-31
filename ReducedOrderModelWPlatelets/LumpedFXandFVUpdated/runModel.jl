@@ -24,6 +24,24 @@ function runModel(TSTART,Ts,TSTOP)
 	return (t,X);
 end
 
+function runModelSundials(TSTART,Ts,TSTOP)
+
+	PROBLEM_DICTIONARY = Dict()
+	PROBLEM_DICTIONARY = buildCoagulationModelDictionary()
+	TSIM = collect(TSTART:Ts:TSTOP)
+	initial_condition_vector = PROBLEM_DICTIONARY["INITIAL_CONDITION_VECTOR"]
+	reshaped_IC = vec(reshape(initial_condition_vector,11,1)) #may need to cast to vector for Sundials
+
+	#calling solver
+	fbalances(t,y,ydot)=BalanceEquations(t,y,ydot,PROBLEM_DICTIONARY)
+	mem = Sundials.CVodeCreate(Sundials.CV_BDF, Sundials.CV_NEWTON) 
+	Sundials.@checkflag Sundials.CVodeSetMaxStep(mem, .01)
+	#X = Sundials.cvode(fbalances,reshaped_IC,TSIM, integrator=:Adams,reltol=1E-8, abstol=1E-8)#, abstol =1E-4, reltol=1E-4);
+	flag = Sundials.CVode(mem, TSIM,fbalances, TSIM, Sundials.CV_NORMAL)
+#	println("got here")
+	return (X);
+end
+
 function makePlots(t,x)
 	FII = x[:,1]
 	FIIA = x[:,2]

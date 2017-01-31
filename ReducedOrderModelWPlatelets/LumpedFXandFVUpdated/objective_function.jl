@@ -6,7 +6,7 @@ using ODE
 
 # some global parameters -
 BIG = 1e10
-SMALL = 1e-6
+SMALL = 1e-9
 
 #globally load data so that we don't have to reload on each iteration
 pathsToData = ["../data/Luan2010Fig5A.csv", "../data/Luan2010Fig5B.csv","../data/Luan2010Fig5C.csv", "../data/Luan2010Fig5D.csv", "../data/Luan2010Fig5E.csv","../data/Luan2010Fig5F.csv"]
@@ -29,7 +29,7 @@ function objective_function(parameter_array, selected_sets)
 #	close(f)
 
 	obj_array = BIG*ones(5,1)
-	
+	@show parameter_array
 	TSTART = 0.0
 	Ts = .02
 	TSTOP = 60.0

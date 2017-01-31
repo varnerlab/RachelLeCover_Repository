@@ -191,20 +191,20 @@ function ChrisSolution()
 	v = rand(4)
 	params = Expr[:(a=>$(v[1]));:(b=>$(v[2]));:(c=>$(v[3]));:(d=$(v[4]))]
 	f=ParameterizedFunctions.ode_def_opts(:LVE,Dict{Symbol,Bool}(
-	    :build_tgrad => false,
+	    :build_tgrad => true,
 	    :build_jac => true,
 	    :build_expjac => false,
-	    :build_invjac => false,
-	    :build_invW => false,
-	    :build_hes => false,
-	    :build_invhes => false,
-	    :build_dpfuncs => false),:(begin
+	    :build_invjac => true,
+	    :build_invW => true,
+	    :build_hes => true,
+	    :build_invhes => true,
+	    :build_dpfuncs => true),:(begin
 	      dx = a*x - b*x*y
 	      dy = -c*y + d*x*y
 	    end),params...)
 
 	prob = ODELocalSensitivityProblem(f,[1.0;1.0],(0.0,10.0))
-	sol = solve(prob,Euler(), dt = .02)
+	sol = solve(prob,DP8(), dt = .02)
 
 	plot(sol)
 end
