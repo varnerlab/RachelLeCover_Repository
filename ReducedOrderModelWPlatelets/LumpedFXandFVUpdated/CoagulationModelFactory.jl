@@ -145,7 +145,7 @@ function buildCoagulationModelDictionary(kinetic_parameter_vector, control_param
     push!(initial_condition_vector,12)         # 5 TM
     push!(initial_condition_vector,1.0E-3)          # 6 TRIGGER
     push!(initial_condition_vector, 0.01) #Fraction of platelets activated
-    push!(initial_condition_vector,100.0)          #  FV+FX
+    push!(initial_condition_vector,22.0)          #  FV+FX
     push!(initial_condition_vector,0.00)          #  FVa+FXa
     push!(initial_condition_vector,0.00)         #  prothombinase complex
     PROBLEM_DICTIONARY["INITIAL_CONDITION_VECTOR"] = initial_condition_vector
@@ -174,11 +174,19 @@ function buildCoagulationModelDictionary(kinetic_parameter_vector, control_param
     qualitative_factor_vector =Float64[]
    push!(qualitative_factor_vector,2.5)           # 0 TFPI
    push!(qualitative_factor_vector,20.0)          # 1 FV
-   push!(qualitative_factor_vector,0.0)           # 2 FVIII
+   push!(qualitative_factor_vector,0.7)           # 2 FVIII
    push!(qualitative_factor_vector,90.0)           # 3 FIX
    push!(qualitative_factor_vector,170.0)         # 4 FX
    push!(qualitative_factor_vector,1.0)           # 5 Platelets
     PROBLEM_DICTIONARY["FACTOR_LEVEL_VECTOR"] = qualitative_factor_vector
+
+	nominal_levels = Float64[]
+   push!(nominal_levels,2.5)           # 0 TFPI
+   push!(nominal_levels,0.7)           # 2 FVIII
+   push!(nominal_levels,90.0)           # 3 FIX
+   push!(nominal_levels,22.0)         # 4 FV_X
+	PROBLEM_DICTIONARY["NOMINAL"]= nominal_levels
+	
     
     return PROBLEM_DICTIONARY
 end
