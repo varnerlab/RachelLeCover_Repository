@@ -165,7 +165,9 @@ function plotFluxes(pathToData,t)
 		plt[:subplot](size(data,2),1,j)
 		@show size(t)
 		@show size(data[:,j])
-		plot(t, data[:,j], ".k")
+		currdata = data[:,j]
+		currdata[currdata.>=1E6] = 0.0
+		plot(t, currdata, ".k")
 		title(string("reaction ", j))
 	end
 end
@@ -174,16 +176,16 @@ end
 function main()
 	pathToData = "../data/ButenasFig1B60nMFVIIa.csv"
 	close("all")
-	#rm("ratevector.txt")
-	#rm("modifiedratevector.txt")
-	#rm("times.txt")
+#	rm("ratevector.txt")
+#	rm("modifiedratevector.txt")
+#	rm("times.txt")
 	(t,x) = runModel(0.0, .01, 20.0)
 	@show size(t)
 	#remove tiny elements that are causing plotting problems
 	#x[x.<=1E-20] = 0.0
-	#times = readdlm("times.txt")
-	#plotFluxes("ratevector.txt",times)
-	#plotFluxes("modifiedratevector.txt",times)
+#	times = readdlm("times.txt")
+#	plotFluxes("ratevector.txt",times)
+#	plotFluxes("modifiedratevector.txt",times)
 
 	#println(x)
 	makeLoopPlots(t,x)
@@ -199,7 +201,7 @@ end
 function plotThrombinWData(t,x,pathToData)
 	#close("all")
 	expdata = readdlm(pathToData,',')
-	#fig = figure(figsize = (15,15))
+	fig = figure(figsize = (15,15))
 	plot(t, [a[2] for a in x], "k-")
 	plot(expdata[:,1], expdata[:,2], ".k")
 	ylabel("Thrombin Concentration, nM")
@@ -316,6 +318,7 @@ function runModelWithParams(params)
 	t,X = ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-8, reltol = 1E-8)
 	plotThrombinWData(t,X,pathToData)
 	makeLoopPlots(t,X)
+	savefig("figures/WhileApplyingNM02_02_2017EndOfDay.pdf")
 	MSE, interpolatedExperimentalData=calculateMSE(t, [a[2] for a in X], readdlm(pathToData, ','))
 	return MSE
 end

@@ -34,9 +34,6 @@ function BalanceEquations(t,x,PROBLEM_DICTIONARY)
 	timing = PROBLEM_DICTIONARY["TIME_DELAY"]
 	nominal_levels = PROBLEM_DICTIONARY["NOMINAL_VALUES"]
 
-#@showp
-#@show typeof(kinetic_parameter_vector)
-
 	# Alias the qualitative factors -
 	TFPI = qualitative_factor_level_vector[1]
 	#FV = qualitative_factor_level_vector[2]
@@ -114,6 +111,7 @@ function BalanceEquations(t,x,PROBLEM_DICTIONARY)
     # Shutdown phase -
     shutdown_term = ((alpha_shutdown_APC*FIIa)^order_shutdown_APC)/(1 + ((alpha_shutdown_APC*FIIa)^order_shutdown_APC))
 
+
     #prothominabse complex formation
     activation_FV_by_thrombin = (alpha_FV_activation*FIIa)^order_FV_activation/(1+(alpha_FV_activation*FIIa)^order_FV_activation)
     activation_FX_by_trigger = (alpha_FX_activation*TRIGGER)^order_FX_activation/(1+(alpha_FX_activation*TRIGGER)^order_FX_activation)
@@ -127,7 +125,7 @@ function BalanceEquations(t,x,PROBLEM_DICTIONARY)
     control_vector[5] = 1
     control_vector[6] = min(inhibition_term,inhibition_term_TFPI)
     control_vector[7] = min(inhibition_term,inhibition_term_TFPI,factor_amplification_term)
-		#@show control_vector[5], activation_FV_by_thrombin, activation_FX_by_trigger, inhibition_of_FX_by_ATIII
+	#@show control_vector[1], initiation_trigger_term, initiation_TFPI_term, inhibition_term
 
     # Calculate the kinetics -
     k_trigger = kinetic_parameter_vector[1]
@@ -154,7 +152,6 @@ function BalanceEquations(t,x,PROBLEM_DICTIONARY)
 	rate_vector[1] = k_trigger*TRIGGER*(FV_FX/(K_trigger + FV_FX))
 	rate_vector[2] = k_amplification*FIIa*(FII/(K_FII_amplification + FII))
 	rate_vector[3] = k_APC_formation*TM*(Float64(PC)/Float64(K_PC_formation + PC))
-	#rate_vector[3] = k_inhibition*APC*(FIIa/(FIIa + K_FIIa_inhibition)) + k_inhibition_ATIII*(ATIII)*pow(FIIa,1.26)
 	rate_vector[4] = Float64(k_inhibition_ATIII)*Float64(ATIII)*(Float64(FIIa)^1.26)
 	rate_vector[5] = k_complex*FV_FXA*aida/Eps
 	rate_vector[6] = k_amp_prothombinase*PROTHOMBINASE_PLATELETS*FII/(K_FII_amp_prothombinase + FII)
@@ -185,6 +182,9 @@ function BalanceEquations(t,x,PROBLEM_DICTIONARY)
 #	writedlm(f, t)
 #	close(f)
 
+#	f = open("ratevector.txt", "a+")
+#	writedlm(f, rate_vector)
+#	close(f)
 
 	# calculate dxdt_reaction -
 	dxdt_total = zeros(size(x,1),1)

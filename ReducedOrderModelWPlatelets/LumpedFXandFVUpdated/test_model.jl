@@ -3,7 +3,7 @@ using POETs
 include("objective_function.jl")
 
 function test_model(initial_parameter_array, selected_idxs)
-	outputfile = string("parameterEstimation/LOOCVSavingAllParams_2016_1_31_No_specific_bounds/POETS_selectedindices",string(selected_idxs) ,".txt")
+	outputfile = string("parameterEstimation/LOOCVSavingAllParams_2017_02_02/POETS_selectedindices",string(selected_idxs) ,".txt")
 	number_of_subdivisions = 10
 	number_of_parameters = 46
 	number_of_objectives = 5
@@ -13,7 +13,7 @@ function test_model(initial_parameter_array, selected_idxs)
 
 	    # Run JuPOETs -
 		objective_function_fed(initial_parameter_array) = objective_function(initial_parameter_array, selected_idxs)
-	    (EC,PC,RA) = estimate_ensemble(objective_function_fed,neighbor_function,acceptance_probability_function,cooling_function,vec(initial_parameter_array);rank_cutoff=4,maximum_number_of_iterations=10,show_trace=true)
+	    (EC,PC,RA) = estimate_ensemble(objective_function_fed,neighbor_function,acceptance_probability_function,cooling_function,(vec(initial_parameter_array));rank_cutoff=4,maximum_number_of_iterations=10,show_trace=true)
 		@show (EC, PC, RA)
 		# Package -
 		ec_array = [ec_array EC]
@@ -32,7 +32,7 @@ function test_model(initial_parameter_array, selected_idxs)
 end
 
 function doLOOCV()
-	initial_parameter_array = readdlm("parameterEstimation/BestNMParameters.txt", ',')
+	initial_parameter_array = readdlm("parameterEstimation/bestNMParams02022017.txt", ',')
 	experimental_indices = collect(1:6)
 	for j in collect(1: size(experimental_indices,1))
 		experimental_indices = collect(1:6)
@@ -40,7 +40,7 @@ function doLOOCV()
 		ec_array, pc_array=test_model(initial_parameter_array, selected_idxs)
 		#create new initial parameter array best on best for this objective-take the set that gives lowest error on all 5 objectives
 		initial_parameter_array_top10 = generateBestNparameters(10,ec_array, pc_array)
-		bestparams_output = string("parameterEstimation/LOOCVSavingAllParams_2016_1_31_No_specific_bounds/bestParamSetsFromLOOCV",j, "excluded.txt")
+		bestparams_output = string("parameterEstimation/LOOCVSavingAllParams_2017_02_02/bestParamSetsFromLOOCV",j, "excluded.txt")
 		f = open(bestparams_output, "a+")
 		writedlm(f,initial_parameter_array_top10, ',')
 		close(f)
