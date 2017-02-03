@@ -6,13 +6,21 @@ function BalanceEquations(t,x,PROBLEM_DICTIONARY)
 	# Correct nagative x's = throws errors in control even if small - 
 	idx = find(x->(x<0),x);
 	x[idx] = 0.0;
+
+	idx = find(x->(abs(x)<1E-15),x); #lets make anything less than 1E-9 zero
+	#@show idx
+	x[idx] = 0.0;
 #	for j = 1:length(x)
 #		if(isnan(x[j]) || !isfinite(x[j]))
 #			println("Found NAN at x $j")
+#			@show t
+#			@show x
+#			@show PROBLEM_DICTIONARY
+#			#quit()
 #			x[j] = 0.0
 #		end
 #	end
-	
+#	
 	# Alias the species -
 	FII	 = x[1]
 	FIIa	= x[2]
@@ -124,6 +132,7 @@ function BalanceEquations(t,x,PROBLEM_DICTIONARY)
     control_vector[4] = 1
     control_vector[5] = 1
     control_vector[6] = min(inhibition_term,inhibition_term_TFPI)
+    #control_vector[6] = min(inhibition_term,inhibition_term_TFPI,factor_amplification_term)
     control_vector[7] = min(inhibition_term,inhibition_term_TFPI,factor_amplification_term)
 	#@show control_vector[1], initiation_trigger_term, initiation_TFPI_term, inhibition_term
 
@@ -216,9 +225,17 @@ function BalanceEquations(t,x,PROBLEM_DICTIONARY)
 	if(isnan(time_scale))
 		time_scale = 1.0
 	end
-	#@show time_scale
-	#@show convert(Array{Float64,2},dxdt_total.*time_scale)
+	#@show dxdt_total
+	idx = find(dxdt_total->(abs(dxdt_total)<1E-15),dxdt_total); #lets make anything less than 1E-9 zero
+	#@show idx
+	dxdt_total[idx] = 0.0;
+
 	dxdt_total = dxdt_total.*time_scale
+	@show x
+	@show control_vector
+	@show rate_vector
+	@show modified_rate_vector
+	@show dxdt_total
 	 return dxdt_total
 
 end
