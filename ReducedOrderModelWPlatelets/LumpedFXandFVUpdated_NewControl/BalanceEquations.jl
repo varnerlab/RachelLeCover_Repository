@@ -168,7 +168,7 @@ function BalanceEquations(t,x,PROBLEM_DICTIONARY)
 
 	for j in collect(1:length(rate_vector))
 		if(isnan(rate_vector[j]) || !isfinite(rate_vector[j]))
-			println("Found NAN at rate_vector $j")
+		#	println("Found NAN at rate_vector $j")
 			rate_vector[j] = 0.0
 		end
 	end
@@ -176,7 +176,7 @@ function BalanceEquations(t,x,PROBLEM_DICTIONARY)
 	#remove nans
 	for j in collect(1:length(rate_vector))
 		if(isnan(control_vector[j])|| !isfinite(control_vector[j]))
-			println("Found NAN at control_vector $j")
+		#	println("Found NAN at control_vector $j")
 			control_vector[j] = 1.0
 		end
 	end

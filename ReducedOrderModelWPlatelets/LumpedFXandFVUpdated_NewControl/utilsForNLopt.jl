@@ -38,7 +38,7 @@ function objectiveForNLOpt(params::Vector, grad::Vector)
 	#hold("on")
 	#plot(t, FIIa, alpha = .5)
 	#write params to file
-	f = open("parameterEstimation/NLopt_2017_02_03Take2.txt", "a+")
+	f = open("parameterEstimation/NLopt_2017_02_06.txt", "a+")
 	write(f, string(params, ",", MSE, "\n"))
 	close(f)
 	#toc()
@@ -160,8 +160,8 @@ function attemptOptimizationNLOpt()
     
  
 	inital_parameter_estimate = vcat(kinetic_parameter_vector, control_parameter_vector, platelet_parameter_vector, timing)	
-
-	(minf, minx, ret) = NLopt.optimize(opt, vec(inital_parameter_estimate))
-	println("got $minf at $minx after $count iterations (returned $ret)")
+	@show inital_parameter_estimate
+	#(minf, minx, ret) = NLopt.optimize(opt, vec(inital_parameter_estimate))
+	#println("got $minf at $minx after $count iterations (returned $ret)")
 end
 
