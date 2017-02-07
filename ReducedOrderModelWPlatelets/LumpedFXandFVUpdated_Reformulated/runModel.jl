@@ -1,5 +1,5 @@
 include("BalanceEquations.jl")
-include("CoagulationModelFactoryDecentFit.jl")
+include("CoagulationModelFactory.jl")
 include("utilities.jl")
 #using Sundials
 using ODE
@@ -190,11 +190,13 @@ function main()
 	#println(x)
 	makeLoopPlots(t,x)
 	plotThrombinWData(t,x,pathToData)
+	savefig("figures/BeforeNLoptFeb7Morning.pdf")
 	MSE, interpolatedExperimentalData=calculateMSE(t, [a[2] for a in x], readdlm(pathToData, ','))
 	estimatedAUC = calculateAUC(t, [a[2] for a in x])
 	experimentalAUC = calculateAUC(t, interpolatedExperimentalData)
 	@show estimatedAUC, experimentalAUC
-	return MSE, abs(estimatedAUC-experimentalAUC)
+	@printf("MSE: %f, Difference in AUC: %f", MSE, abs(estimatedAUC-experimentalAUC))
+	#return MSE, abs(estimatedAUC-experimentalAUC)
 end
 
 
