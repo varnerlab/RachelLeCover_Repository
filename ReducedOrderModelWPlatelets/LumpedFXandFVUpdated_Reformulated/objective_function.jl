@@ -41,7 +41,7 @@ function objective_function(parameter_array, selected_sets)
 		initial_condition_vector = dict["INITIAL_CONDITION_VECTOR"]
 		fbalances(t,y)= BalanceEquations(t,y,dict) 
 		tic()
-		t,X = ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-4, reltol = 1E-6)
+		t,X = ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-3, reltol = 1E-3, minstep=1E-8)
 		toc()
 		FIIa = [a[2] for a in X]
 		MSE, interpolatedExperimentalData=calculateMSE(t, FIIa, allexperimentaldata[j])

@@ -322,7 +322,7 @@ function runModelWithParams(params)
 	t,X = ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-8, reltol = 1E-8)
 	plotThrombinWData(t,X,pathToData)
 	makeLoopPlots(t,X)
-	savefig("figures/WhileApplyingNM02_02_2017EndOfDay.pdf")
+	savefig("figures/NM02072017Noon.pdf")
 	MSE, interpolatedExperimentalData=calculateMSE(t, [a[2] for a in X], readdlm(pathToData, ','))
 	return MSE
 end

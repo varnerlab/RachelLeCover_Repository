@@ -77,6 +77,9 @@ function neighbor_function(parameter_array)
 	#lb_arr[45]= 3.0 #lower bound on time delay, 3 minutes
 	#up_arr[46]= .01 #upper bound on scaling for tau
 	#up_arr[3] = 10.0 #upper bound on the k_cat for self activation of thrombin
+	up_arr[3] = 50.0 #bound k_amplication to be small
+	up_arr[17] = 50.0 #bound k_amp_active_factors to be small
+	up_arr[19] = 5.0 #bound k_PT_deg to be small
 
   # return the corrected parameter arrays -
   return parameter_bounds_function(new_parameter_array,lb_arr, up_arr)
@@ -119,6 +122,8 @@ function parameter_bounds_function(parameter_array,lower_bound_array,upper_bound
 end
 
 function createCorrectDict(basic_dict, exp_index)
+	#set trigger to 1picomolar = 1E-3 nM
+	basic_dict["INITIAL_CONDITION_VECTOR"][7] = 1.0E-3
 	if(exp_index==1)
 		
 	elseif(exp_index==2)
@@ -132,6 +137,7 @@ function createCorrectDict(basic_dict, exp_index)
 	elseif(exp_index==6)
 		basic_dict["FACTOR_LEVEL_VECTOR"][3] =basic_dict["FACTOR_LEVEL_VECTOR"][3]*.00
 	end
+	#@show basic_dict["FACTOR_LEVEL_VECTOR"]
 	return basic_dict
 end
 

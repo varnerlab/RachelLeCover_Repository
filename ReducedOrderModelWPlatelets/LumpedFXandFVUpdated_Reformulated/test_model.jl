@@ -3,9 +3,9 @@ using POETs
 include("objective_function.jl")
 
 function test_model(initial_parameter_array, selected_idxs)
-	outputfile = string("parameterEstimation/LOOCVSavingAllParams_2017_02_06_low_acc/POETS_selectedindices",string(selected_idxs) ,".txt")
+	outputfile = string("parameterEstimation/LOOCVSavingAllParams_2017_02_07_low_acc/POETS_selectedindices",string(selected_idxs) ,".txt")
 	number_of_subdivisions = 10
-	number_of_parameters = 46
+	number_of_parameters = 49
 	number_of_objectives = 5
 	ec_array = zeros(number_of_objectives)
   	pc_array = zeros(number_of_parameters)
@@ -32,7 +32,7 @@ function test_model(initial_parameter_array, selected_idxs)
 end
 
 function doLOOCV()
-	initial_parameter_array = readdlm("parameterEstimation/handfit.txt", ',')
+	initial_parameter_array = readdlm("parameterEstimation/NMparams.txt", ',')
 	experimental_indices = collect(1:6)
 	for j in collect(1: size(experimental_indices,1))
 		experimental_indices = collect(1:6)
@@ -40,7 +40,7 @@ function doLOOCV()
 		ec_array, pc_array=test_model(initial_parameter_array, selected_idxs)
 		#create new initial parameter array best on best for this objective-take the set that gives lowest error on all 5 objectives
 		initial_parameter_array_top10 = generateBestNparameters(10,ec_array, pc_array)
-		bestparams_output = string("parameterEstimation/LOOCVSavingAllParams_2017_02_06_low_acc/bestParamSetsFromLOOCV",j, "excluded.txt")
+		bestparams_output = string("parameterEstimation/LOOCVSavingAllParams_2017_02_07_low_acc/bestParamSetsFromLOOCV",j, "excluded.txt")
 		f = open(bestparams_output, "a+")
 		writedlm(f,initial_parameter_array_top10, ',')
 		close(f)
