@@ -8,9 +8,9 @@ function validate_model()
 		experimentaldata = readdlm(pathsToData[j], ',')	
 		push!(allexperimentaldata, experimentaldata)
 	end
-	for j in collect(1:3)
-		pathToParams = string("parameterEstimation/LOOCVSavingAllParams_2017_02_06_low_acc/bestParamSetsFromLOOCV", j, "excluded.txt")
-		savestr = string("figures/LOOCVValidation_Predicting_set_", j, "-2017_02_06_low_acc.pdf")
+	for j in collect(1:6)
+		pathToParams = string("parameterEstimation/LOOCVSavingAllParams_2017_02_07_low_acc/bestParamSetsFromLOOCV", j, "excluded.txt")
+		savestr = string("figures/LOOCVValidation_Predicting_set_", j, "-2017_02_07_low_acc.pdf")
 		currdata = allexperimentaldata[j]
 		runModelWithMultipleParams(pathToParams, pathsToData[j],j,savestr)
 	end

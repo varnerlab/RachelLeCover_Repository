@@ -34,7 +34,7 @@ end
 function doLOOCV()
 	initial_parameter_array = readdlm("parameterEstimation/handfitparams.txt", ',')
 	experimental_indices = collect(1:6)
-	for j in collect(1: size(experimental_indices,1))
+	for j in collect(3: size(experimental_indices,1))
 		experimental_indices = collect(1:6)
 		selected_idxs = deleteat!(experimental_indices,j)
 		ec_array, pc_array=test_model(initial_parameter_array, selected_idxs)
