@@ -39,7 +39,7 @@ function objectiveForNLOpt(params::Vector, grad::Vector)
 	#hold("on")
 	#plot(t, FIIa, alpha = .5)
 	#write params to file
-	f = open("parameterEstimation/NLoptNMoffofhandfit_2017_02_09.txt", "a+")
+	f = open("parameterEstimation/NLoptCOBYLA_2017_02_10.txt", "a+")
 	write(f, string(params, ",", MSE, "\n"))
 	close(f)
 	#toc()
@@ -86,7 +86,7 @@ end
 
 function attemptOptimizationNLOpt()
 	numvars = 46
-	opt = Opt(:LN_NELDERMEAD,numvars)
+	opt = Opt(:LN_COBYLA,numvars)
 	lower_bounds!(opt, vec(fill(1E-9,1,numvars)))
 	upperbounds = fill(1E7, 1, numvars)
 	upperbounds[3] = 70.0 #bound k_amplication to be small
@@ -98,24 +98,24 @@ function attemptOptimizationNLOpt()
     
     # Kinetic parameters -
    kinetic_parameter_vector = Float64[]
-    push!(kinetic_parameter_vector,72000*1.2)       #  k_trigger
+    push!(kinetic_parameter_vector,7200*1.5)       #  k_trigger
     push!(kinetic_parameter_vector,1)       # 1 K_trigger
     push!(kinetic_parameter_vector,10.0)        # 2 k_amplification
     push!(kinetic_parameter_vector,1200)       # 3 K_FII_amplification
-    push!(kinetic_parameter_vector,0.1)        # 4 k_APC_formation
+    push!(kinetic_parameter_vector,.1)        # 4 k_APC_formation
     push!(kinetic_parameter_vector,30/10.0)         # 5 K_PC_formation
-    push!(kinetic_parameter_vector,0.2*10000)        # 6 k_inhibition
-    push!(kinetic_parameter_vector,1200/10.0)       # 7 K_FIIa_inhibition
+    push!(kinetic_parameter_vector,0.2*100)        # 6 k_inhibition
+    push!(kinetic_parameter_vector,120)       # 7 K_FIIa_inhibition
     push!(kinetic_parameter_vector,0.001*1.2)     # 8 k_inhibition_ATIII
     #push!(kinetic_parameter_vector,0.001)      # 9 K_inhibition_ATIII
     #push!(kinetic_parameter_vector,100.0)      # 10 K_inhibition_FIIa
     push!(kinetic_parameter_vector, 2E7*60*10.0^-6) #9 k_FV_activation, from reaction 16 in Diamond 2010 paper
     push!(kinetic_parameter_vector, 1E8*80*10.0^-6/100) #10 K_FV_activation 
     push!(kinetic_parameter_vector, 60.0) #11 k_FX_activation from reaction 6 in Diamond 2010 paper
-    push!(kinetic_parameter_vector, 2.8E-7*10.0^6) #12 K_FX_activation
-    push!(kinetic_parameter_vector, 240) #13 k_complex
-    push!(kinetic_parameter_vector, 63.5*60*1000*1.5 )#14 k_amp_prothombinase from reaction 18 in Diamond 2010
-    push!(kinetic_parameter_vector, 1.6E-6*10.0^6*10000) #13 K_FII_amp_prothombinase
+    push!(kinetic_parameter_vector, .28) #12 K_FX_activation
+    push!(kinetic_parameter_vector, 24000) #13 k_complex
+    push!(kinetic_parameter_vector, 63.5*60*100*2.5 )#14 k_amp_prothombinase from reaction 18 in Diamond 2010
+    push!(kinetic_parameter_vector, 1.6E-6*10.0^6*100) #13 K_FII_amp_prothombinase
     push!(kinetic_parameter_vector, 6.0*10) #k_amp_active_factors
     push!(kinetic_parameter_vector, 1.0) #K_amp_active_factor
     
@@ -130,7 +130,7 @@ function attemptOptimizationNLOpt()
     push!(control_parameter_vector,2.0)        # 5 14 order_trigger_inhibition_TFPI = control_parameter_vector[5]
     
     # Amplification -
-    push!(control_parameter_vector,0.1*10000)        # 6 15 alpha_amplification_FIIa = control_parameter_vector[6]
+    push!(control_parameter_vector,0.1)        # 6 15 alpha_amplification_FIIa = control_parameter_vector[6]
     push!(control_parameter_vector,2.0)        # 7 16 order_amplification_FIIa = control_parameter_vector[7]
     push!(control_parameter_vector,0.4)        # 8 17 alpha_amplification_APC = control_parameter_vector[8]
     push!(control_parameter_vector,2.0)        # 9 18 order_amplification_APC = control_parameter_vector[9]
@@ -157,12 +157,12 @@ function attemptOptimizationNLOpt()
 	push!(platelet_parameter_vector, .05) #koffplatelets
 
 	timing = Float64[]
-	push!(timing, 3.0) #time_delay
-	push!(timing, .35) #coeff
+	push!(timing, 4.0) #time_delay
+	push!(timing, 3.5) #coeff
     
  
-	#inital_parameter_estimate = vcat(kinetic_parameter_vector, control_parameter_vector, platelet_parameter_vector, timing)
-	inital_parameter_estimate = readdlm("parameterEstimation/besthandfit.txt", ',')	
+	inital_parameter_estimate = vcat(kinetic_parameter_vector, control_parameter_vector, platelet_parameter_vector, timing)
+	#inital_parameter_estimate = readdlm("parameterEstimation/besthandfit.txt", ',')	
 	@show inital_parameter_estimate
 	(minf, minx, ret) = NLopt.optimize(opt, vec(inital_parameter_estimate))
 	println("got $minf at $minx after $count iterations (returned $ret)")
