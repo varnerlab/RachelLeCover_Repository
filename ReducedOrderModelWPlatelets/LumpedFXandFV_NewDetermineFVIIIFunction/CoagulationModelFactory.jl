@@ -118,7 +118,7 @@ function buildCoagulationModelDictionary()
    push!(nominal_levels,22.0)         # 4 FV_X
 	PROBLEM_DICTIONARY["NOMINAL_VALUES"] = nominal_levels
 
-	PROBLEM_DICTIONARY["FVIII_CONTROL"] = 1.0
+	PROBLEM_DICTIONARY["FVIII_CONTROL"] = 5.20895
     
     return PROBLEM_DICTIONARY
 end
@@ -188,7 +188,7 @@ function buildCoagulationModelDictionary(kinetic_parameter_vector, control_param
    push!(nominal_levels,22.0)         # 4 FV_X
 	PROBLEM_DICTIONARY["NOMINAL_VALUES"] = nominal_levels
 
-	PROBLEM_DICTIONARY["FVIII_CONTROL"] = 1.0
+	PROBLEM_DICTIONARY["FVIII_CONTROL"] = 5.20895
     
     return PROBLEM_DICTIONARY
 end

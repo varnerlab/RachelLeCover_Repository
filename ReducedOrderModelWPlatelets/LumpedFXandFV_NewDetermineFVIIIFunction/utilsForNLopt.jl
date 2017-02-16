@@ -39,7 +39,7 @@ function objectiveForNLOpt(params::Vector, grad::Vector)
 	#hold("on")
 	#plot(t, FIIa, alpha = .5)
 	#write params to file
-	f = open("parameterEstimation/NLoptCOBYLA_2017_02_10.txt", "a+")
+	f = open("parameterEstimation/NLoptAfterF8AdjustmentNM_2017_02_15.txt", "a+")
 	write(f, string(params, ",", MSE, "\n"))
 	close(f)
 	#toc()
@@ -86,7 +86,7 @@ end
 
 function attemptOptimizationNLOpt()
 	numvars = 46
-	opt = Opt(:LN_COBYLA,numvars)
+	opt = Opt(:LN_NELDERMEAD,numvars)
 	lower_bounds!(opt, vec(fill(1E-9,1,numvars)))
 	upperbounds = fill(1E7, 1, numvars)
 	upperbounds[3] = 70.0 #bound k_amplication to be small
@@ -161,8 +161,8 @@ function attemptOptimizationNLOpt()
 	push!(timing, 3.5) #coeff
     
  
-	inital_parameter_estimate = vcat(kinetic_parameter_vector, control_parameter_vector, platelet_parameter_vector, timing)
-	#inital_parameter_estimate = readdlm("parameterEstimation/besthandfit.txt", ',')	
+	#inital_parameter_estimate = vcat(kinetic_parameter_vector, control_parameter_vector, platelet_parameter_vector, timing)
+	inital_parameter_estimate = readdlm("parameterEstimation/AfterCalculatingF8Function.txt", ',')	
 	@show inital_parameter_estimate
 	(minf, minx, ret) = NLopt.optimize(opt, vec(inital_parameter_estimate))
 	println("got $minf at $minx after $count iterations (returned $ret)")

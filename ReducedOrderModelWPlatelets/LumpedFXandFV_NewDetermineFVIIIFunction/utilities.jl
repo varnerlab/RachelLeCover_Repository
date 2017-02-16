@@ -259,3 +259,29 @@ function peturbIC(ICvec,seed)
 	end
 	return ICvec
 end
+
+function setIC(IC, exp_index)
+	if(exp_index==2)
+		IC[1]= IC[1]*1.55
+		#IC[3] =IC[3]*.95
+		#IC[5] = IC[5]*.95
+		IC[7] = IC[7]*1.5
+		IC[8]= IC[8]*1.5
+		IC[11] =.01
+	elseif(exp_index== 3)
+		IC[1]= IC[1]*1.15
+		IC[6] = IC[6]*.75
+		IC[7] = IC[7]*1.2
+		IC[11] = .001
+	elseif(exp_index ==4)
+		IC[1] = IC[1]*.75
+		IC[7] = IC[7]*.95
+	elseif(exp_index ==5)
+		IC[1] = IC[1]*.65
+		IC[7] = IC[7]*.6
+	elseif(exp_index ==6)
+		IC[1] = IC[1]*.65
+		IC[7] = IC[7]*.55
+	end
+	return IC
+end

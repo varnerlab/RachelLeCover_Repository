@@ -1,6 +1,7 @@
 include("BalanceEquations.jl")
 include("CoagulationModelFactory.jl")
 include("utilities.jl")
+include("runModel.jl")
 #using Sundials
 using ODE
 using NLopt
@@ -46,11 +47,11 @@ end
 function attemptOptimizationNLOptF8(exp_index,dict)
 	numvars = 1
 	opt = Opt(:LN_NELDERMEAD, numvars)
-	lower_bounds!(opt, vec(fill(1E-3,1,numvars)))
+	lower_bounds!(opt, vec(fill(1E-9,1,numvars)))
 	upper_bounds!(opt, vec(fill(1E2,1,numvars)))
 	min_objective!(opt, objectiveForNLOpt)
 	dict = createCorrectDict(dict, exp_index)
-	(minf, minx, ret) = NLopt.optimize(opt, vec([.5]))
+	(minf, minx, ret) = NLopt.optimize(opt, vec([50]))
 	println("got $minf at $minx after $count iterations (returned $ret)")
 	return minf, minx, ret
 	
@@ -59,8 +60,8 @@ end
 
 function runOpt(exp_index)
 	global experimentaldata = allexperimentaldata[exp_index]
-	global savestr = string("parameterEstimation/fitF8/NM10022017EstFVIIIparamDataSet",exp_index, ".txt")
-	params = readdlm("parameterEstimation/bestparamsafter2rounds.txt", ',')
+	global savestr = string("parameterEstimation/fitF8/NM15022017EstFVIIIparamDataSet",exp_index, ".txt")
+	params = readdlm("parameterEstimation/AfterCalculatingF8FunctionPostNM.txt", ',')
 	global dict =buildDictFromOneVector(params)
 	dict = createCorrectDict(dict, exp_index)
 	minf, minx, ret=attemptOptimizationNLOptF8(exp_index, dict)
@@ -73,6 +74,31 @@ function runAllOpt()
 		minf, minx, ret=runOpt(j)
 		results[j-1,1] = minf
 		results[j-1,2] = minx[1]
-	end	
+	end
+	f8 = [1.07,.39,.07,.01, 0.0, 1.0]
+	f8control = results[:,2]
+	push!(f8control, 5.2089)
+	figure()
+	semilogy(f8, f8control, "k.")
+	xlabel("FVIII Level")
+	ylabel("FVIII Control")
+	savefig("figures/FVIIIControl.pdf")	
 	return results
+end
+
+function makeFigures()
+	params = readdlm("parameterEstimation/AfterCalculatingF8FunctionPostNM.txt", ',')
+	indices = [2,3,4,5,6,1]
+	f8 = [1.07,.39,.07,.01, 0.0, 1.0]
+	j = 1
+	for ind in indices
+		MSE=runModelWithParamsSetF8(params, calculateF8control(f8[j]), ind)
+		@show MSE
+		j = j+1
+	end
+end
+
+function calculateF8control(f8)
+	control = 4.6863*f8^2+.5357*f8-.01319
+	return abs(control)
 end

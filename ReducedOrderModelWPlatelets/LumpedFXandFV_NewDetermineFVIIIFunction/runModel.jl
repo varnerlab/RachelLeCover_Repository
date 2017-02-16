@@ -371,25 +371,30 @@ function runModelWithParamsPeturbIC(params, num_runs)
 	return alldata
 end
 
-function runModelWithParamsSetF8(params, FVIIIcontrol)
+function runModelWithParamsSetF8(params, FVIIIcontrol, index)
 	close("all")
 	TSTART = 0.0
 	Ts = .02
 	TSTOP = 60.0
 	TSIM = collect(TSTART:Ts:TSTOP)
+	letters = ["A", "B", "C", "D", "E", "F"]
 	#pathToData = "../data/ButenasFig1B60nMFVIIa.csv"
 	#pathToData = "../data/Buentas1999Fig4100PercentProthrombin.txt"
-	pathToData = "../data/Luan2010Fig5C.csv"
+	pathToData = string("../data/Luan2010Fig5",letters[index], ".csv")
 	fig = figure(figsize = (15,15))
 	
 	dict = buildDictFromOneVector(params)
+	dict = createCorrectDict(dict, index)
 	dict["FVIII_CONTROL"]= FVIIIcontrol
 	initial_condition_vector = dict["INITIAL_CONDITION_VECTOR"]
+	initial_condition_vector = setIC(initial_condition_vector, index)
+	@show initial_condition_vector
+	@show dict["FVIII_CONTROL"]
 	fbalances(t,y)= BalanceEquations(t,y,dict) 
 	t,X = ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-6, reltol = 1E-6)
 	plotThrombinWData(t,X,pathToData)
-	savefig("figures/AttemtingF8FittingSet3_02_10_2017.pdf")
-	makeLoopPlots(t,X)
+	savefig(string("figures/AttemtingF8FittingSet",index,"_02_16_2017.pdf"))
+	#makeLoopPlots(t,X)
 	MSE, interpolatedExperimentalData=calculateMSE(t, [a[2] for a in X], readdlm(pathToData, ','))
 	return MSE
 end
