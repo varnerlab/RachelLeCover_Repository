@@ -211,6 +211,17 @@ function plotThrombinWData(t,x,pathToData)
 	#savefig("figures/UsingNMParameters.pdf")
 end
 
+function plotThrombinWData(t,x,pathToData, plotcolor)
+	#close("all")
+	expdata = readdlm(pathToData,',')
+	#fig = figure(figsize = (15,15))
+	plot(t, [a[2] for a in x], "-", color = plotcolor)
+	plot(expdata[:,1], expdata[:,2], ".", color = plotcolor)
+	ylabel("Thrombin Concentration, nM")
+	xlabel("Time, in minutes")
+	#savefig("figures/UsingNMParameters.pdf")
+end
+
 function plotAverageThrobinWData(t,meanThrombin,stdThrombin,pathToData,MSE, savestr)
 	expdata = readdlm(pathToData,',')
 	fig = figure(figsize = (15,15))
@@ -328,6 +339,26 @@ function runModelWithParams(params)
 	return MSE
 end
 
+
+function runModelWithParamsReturnAUC(params)
+	close("all")
+	TSTART = 0.0
+	Ts = .02
+	TSTOP = 60.0
+	TSIM = collect(TSTART:Ts:TSTOP)
+	#pathToData = "../data/ButenasFig1B60nMFVIIa.csv"
+	#pathToData = "../data/Buentas1999Fig4100PercentProthrombin.txt"
+	
+	dict = buildDictFromOneVector(params)
+	initial_condition_vector = dict["INITIAL_CONDITION_VECTOR"]
+	fbalances(t,y)= BalanceEquations(t,y,dict) 
+	t,X = ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-6, reltol = 1E-6)
+	AUC=calculateAUC(t, [a[2] for a in X])
+	return AUC
+end
+
+
+
 function runModelWithParamsPeturbIC(params, num_runs)
 	close("all")
 	#rm("dataforvarner.txt")
@@ -397,4 +428,31 @@ function runModelWithParamsSetF8(params, FVIIIcontrol, index)
 	#makeLoopPlots(t,X)
 	MSE, interpolatedExperimentalData=calculateMSE(t, [a[2] for a in X], readdlm(pathToData, ','))
 	return MSE
+end
+
+function runModelWithParamsSetF8OnePlot(fig,params, FVIIIcontrol, index)
+	#close("all")
+	TSTART = 0.0
+	Ts = .02
+	TSTOP = 60.0
+	TSIM = collect(TSTART:Ts:TSTOP)
+	letters = ["A", "B", "C", "D", "E", "F"]
+	#pathToData = "../data/ButenasFig1B60nMFVIIa.csv"
+	#pathToData = "../data/Buentas1999Fig4100PercentProthrombin.txt"
+	pathToData = string("../data/Luan2010Fig5",letters[index], ".csv")
+	
+	dict = buildDictFromOneVector(params)
+	dict = createCorrectDict(dict, index)
+	dict["FVIII_CONTROL"]= FVIIIcontrol
+	initial_condition_vector = dict["INITIAL_CONDITION_VECTOR"]
+	initial_condition_vector = setIC(initial_condition_vector, index)
+	@show initial_condition_vector
+	@show dict["FVIII_CONTROL"]
+	fbalances(t,y)= BalanceEquations(t,y,dict) 
+	t,X = ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-6, reltol = 1E-6)
+	plotThrombinWData(t,X,pathToData, string(index/(6+.1)))
+	#savefig(string("figures/AttemtingF8FittingSet",index,"_02_16_2017.pdf"))
+	#makeLoopPlots(t,X)
+	MSE, interpolatedExperimentalData=calculateMSE(t, [a[2] for a in X], readdlm(pathToData, ','))
+	return fig
 end

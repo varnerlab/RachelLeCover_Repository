@@ -21,7 +21,7 @@ function buildCoagulationModelDictionary()
     push!(initial_condition_vector,3400)       # 4 ATIII
     push!(initial_condition_vector,12)         # 5 TM
     push!(initial_condition_vector,1.0E-3)          # 6 TRIGGER
-    push!(initial_condition_vector, 0.01) #Fraction of platelets activated
+    push!(initial_condition_vector, 0.0) #Fraction of platelets activated
     push!(initial_condition_vector,22.0)          #  FV+FX
     push!(initial_condition_vector,0.0)          #  FVa+FXa
     push!(initial_condition_vector,0.000)         #  prothombinase complex
@@ -29,23 +29,23 @@ function buildCoagulationModelDictionary()
     
     # Kinetic parameters -
     kinetic_parameter_vector = Float64[]
-    push!(kinetic_parameter_vector,7200*1.5)       #  k_trigger
-    push!(kinetic_parameter_vector,1)       # 1 K_trigger
-    push!(kinetic_parameter_vector,10.0)        # 2 k_amplification
-    push!(kinetic_parameter_vector,1200)       # 3 K_FII_amplification
-    push!(kinetic_parameter_vector,.1)        # 4 k_APC_formation
-    push!(kinetic_parameter_vector,30/10.0)         # 5 K_PC_formation
+    push!(kinetic_parameter_vector,7200/2.5)       #  k_trigger
+    push!(kinetic_parameter_vector,100)       # 1 K_trigger
+    push!(kinetic_parameter_vector,1.0)        # 2 k_amplification
+    push!(kinetic_parameter_vector,120)       # 3 K_FII_amplification
+    push!(kinetic_parameter_vector,.05)        # 4 k_APC_formation
+    push!(kinetic_parameter_vector,3/100.0)         # 5 K_PC_formation
     push!(kinetic_parameter_vector,0.2*100)        # 6 k_inhibition
     push!(kinetic_parameter_vector,120)       # 7 K_FIIa_inhibition
-    push!(kinetic_parameter_vector,0.001*1.2)     # 8 k_inhibition_ATIII
+    push!(kinetic_parameter_vector,5E-5)     # 8 k_inhibition_ATIII
     #push!(kinetic_parameter_vector,0.001)      # 9 K_inhibition_ATIII
     #push!(kinetic_parameter_vector,100.0)      # 10 K_inhibition_FIIa
-    push!(kinetic_parameter_vector, 2E7*60*10.0^-6) #9 k_FV_activation, from reaction 16 in Diamond 2010 paper
+    push!(kinetic_parameter_vector, 2E7*60*10.0^-4) #9 k_FV_activation, from reaction 16 in Diamond 2010 paper
     push!(kinetic_parameter_vector, 1E8*80*10.0^-6/100) #10 K_FV_activation 
     push!(kinetic_parameter_vector, 60.0) #11 k_FX_activation from reaction 6 in Diamond 2010 paper
     push!(kinetic_parameter_vector, .28) #12 K_FX_activation
-    push!(kinetic_parameter_vector, 24000) #13 k_complex
-    push!(kinetic_parameter_vector, 63.5*60*100*2.5 )#14 k_amp_prothombinase from reaction 18 in Diamond 2010
+    push!(kinetic_parameter_vector, 2400) #13 k_complex
+    push!(kinetic_parameter_vector, 63.5*60*2.5 )#14 k_amp_prothombinase from reaction 18 in Diamond 2010
     push!(kinetic_parameter_vector, 1.6E-6*10.0^6*100) #13 K_FII_amp_prothombinase
     push!(kinetic_parameter_vector, 6.0*10) #k_amp_active_factors
     push!(kinetic_parameter_vector, 1.0) #K_amp_active_factor
@@ -85,20 +85,20 @@ function buildCoagulationModelDictionary()
 
    #platlet controls
 	platelet_parameter_vector = Float64[]
-	push!(platelet_parameter_vector, .005*400) #1 rate constant
+	push!(platelet_parameter_vector, .005*5) #1 rate constant
 	push!(platelet_parameter_vector, 1.6123) #2 power for control function
 	push!(platelet_parameter_vector, 2.4279E-9) #3 adjustment in denominator
 	push!(platelet_parameter_vector, .01) #4 Epsmax0
-	push!(platelet_parameter_vector, .01*1.05)  #5 aida
-	push!(platelet_parameter_vector, .05) #koffplatelets
+	push!(platelet_parameter_vector, 1.05)  #5 aida
+	push!(platelet_parameter_vector, .005) #koffplatelets
 	PROBLEM_DICTIONARY["PLATELET_PARAMS"] = platelet_parameter_vector
    
 
    PROBLEM_DICTIONARY["ALEPH"] = initial_condition_vector[2]
 
 	timing = Float64[]
-	push!(timing, 4.0) #time_delay
-	push!(timing, 3.5) #coeff
+	push!(timing, 1.0) #time_delay
+	push!(timing, 3.5*100) #coeff
 	PROBLEM_DICTIONARY["TIME_DELAY"]=timing
     
     # QFactor vector - from simulateFig3Butenas2002
@@ -146,7 +146,7 @@ function buildCoagulationModelDictionary(kinetic_parameter_vector, control_param
     push!(initial_condition_vector,3400)       # 4 ATIII
     push!(initial_condition_vector,12)         # 5 TM
     push!(initial_condition_vector,1.0E-3)          # 6 TRIGGER
-    push!(initial_condition_vector, 0.01) #Fraction of platelets activated
+    push!(initial_condition_vector, 0.0) #Fraction of platelets activated
     push!(initial_condition_vector,22.0)          #  FV+FX
     push!(initial_condition_vector,0.00)          #  FVa+FXa
     push!(initial_condition_vector,0.00)         #  prothombinase complex

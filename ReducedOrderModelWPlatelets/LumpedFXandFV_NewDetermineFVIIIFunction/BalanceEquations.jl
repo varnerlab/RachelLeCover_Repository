@@ -234,6 +234,8 @@ function BalanceEquations(t,x,PROBLEM_DICTIONARY)
 	dxdt_total[idx] = 0.0;
 
 	dxdt_total = dxdt_total.*time_scale
+#	dxdt_total[1:7]=dxdt_total[1:7].*time_scale
+#	dxdt_total[9:end]=dxdt_total[9:end].*time_scale
 #	@show x
 #	@show control_vector
 #	@show rate_vector

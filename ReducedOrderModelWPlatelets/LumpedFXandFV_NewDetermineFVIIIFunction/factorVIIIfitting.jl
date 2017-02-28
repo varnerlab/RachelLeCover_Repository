@@ -98,6 +98,24 @@ function makeFigures()
 	end
 end
 
+function makeOneFigure()
+	close("all")
+	params = readdlm("parameterEstimation/AfterCalculatingF8FunctionPostNM.txt", ',')
+	indices = [2,3,4,5,6,1]
+	f8 = [1.07,.39,.07,.01, 0.0, 1.0]
+	j = 1
+	fig = figure(figsize = (15,15))
+	hold(true)
+	for ind in indices
+		fig=runModelWithParamsSetF8OnePlot(fig, params, calculateF8control(f8[j]), ind)
+		#@show MSE
+		j = j+1
+	end
+	#legend(["FVIII=107%", "FVIII=100%", "FVIII=39%", "FVIII=7%", "FVIII=1%", "FVIII=0%"])
+	axis([0, 60, 0, 400])
+	savefig("figures/MasterFigure_17_02_2017.pdf")
+end
+
 function calculateF8control(f8)
 	control = 4.6863*f8^2+.5357*f8-.01319
 	return abs(control)

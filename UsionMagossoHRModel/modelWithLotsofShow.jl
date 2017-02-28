@@ -282,7 +282,8 @@ function complexHeartModel(t,y,dydt,data_dict)
 	else
 		fsp = fesmax
 	end
-
+	
+	fsh = fesinf +(fes0-fesinf)*exp(kes*(-Wbsh*fab+Wcsh*fac-Thetash))
 	if(fes < fesmax)
 		fsh = fesinf +(fes0-fesinf)*exp(kes*(-Wbsh*fab+Wcsh*fac-Thetash))
 	elseif(fsh>=fesmax)
@@ -546,9 +547,9 @@ function main()
 	#plot(tout, mod(psi,1), "kx")
 	plotEverything(t, res, data_dict, "figures/EverythingStep.1absrel1E-1AttemptToRecreateFig13Everything.pdf")
 	plotPretty(t, res, data_dict, "figures/PrettyStep.1absrel1E-1200sNoBleeAttemptToRecreateFig13Pretty.pdf")
-	writedlm("results/Nov9/results200sAttemptToRecreateFig13.txt", res)
+	writedlm("results/Feb20/results200sAttemptToRecreateFig13.txt", res)
 	attemptToRecreateFig13(t[1000:end],res[1000:end, :],data_dict, "AttemptedFig13.pdf")
-	writedlm("results/Nov9/results200sAttemptToRecreateFig13.txt", res)
+	writedlm("results/Feb20/results200sAttemptToRecreateFig13.txt", res)
 	return t, res, data_dict
 end
 

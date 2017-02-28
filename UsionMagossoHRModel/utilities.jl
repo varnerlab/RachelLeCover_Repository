@@ -100,7 +100,8 @@ function updateHistoricalData(historicaldata, currV, currt)
 end
 
 function plotEverything(tout, res, data_dict, outputfn)
-	names=fill("", 1, size(res,2))
+#	names=fill("", 1, size(res,2))
+	names=fill("", 1, size(res,1))	
 	names[1]="Ppa"
 	names[2]="Fpa"
 	names[3]="Ppp"
@@ -140,10 +141,12 @@ function plotEverything(tout, res, data_dict, outputfn)
 	figure(figsize=(30,20))
 	PyPlot.hold(true)
 	#plt[:tight_layout]()
-	@show size(res)
-	for j in collect(1:size(res,2))
+	@show size(res[:,1])
+	@show size(tout)
+	for j in collect(1:36)
 		plt[:subplot](6,6,j)
 		plot(tout, res[:,j], "k", linewidth = .25)
+#		plot(tout, res[j], "k", linewidth =.25)
 		ylabel(names[j])
 	end
 	savefig(outputfn)

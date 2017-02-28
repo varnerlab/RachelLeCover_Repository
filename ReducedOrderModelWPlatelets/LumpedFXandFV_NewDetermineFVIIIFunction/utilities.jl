@@ -272,7 +272,7 @@ function setIC(IC, exp_index)
 		IC[1]= IC[1]*1.15
 		IC[6] = IC[6]*.75
 		IC[7] = IC[7]*1.2
-		IC[11] = .001
+		IC[11] = .00
 	elseif(exp_index ==4)
 		IC[1] = IC[1]*.75
 		IC[7] = IC[7]*.95
