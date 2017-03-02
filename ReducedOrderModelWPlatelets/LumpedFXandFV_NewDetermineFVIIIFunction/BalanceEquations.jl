@@ -1,4 +1,22 @@
-using DifferentialEquations
+function AdjBalanceEquations(t,x,parameter_index, data_dictionary)
+	@show t
+	number_of_states = 11
+	#partition
+	state_array = x[1:number_of_states]
+	sensitivity_array = x[(number_of_states+1):end]
+	dxdt_array = BalanceEquations(t,state_array, data_dictionary)
+
+	#calculate sensitivity states
+	local_data_dictionary = deepcopy(data_dictionary)
+	JM = calculate_jacobian(t,state_array, local_data_dictionary)
+	BM = calculate_bmatrix(t, state_array, local_data_dictionary)
+#	@show size(JM), size(BM), size(sensitivity_array)
+	dsdt_array = JM*sensitivity_array+BM[:, parameter_index]
+	r_array = [dxdt_array; dsdt_array]
+	return r_array
+
+end
+
 
 function BalanceEquations(t,x,PROBLEM_DICTIONARY)
 	

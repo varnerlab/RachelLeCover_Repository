@@ -119,6 +119,9 @@ function buildCoagulationModelDictionary()
 	PROBLEM_DICTIONARY["NOMINAL_VALUES"] = nominal_levels
 
 	PROBLEM_DICTIONARY["FVIII_CONTROL"] = 5.20895
+	PROBLEM_DICTIONARY["parameter_name_mapping_array"]=["k_trigger","K_trigger" ,"k_amplification" ,"K_FII_amplification" ,"k_APC_formation" ,"K_PC_formation" ,"k_inhibition" ,"K_FIIa_inhibition" ,"k_inhibition_ATIII" ,"k_FV_X_activation", "K_FV_X_actiation" ,"k_FX_activation","k_FX_activation","k_complex","k_amp_prothombinase","K_FII_amp_prothombinase","k_amp_active_factors", "k_amp_active_factors","alpha_trigger_activation","order_trigger_activation","alpha_trigger_inhibition_APC","order_trigger_inhibition_APC","alpha_trigger_inhibition_TFPI", "order_trigger_inhibition_TFPI","alpha_amplification_FIIa","order_amplification_FIIa","alpha_amplification_APC","order_amplification_APC","alpha_amplification_TFPI","order_amplification_TFPI","alpha_shutdown_APC","order_shutdown_APC","alpha_FV_activation","order_FV_activation","alpha_FX_activation","order_FX_activation","alpha_FX_inhibition","order_FX_inhibition","platelet_rate_constant",
+"platelet_power","platelet_denominator","Epsmax0","aida","koffplatelets","time_delay","coeff"] 
+	PROBLEM_DICTIONARY["number_of_states"]=11
     
     return PROBLEM_DICTIONARY
 end
@@ -189,6 +192,9 @@ function buildCoagulationModelDictionary(kinetic_parameter_vector, control_param
 	PROBLEM_DICTIONARY["NOMINAL_VALUES"] = nominal_levels
 
 	PROBLEM_DICTIONARY["FVIII_CONTROL"] = 5.20895
-    
+    		PROBLEM_DICTIONARY["parameter_name_mapping_array"]=["k_trigger","K_trigger" ,"k_amplification" ,"K_FII_amplification" ,"k_APC_formation" ,"K_PC_formation" ,"k_inhibition" ,"K_FIIa_inhibition" ,"k_inhibition_ATIII" ,"k_FV_X_activation", "K_FV_X_actiation" ,"k_FX_activation","k_FX_activation","k_complex","k_amp_prothombinase","K_FII_amp_prothombinase","k_amp_active_factors", "k_amp_active_factors","alpha_trigger_activation","order_trigger_activation","alpha_trigger_inhibition_APC","order_trigger_inhibition_APC","alpha_trigger_inhibition_TFPI", "order_trigger_inhibition_TFPI","alpha_amplification_FIIa","order_amplification_FIIa","alpha_amplification_APC","order_amplification_APC","alpha_amplification_TFPI","order_amplification_TFPI","alpha_shutdown_APC","order_shutdown_APC","alpha_FV_activation","order_FV_activation","alpha_FX_activation","order_FX_activation","alpha_FX_inhibition","order_FX_inhibition","platelet_rate_constant",
+"platelet_power","platelet_denominator","Epsmax0","aida","koffplatelets","time_delay","coeff"] 
+
+	PROBLEM_DICTIONARY["number_of_states"]=11
     return PROBLEM_DICTIONARY
 end
