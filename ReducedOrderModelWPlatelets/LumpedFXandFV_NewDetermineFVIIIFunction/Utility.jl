@@ -125,7 +125,6 @@ function time_average_model_outputs(path_to_senstivity_files, file_pattern, time
 end
 
 function calculate_sensitivity_array(path_to_senstivity_files,file_pattern,time_skip,data_dictionary)
-
   # what is my system dimension?
   number_of_states = data_dictionary["number_of_states"]
 
@@ -139,6 +138,7 @@ function calculate_sensitivity_array(path_to_senstivity_files,file_pattern,time_
   list_of_files = searchdir(path_to_senstivity_files,file_pattern)
   number_of_files = length(list_of_files)
   time_array = []
+  selected_states_array =zeros(61,number_of_states)
   for file_index = 1:number_of_files
 
     # Build path -
@@ -151,6 +151,9 @@ function calculate_sensitivity_array(path_to_senstivity_files,file_pattern,time_
     time_array = local_data_array[:,1]
     X = local_data_array[:,2:end]
     state_array = X[:,1:number_of_states]
+#	@show size(state_array)
+#	@show size(state_array[1:time_skip:end,:])
+	selected_states_array = selected_states_array+state_array[1:time_skip:end,:]
     sensitivity_array = X[:,(number_of_states+1):end]
     scaled_sensitivity_block = scale_sensitivity_array(time_array,state_array,sensitivity_array,file_index,data_dictionary)
 
@@ -158,6 +161,7 @@ function calculate_sensitivity_array(path_to_senstivity_files,file_pattern,time_
     key_symbol = file_pattern*string(file_index)*".dat"
     block_dictionary[key_symbol] = transpose(scaled_sensitivity_block)
   end
+	selected_states_array = selected_states_array/number_of_files
 
   # what is my system dimension?
   number_of_timesteps = length(time_array)
@@ -168,7 +172,7 @@ function calculate_sensitivity_array(path_to_senstivity_files,file_pattern,time_
   sample_time_array = Float64[]
 	@show number_of_timesteps
   for time_step_index = 1:time_skip:number_of_timesteps
-    time_value = time_array[Int(floor(time_step_index))]
+    time_value = time_array[((time_step_index))]
     push!(sample_time_array,time_value)
 
     local_sens_block = zeros(number_of_states,number_of_parameters)
@@ -179,7 +183,7 @@ function calculate_sensitivity_array(path_to_senstivity_files,file_pattern,time_
       block = block_dictionary[key_symbol]
 
       # grab the col -
-      block_col = block[:,Int(floor(time_step_index))]
+      block_col = block[:,((time_step_index))]
 
       for state_index = 1:number_of_states
         local_sens_block[state_index,parameter_index] = block_col[state_index]
@@ -192,7 +196,7 @@ function calculate_sensitivity_array(path_to_senstivity_files,file_pattern,time_
 
   # cutoff leading block -
   sensitivity_array = sensitivity_array[(number_of_states+1):end,:]
-  return (sample_time_array,sensitivity_array)
+  return (sample_time_array,sensitivity_array, selected_states_array)
 end
 
 function calculate_average_scaled_sensitivity_array(path_to_senstivity_files,file_pattern,data_dictionary)
@@ -262,7 +266,7 @@ function time_average_array(time_array,data_array)
 
 end
 
-function calculate_sensitivity_array(path_to_senstivity_files,file_pattern,time_skip,data_dictionary)
+function calculate_sensitivity_array(path_to_senstivity_files,file_pattern,time_skip,data_dictionary, tstart, tend)
 
   # what is my system dimension?
   number_of_states = data_dictionary["number_of_states"]

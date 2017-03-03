@@ -6,7 +6,7 @@ using PyPlot
 function calculateSensitivityArr()
 	pathToSensitivityFiles = "sensitivity/AdjSimulation03012017/"
 	pattern = "-P"
-	timeSkip = 1.0
+	timeSkip = 100
 	time_start = 0.0
 	time_stop = 60.0
 	time_step_size=.01
@@ -15,21 +15,27 @@ function calculateSensitivityArr()
 	num_species =11
 	eps = 1E-2
 	parameter_name_mapping_array = data_dictionary["parameter_name_mapping_array"]
-	time_arr,sensitivity_arr = calculate_sensitivity_array(pathToSensitivityFiles, pattern, timeSkip, data_dictionary)
+	time_arr,sensitivity_arr,selected_states_array = calculate_sensitivity_array(pathToSensitivityFiles, pattern, timeSkip, data_dictionary)
 	@show size(sensitivity_arr)
-	@show size(time_arr)
-	avg_sensitivity_arr = calculate_average_scaled_sensitivity_array(pathToSensitivityFiles, pattern, data_dictionary)
-	@show size(avg_sensitivity_arr)
-	avg_state_arr = time_average_model_outputs(pathToSensitivityFiles, pattern, timeSkip, data_dictionary)
-	useful_state_vec = mean(avg_state_arr,1)
-	@show useful_state_vec
-	@show size(avg_state_arr)
-	estable_params = estimate_identifiable_parameters(avg_sensitivity_arr, eps)
+	@show selected_states_array[1,1]
+	@show selected_states_array[1]
+	@show selected_states_array[1,:]
+	@show selected_states_array[:,1]
+#	avg_sensitivity_arr = calculate_average_scaled_sensitivity_array(pathToSensitivityFiles, pattern, data_dictionary)
+#	@show size(avg_sensitivity_arr)
+#	avg_state_arr = time_average_model_outputs(pathToSensitivityFiles, pattern, timeSkip, data_dictionary)
+#	@show avg_state_arr
+#	useful_state_vec = mean(avg_state_arr,2)
+#	@show useful_state_vec
+#	@show size(avg_state_arr)
+	estable_params = estimate_identifiable_parameters(sensitivity_arr, eps)
 	@show estable_params
-	W = createW(num_species,useful_state_vec, eps)
-	#FIM = calculate_fisher_information_matrix(avg_sensitivity_arr, eye(num_species)*eps,estable_params)
-	FIM = calculate_fisher_information_matrix(avg_sensitivity_arr, W,estable_params)
-	@show FIM
+#	W = createW(num_species,useful_state_vec, eps)
+#	#FIM = calculate_fisher_information_matrix(avg_sensitivity_arr, eye(num_species)*eps,estable_params)
+##	FIM = calculate_fisher_information_matrix(avg_sensitivity_arr, W,estable_params)
+#	W = createWTimeVar(num_species, selected_states_array,eps)
+	FIM = calculate_fisher_information_matrix(sensitivity_arr, eye(size(sensitivity_arr,1)),estable_params)
+#	@show FIM
 	@show size(FIM)
 	d = abs(diag(inv(FIM)))
 	@show d
@@ -45,15 +51,36 @@ function createW(num_species, time_avg_data, eps)
 	W = eye(num_species)*eps
 	for(j in collect(1:num_species))
 		for(i in collect(1:num_species))
-			#if(i!=j)
+			if(i!=j)
 				W[i,j]=time_avg_data[i]*time_avg_data[j]*.1^2
-			#end
+			else
+				W[i,j] = eps
+			end
 		end
 	end
 	@show(W==transpose(W))
+	@show W
 	return W
 	
 end
+
+function createWTimeVar(num_species,time_data, eps)
+	W = eye(num_species*size(time_data,1))*eps
+	len = size(W,1)
+	species_1_idx = 1
+	species_2_idx =1
+	time_idx = 1
+	num_time_pts = size(time_data,1)
+	for(j in collect(1:len))
+		
+		for(i in collect(1:len))
+				W[j,i]=time_data[time_idx,species_1_idx]*time_data[time_idx,species_2_idx]*.1^2
+		end
+	end
+	@show(W==transpose(W))
+	return W	
+end
+
 
 function plotParamEsts(params,var, CI_top, CI_bottom, labels)
 	close("all")
