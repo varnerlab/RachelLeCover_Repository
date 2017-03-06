@@ -42,3 +42,31 @@ println("Subset Sampler Output")
 sim = sim1[1:1000, ["lp__", "theta", "accept_stat__"], :]
 describe(sim)
 println()
+println("Brooks, Gelman and Rubin Convergence Diagnostic")
+try
+  gelmandiag(sim1, mpsrf=true, transform=true) |> display
+catch e
+  #println(e)
+  gelmandiag(sim, mpsrf=false, transform=true) |> display
+end
+println()
+
+println("Geweke Convergence Diagnostic")
+gewekediag(sim) |> display
+println()
+
+println("Highest Posterior Density Intervals")
+hpd(sim) |> display
+println()
+
+println("Cross-Correlations")
+cor(sim) |> display
+println()
+
+println("Lag-Autocorrelations")
+autocor(sim) |> display
+println()
+
+p = plot(sim, [:trace, :mean, :density, :autocor], legend=true);
+draw(p, ncol=4, filename="summaryplot", fmt=:svg)
+draw(p, ncol=4, filename="summaryplot", fmt=:pdf)
