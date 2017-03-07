@@ -17,10 +17,6 @@ function calculateSensitivityArr()
 	parameter_name_mapping_array = data_dictionary["parameter_name_mapping_array"]
 	time_arr,sensitivity_arr,selected_states_array = calculate_sensitivity_array(pathToSensitivityFiles, pattern, timeSkip, data_dictionary)
 	@show size(sensitivity_arr)
-	@show selected_states_array[1,1]
-	@show selected_states_array[1]
-	@show selected_states_array[1,:]
-	@show selected_states_array[:,1]
 #	avg_sensitivity_arr = calculate_average_scaled_sensitivity_array(pathToSensitivityFiles, pattern, data_dictionary)
 #	@show size(avg_sensitivity_arr)
 #	avg_state_arr = time_average_model_outputs(pathToSensitivityFiles, pattern, timeSkip, data_dictionary)
@@ -46,6 +42,46 @@ function calculateSensitivityArr()
 	#plotParamEsts(params[estable_params], var, CI_top, CI_bottom,parameter_name_mapping_array[estable_params])
 	return (parameter_name_mapping_array[estable_params], params[estable_params], CI_top, CI_bottom)
 end
+
+function unscale(sens_arr, params)
+	unscaled_arr = zeros(size(sens_arr))
+	for i in collect(1:size(sens_arr,1))
+		for j in collect(1:size(params,2))
+			@show i,j, sens_arr[i,j], params[j]
+			unscaled_arr[i,j] = sens_arr[i,j]*params[j]
+		end
+	end
+	return unscaled_arr
+end
+
+function calculateSensitivityArrSelectedSpecies()
+	pathToSensitivityFiles = "sensitivity/AdjSimulation03012017/"
+	pattern = "-P"
+	timeSkip = 100
+	time_start = 0.0
+	time_stop = 60.0
+	time_step_size=.01
+	params = readdlm("parameterEstimation/AfterCalculatingF8FunctionPostNM.txt", ',')
+	data_dictionary = buildDictFromOneVector(params)
+	num_species =11
+	eps = 1.05
+	parameter_name_mapping_array = data_dictionary["parameter_name_mapping_array"]
+	time_arr,sensitivity_arr = calculate_sensitivity_array_selected_species(pathToSensitivityFiles, pattern, timeSkip, data_dictionary, [2])
+	@show size(sensitivity_arr)
+	estable_params = estimate_identifiable_parameters(sensitivity_arr, eps)
+	@show estable_params
+	#unscaled_arr = unscale(sensitivity_arr, params)
+	#FIM = calculate_fisher_information_matrix(unscaled_arr, eye(size(sensitivity_arr,1))*eps,estable_params) #to unscale
+	FIM = calculate_fisher_information_matrix(sensitivity_arr, eye(size(sensitivity_arr,1))*eps,estable_params)
+	#FIM=calculate_fisher_information_matrix(sensitivity_arr, ones(size(sensitivity_arr,1), size(sensitivity_arr,1))*1E4,estable_params)
+	d = abs(diag(inv(FIM)))
+	var = (d.^(.5))
+	CI_top = params[estable_params]+1.96*var
+	CI_bottom = params[estable_params]-1.96*var
+	return (parameter_name_mapping_array[estable_params], params[estable_params], CI_top, CI_bottom)
+
+end
+
 
 function createW(num_species, time_avg_data, eps)
 	W = eye(num_species)*eps

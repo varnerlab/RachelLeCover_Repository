@@ -199,6 +199,78 @@ function calculate_sensitivity_array(path_to_senstivity_files,file_pattern,time_
   return (sample_time_array,sensitivity_array, selected_states_array)
 end
 
+function calculate_sensitivity_array_selected_species(path_to_senstivity_files,file_pattern,time_skip,data_dictionary, species_id)
+
+  # what is my system dimension?
+  number_of_states = data_dictionary["number_of_states"]
+
+  # load the files -
+  searchdir(path,key) = filter(x->contains(x,key),readdir(path))
+
+  # block_dictionary -
+  block_dictionary = Dict()
+
+  # build file list -
+  list_of_files = searchdir(path_to_senstivity_files,file_pattern)
+  number_of_files = length(list_of_files)
+  time_array = []
+  for file_index = 1:number_of_files
+
+    # Build path -
+    path_to_data_file = path_to_senstivity_files*"/"*file_pattern*string(file_index)*".dat"
+
+    # Load file -
+    local_data_array = readdlm(path_to_data_file)
+
+    # split -
+    time_array = local_data_array[:,1]
+    X = local_data_array[:,2:end]
+    state_array = X[:,1:number_of_states]
+    sensitivity_array = X[:,(number_of_states+1):end]
+    scaled_sensitivity_block = scale_sensitivity_array(time_array,state_array,sensitivity_array,file_index,data_dictionary)
+	@show size(scaled_sensitivity_block)
+	@show size(scaled_sensitivity_block[:,species_id])
+	scaled_sensitivity_block=scaled_sensitivity_block[:,species_id]
+    # store the transpose -
+    key_symbol = file_pattern*string(file_index)*".dat"
+    block_dictionary[key_symbol] = transpose(scaled_sensitivity_block)
+  end
+
+  # what is my system dimension?
+  number_of_timesteps = length(time_array)
+  number_of_parameters = number_of_files
+
+  # initialize -
+  sensitivity_array = zeros(size(species_id,1),number_of_parameters)
+  sample_time_array = Float64[]
+  for time_step_index = 1:time_skip:number_of_timesteps
+    time_value = time_array[(time_step_index)]
+    push!(sample_time_array,time_value)
+
+    local_sens_block = zeros(size(species_id,1),number_of_parameters)
+    for parameter_index = 1:number_of_parameters
+
+      # get the block from the dictionary -
+      key_symbol = file_pattern*string(parameter_index)*".dat"
+      block = block_dictionary[key_symbol]
+
+      # grab the col -
+      block_col = block[:,(time_step_index)]
+
+      for state_index = 1:size(species_id,1)
+        local_sens_block[state_index,parameter_index] = block_col[state_index]
+      end
+    end
+
+    # add block to s array -
+    sensitivity_array = [sensitivity_array ; local_sens_block]
+  end
+
+  # cutoff leading block -
+  sensitivity_array = sensitivity_array[(size(species_id,1)+1):end,:]
+  return (sample_time_array,sensitivity_array)
+end
+
 function calculate_average_scaled_sensitivity_array(path_to_senstivity_files,file_pattern,data_dictionary)
 
   # what is my system dimension?

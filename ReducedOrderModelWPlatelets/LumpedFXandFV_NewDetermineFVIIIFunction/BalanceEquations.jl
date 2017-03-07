@@ -58,7 +58,6 @@ function BalanceEquations(t,x,PROBLEM_DICTIONARY)
 	qualitative_factor_level_vector = PROBLEM_DICTIONARY["FACTOR_LEVEL_VECTOR"]
 	platelet_parameter_vector = PROBLEM_DICTIONARY["PLATELET_PARAMS"]
 	timing = PROBLEM_DICTIONARY["TIME_DELAY"]
-	nominal_levels = PROBLEM_DICTIONARY["NOMINAL_VALUES"]
 
 	# Alias the qualitative factors -
 	TFPI = qualitative_factor_level_vector[1]
@@ -103,11 +102,11 @@ function BalanceEquations(t,x,PROBLEM_DICTIONARY)
 	aida = platelet_parameter_vector[5] #5 aida
 	koffplatelets = platelet_parameter_vector[6]
 
-	#nominal_levels
-	nominal_TFPI = nominal_levels[1]
-	nominal_FVIII = nominal_levels[2]
-	nominal_FIX = nominal_levels[3]
-	nominal_FV_X = nominal_levels[4]
+#	#nominal_levels
+#	nominal_TFPI = nominal_levels[1]
+#	nominal_FVIII = nominal_levels[2]
+#	nominal_FIX = nominal_levels[3]
+#	nominal_FV_X = nominal_levels[4]
 
 	#FVIII function
 	FVIII_control = PROBLEM_DICTIONARY["FVIII_CONTROL"]
@@ -229,7 +228,7 @@ function BalanceEquations(t,x,PROBLEM_DICTIONARY)
 	dxdt_total[8] = kplatelts*(EpsMax-Eps)-koffplatelets*Eps#-rate_vector[5] #frac active platelets
 	#dxdt_total[8] = 0.0 #if no platelets, they can't be activated
 	dxdt_total[9] = -1*modified_rate_vector[1] #FV_FX
-	dxdt_total[10] = modified_rate_vector[1] -rate_vector[5]#FV_FXa
+	dxdt_total[10] = modified_rate_vector[1] -modified_rate_vector[5]#FV_FXa
 	dxdt_total[11] = modified_rate_vector[5] #Prothromibase_platelets
 
 	idx = find(x->(x<0),x);
