@@ -1,0 +1,47 @@
+k_trigger,1741.46,5224.39
+K_trigger,0.499082,1.49725
+k_amplification,2.25467,6.76401
+K_FII_amplification,497.433,1492.3
+k_APC_formation ,0.252276,0.756828
+K_PC_formation,3.43467,10.304
+k_inhibition ,41.3447,124.034
+K_FIIa_inhibition,2552.09,7656.26
+k_inhibition_ATIII ,4.17E-05,0.000125221
+k_FV_X_activation ,3794.59,11383.8
+K_FV_X_actiation ,227.956,683.866
+k_FX_activation,407.394,1222.18
+k_FX_activation,1.38456,4.15368
+k_complex,3499.66,10499
+k_amp_prothombinase,2613.87,7841.61
+K_FII_amp_prothombinase,2235.37,6706.11
+k_amp_active_factors,35,105
+k_amp_active_factors,26.0365,78.1095
+alpha_trigger_activation ,11.9232,35.7698
+order_trigger_activation,0.80054,2.40162
+alpha_trigger_inhibition_APC,2.25362,6.76086
+order_trigger_inhibition_APC,2.38857,7.16571
+alpha_trigger_inhibition_TFPI,0.0587185,0.176155
+order_trigger_inhibition_TFPI,0.0192898,0.0578694
+alpha_amplification_FIIa,0.248808,0.746424
+order_amplification_FIIa,13.3688,40.1063
+alpha_amplification_APC ,6.5394,19.6182
+order_amplification_APC,27.0455,81.1367
+alpha_amplification_TFPI,0.081343,0.244029
+order_amplification_TFPI,0.343334,1.03
+alpha_shutdown_APC,12.9276,38.7829
+order_shutdown_APC,7.7562,23.2686
+alpha_FV_activation,2.61043,7.83129
+order_FV_activation,0.288693,0.866078
+alpha_FX_activation,4.29613,12.8884
+order_FX_activation,3.99188,11.9756
+alpha_FX_inhibition,20.4067,61.2202
+order_FX_inhibition,3.7021,11.1063
+platelet_rate_constant,0.84939,2.54817
+platelet_power,1.38386,4.15159
+platelet_denominator,3.03E-09,9.10E-09
+Epsmax0,0.0102355,0.0307066
+aida,1.90E-06,5.71E-06
+koffplatelets,0.063107,0.189321
+time_delay,1.14291,3.42874
+coeff,1.49809,4.49426
+
