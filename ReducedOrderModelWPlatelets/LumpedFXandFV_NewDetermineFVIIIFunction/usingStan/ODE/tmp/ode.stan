@@ -6,6 +6,9 @@ functions {
 		          int[] x_i) {
 		 real dydt[2];
 		 dydt[1] <- y[2];
+		if(t>4){
+			dydt[1] <-5*y[2];		
+		}
 		 dydt[2] <- -y[1] - theta[1] * y[2];
 		 return dydt;
 		}

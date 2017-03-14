@@ -19,7 +19,7 @@ function runModel(TSTART,Ts,TSTOP)
 #	fbalances(t,y,ydot)=BalanceEquations(t,y,ydot,PROBLEM_DICTIONARY)
 #	X = Sundials.cvode(fbalances,reshaped_IC,TSIM, abstol =1E-4, reltol=1E-4);
 	fbalances(t,y)= BalanceEquations(t,y,PROBLEM_DICTIONARY) 
-	t,X = ODE.ode23s(fbalances,(initial_condition_vector),TSIM; abstol = 1E-9, reltol = 1E-9, maxstep = 1E-2,points=:specified)
+	t,X = ODE.ode23s(fbalances,(initial_condition_vector),TSIM; abstol = 1E-5, reltol = 1E-5, maxstep = 1E-2,points=:specified)
 #	println("got here")
 	return (t,X);
 end
@@ -195,7 +195,7 @@ function plotFluxes(pathToData,t)
 		@show size(t)
 		@show size(data[:,j])
 		currdata = data[:,j]
-		currdata[currdata.>=1E6] = 0.0
+		currdata[currdata.>=1E3] = 0.0
 		plot(t, currdata, ".k")
 		title(string("reaction ", j))
 	end
@@ -206,16 +206,15 @@ function main()
 	#pathToData = "../data/ButenasFig1B60nMFVIIa.csv"
 	pathToData = "../data/Luan2010Fig5A.csv"
 	close("all")
-	#rm("ratevector.txt")
-	#rm("modifiedratevector.txt")
-	#rm("times.txt")
+#	rm("ratevector.txt")
+#	rm("modifiedratevector.txt")
+#	rm("times.txt")
 	(t,x) = runModel(0.0, .01, 60.0)
 	@show size(t)
 	#remove tiny elements that are causing plotting problems
-	#x[x.<=1E-20] = 0.0
-	#times = readdlm("times.txt")
-	#plotFluxes("ratevector.txt",times)
-	#plotFluxes("modifiedratevector.txt",times)
+#	times = readdlm("times.txt")
+#	plotFluxes("ratevector.txt",times)
+#	plotFluxes("modifiedratevector.txt",times)
 
 	#println(x)
 	makeLoopPlots(t,x)
@@ -360,9 +359,9 @@ function runModelWithParams(params)
 	dict = buildDictFromOneVector(params)
 	initial_condition_vector = dict["INITIAL_CONDITION_VECTOR"]
 	fbalances(t,y)= BalanceEquations(t,y,dict) 
-	t,X = ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-6, reltol = 1E-6)
+	t,X = ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-5, reltol = 1E-5)
 	plotThrombinWData(t,X,pathToData)
-	#savefig("figures/AfterSomeHandFitting02_09_2017.pdf")
+	#savefig("figures/AfterNM03_03_2017Round2.pdf")
 	makeLoopPlots(t,X)
 	MSE, interpolatedExperimentalData=calculateMSE(t, [a[2] for a in X], readdlm(pathToData, ','))
 	return MSE

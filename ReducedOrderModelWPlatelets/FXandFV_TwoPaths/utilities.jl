@@ -51,10 +51,10 @@ function calculateAUC(t,y)
 end
 
 function buildDictFromOneVector(vector)
-	kinetic_parameter_vector = vector[1:18]
-	control_parameter_vector=vector[19:38]
-	platelet_parameter_vector=vector[39:44]
-	timing = vector[45:46]
+	kinetic_parameter_vector = vector[1:16]
+	control_parameter_vector=vector[17:36]
+	platelet_parameter_vector=vector[37:42]
+	timing = vector[43:44]
 	dict = buildCoagulationModelDictionary(kinetic_parameter_vector, control_parameter_vector, platelet_parameter_vector, timing)
 	return dict
 end

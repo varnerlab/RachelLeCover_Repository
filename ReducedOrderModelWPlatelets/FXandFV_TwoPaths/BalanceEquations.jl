@@ -25,7 +25,7 @@ function BalanceEquations(t,x,PROBLEM_DICTIONARY)
 	idx = find(x->(x<0),x);
 	x[idx] = 0.0;
 
-	idx = find(x->(abs(x)<1E-15),x); #lets make anything less than 1E-9 zero
+	idx = find(x->(abs(x)<1E-25),x); #lets make anything less than 1E-9 zero
 	#@show idx
 	x[idx] = 0.0;
 #	for j = 1:length(x)
@@ -247,7 +247,7 @@ function BalanceEquations(t,x,PROBLEM_DICTIONARY)
 		time_scale = 1.0
 	end
 	#@show dxdt_total
-	idx = find(dxdt_total->(abs(dxdt_total)<1E-15),dxdt_total); #lets make anything less than 1E-9 zero
+	idx = find(dxdt_total->(abs(dxdt_total)<1E-25),dxdt_total); #lets make anything less than 1E-9 zero
 	#@show idx
 	dxdt_total[idx] = 0.0;
 

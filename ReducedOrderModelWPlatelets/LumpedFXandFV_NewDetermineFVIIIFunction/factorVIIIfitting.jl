@@ -113,7 +113,7 @@ function makeOneFigure()
 	end
 	#legend(["FVIII=107%", "FVIII=100%", "FVIII=39%", "FVIII=7%", "FVIII=1%", "FVIII=0%"])
 	axis([0, 60, 0, 400])
-	savefig("figures/MasterFigure_17_02_2017.pdf")
+	savefig("figures/MasterFigure_08_03_2017.pdf")
 end
 
 function calculateF8control(f8)

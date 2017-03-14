@@ -45,8 +45,14 @@ sho(const T0__& t,
             current_statement_begin__ = 8;
             stan::math::assign(get_base1_lhs(dydt,1,"dydt",1), get_base1(y,2,"y",1));
             current_statement_begin__ = 9;
+            if (as_bool(logical_gt(t,4))) {
+
+                current_statement_begin__ = 10;
+                stan::math::assign(get_base1_lhs(dydt,1,"dydt",1), (5 * get_base1(y,2,"y",1)));
+            }
+            current_statement_begin__ = 12;
             stan::math::assign(get_base1_lhs(dydt,2,"dydt",1), (-(get_base1(y,1,"y",1)) - (get_base1(theta,1,"theta",1) * get_base1(y,2,"y",1))));
-            current_statement_begin__ = 10;
+            current_statement_begin__ = 13;
             return stan::math::promote_scalar<fun_return_scalar_t__>(dydt);
         }
     } catch (const std::exception& e) {
@@ -329,17 +335,17 @@ public:
                 stan::math::fill(y_hat,DUMMY_VAR__);
 
 
-                current_statement_begin__ = 36;
-                lp_accum__.add(cauchy_log<propto__>(sigma, 0, 2.5));
-                current_statement_begin__ = 37;
-                lp_accum__.add(normal_log<propto__>(theta, 0, 1));
-                current_statement_begin__ = 38;
-                lp_accum__.add(normal_log<propto__>(y0, 0, 1));
                 current_statement_begin__ = 39;
-                stan::math::assign(y_hat, integrate_ode_rk45(sho_functor__(), y0, t0, ts, theta, x_r, x_i, pstream__));
+                lp_accum__.add(cauchy_log<propto__>(sigma, 0, 2.5));
                 current_statement_begin__ = 40;
+                lp_accum__.add(normal_log<propto__>(theta, 0, 1));
+                current_statement_begin__ = 41;
+                lp_accum__.add(normal_log<propto__>(y0, 0, 1));
+                current_statement_begin__ = 42;
+                stan::math::assign(y_hat, integrate_ode_rk45(sho_functor__(), y0, t0, ts, theta, x_r, x_i, pstream__));
+                current_statement_begin__ = 43;
                 for (int t = 1; t <= T; ++t) {
-                    current_statement_begin__ = 41;
+                    current_statement_begin__ = 44;
                     lp_accum__.add(normal_log<propto__>(get_base1(y,t,"y",1), get_base1(y_hat,t,"y_hat",1), sigma));
                 }
             }
@@ -459,14 +465,14 @@ public:
 
 
         try {
-            current_statement_begin__ = 46;
+            current_statement_begin__ = 49;
             stan::math::assign(y_hat, integrate_ode_rk45(sho_functor__(), y0, t0, ts, theta, x_r, x_i, pstream__));
-            current_statement_begin__ = 48;
+            current_statement_begin__ = 51;
             for (int t = 1; t <= T; ++t) {
 
-                current_statement_begin__ = 49;
+                current_statement_begin__ = 52;
                 stan::math::assign(get_base1_lhs(get_base1_lhs(y_hat,t,"y_hat",1),1,"y_hat",2), (get_base1(get_base1(y_hat,t,"y_hat",1),1,"y_hat",2) + normal_rng(0,0.10000000000000001, base_rng__)));
-                current_statement_begin__ = 50;
+                current_statement_begin__ = 53;
                 stan::math::assign(get_base1_lhs(get_base1_lhs(y_hat,t,"y_hat",1),2,"y_hat",2), (get_base1(get_base1(y_hat,t,"y_hat",1),2,"y_hat",2) + normal_rng(0,0.10000000000000001, base_rng__)));
             }
         } catch (const std::exception& e) {
