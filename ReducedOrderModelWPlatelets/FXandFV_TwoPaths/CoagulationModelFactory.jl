@@ -33,9 +33,9 @@ function buildCoagulationModelDictionary()
     kinetic_parameter_vector = Float64[]
     push!(kinetic_parameter_vector,7200*1.5)       # 1 k_trigger
     push!(kinetic_parameter_vector,.001)       # 2 K_trigger
-    push!(kinetic_parameter_vector,2.0)        # 3 k_amplification
-    push!(kinetic_parameter_vector,1)       # 4 K_FII_amplification
-    push!(kinetic_parameter_vector,.05)        # 5 k_APC_formation
+    push!(kinetic_parameter_vector,1.0)        # 3 k_amplification
+    push!(kinetic_parameter_vector,100)       # 4 K_FII_amplification
+    push!(kinetic_parameter_vector,.1)        # 5 k_APC_formation
     push!(kinetic_parameter_vector,3/100.0)         # 6 K_PC_formation
     push!(kinetic_parameter_vector,0.2*100)        # 7 k_inhibition
     push!(kinetic_parameter_vector,120)       # 8 K_FIIa_inhibition
@@ -43,7 +43,7 @@ function buildCoagulationModelDictionary()
     push!(kinetic_parameter_vector,1.2) #10 k_FV_activation, from reaction 16 in Diamond 2010 paper
     push!(kinetic_parameter_vector, 1.0) #11 K_FV_activation 
     push!(kinetic_parameter_vector, 2400) #12 k_complex
-    push!(kinetic_parameter_vector, 63.5*2 )#13 k_amp_prothombinase from reaction 18 in Diamond 2010
+    push!(kinetic_parameter_vector, 400)#13 k_amp_prothombinase from reaction 18 in Diamond 2010
     push!(kinetic_parameter_vector, 160) #14 K_FII_amp_prothombinase
     push!(kinetic_parameter_vector, 6.0*10) #k_amp_FXa
     push!(kinetic_parameter_vector, .01) #K_amp_FXa

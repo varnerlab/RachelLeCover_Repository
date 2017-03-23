@@ -27,7 +27,7 @@ function objectiveForNLOpt(params::Vector, grad::Vector)
 	TSIM = collect(TSTART:Ts:TSTOP)
 	initial_condition_vector = dict["INITIAL_CONDITION_VECTOR"]
 	dict["FVIII_CONTROL"] =params[1]
-	@show params
+	@show dict["FACTOR_LEVEL_VECTOR"][3], dict["FVIII_CONTROL"]
 	fbalances(t,y)= BalanceEquations(t,y,dict)
 	#println("got here") 
 	t,X = ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-6, reltol = 1E-6)
@@ -46,12 +46,12 @@ end
 
 function attemptOptimizationNLOptF8(exp_index,dict)
 	numvars = 1
-	opt = Opt(:LN_NELDERMEAD, numvars)
-	lower_bounds!(opt, vec(fill(1E-9,1,numvars)))
-	upper_bounds!(opt, vec(fill(1E2,1,numvars)))
+	opt = Opt(:LN_COBYLA, numvars)
+	lower_bounds!(opt, vec(fill(1E-4,1,numvars)))
+	upper_bounds!(opt, vec(fill(1E3,1,numvars)))
 	min_objective!(opt, objectiveForNLOpt)
 	dict = createCorrectDict(dict, exp_index)
-	(minf, minx, ret) = NLopt.optimize(opt, vec([50]))
+	(minf, minx, ret) = NLopt.optimize(opt, vec([500]))
 	println("got $minf at $minx after $count iterations (returned $ret)")
 	return minf, minx, ret
 	
@@ -60,10 +60,15 @@ end
 
 function runOpt(exp_index)
 	global experimentaldata = allexperimentaldata[exp_index]
-	global savestr = string("parameterEstimation/fitF8/NM15022017EstFVIIIparamDataSet",exp_index, ".txt")
-	params = readdlm("parameterEstimation/AfterCalculatingF8FunctionPostNM.txt", ',')
+	global savestr = string("parameterEstimation/fitF8/NM17032017EstFVIIIparamDataSet",exp_index, ".txt")
+	params = readdlm("parameterEstimation/bestAfterNMround302_15_2017.txt", ',')
 	global dict =buildDictFromOneVector(params)
 	dict = createCorrectDict(dict, exp_index)
+	@show dict["FACTOR_LEVEL_VECTOR"][3]
+	#if I want to fiddle with IC to make better fit
+	initial_condition_vector = dict["INITIAL_CONDITION_VECTOR"]
+	initial_condition_vector = setIC(initial_condition_vector, exp_index)
+	dict["INITIAL_CONDITION_VECTOR"]=initial_condition_vector
 	minf, minx, ret=attemptOptimizationNLOptF8(exp_index, dict)
 	return minf, minx, ret
 end
@@ -75,9 +80,8 @@ function runAllOpt()
 		results[j-1,1] = minf
 		results[j-1,2] = minx[1]
 	end
-	f8 = [1.07,.39,.07,.01, 0.0, 1.0]
+	f8 = [1.07,.39,.07,.01, 0.0]
 	f8control = results[:,2]
-	push!(f8control, 5.2089)
 	figure()
 	semilogy(f8, f8control, "k.")
 	xlabel("FVIII Level")
@@ -100,7 +104,7 @@ end
 
 function makeOneFigure()
 	close("all")
-	params = readdlm("parameterEstimation/AfterCalculatingF8FunctionPostNM.txt", ',')
+	params = readdlm("parameterEstimation/bestAfterNMround302_15_2017.txt", ',')
 	indices = [2,3,4,5,6,1]
 	f8 = [1.07,.39,.07,.01, 0.0, 1.0]
 	j = 1
@@ -113,10 +117,18 @@ function makeOneFigure()
 	end
 	#legend(["FVIII=107%", "FVIII=100%", "FVIII=39%", "FVIII=7%", "FVIII=1%", "FVIII=0%"])
 	axis([0, 60, 0, 400])
-	savefig("figures/MasterFigure_08_03_2017.pdf")
+	savefig("figures/MasterFigure_15_03_2017.pdf")
 end
 
+#old
+#function calculateF8control(f8)
+#	control = 4.6863*f8^2+.5357*f8-.01319
+#	return abs(control)
+#end
+
+#new
 function calculateF8control(f8)
-	control = 4.6863*f8^2+.5357*f8-.01319
+	control = -1.30954*f8^2+2.5819*f8-.0032
 	return abs(control)
+	
 end

@@ -1,0 +1,7 @@
+DIAGNOSTIC(S) FROM PARSER:
+Warning (non-fatal): assignment operator <- deprecated in the Stan language; use = instead.
+Warning (non-fatal): assignment operator <- deprecated in the Stan language; use = instead.
+Warning (non-fatal): assignment operator <- deprecated in the Stan language; use = instead.
+Warning (non-fatal): assignment operator <- deprecated in the Stan language; use = instead.
+Warning: the integrate_ode() function is deprecated in the Stan language; use integrate_ode_rk45() [non-stiff] or integrate_ode_bdf() [stiff] instead.
+

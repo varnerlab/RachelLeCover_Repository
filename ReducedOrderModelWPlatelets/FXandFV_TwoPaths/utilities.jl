@@ -122,7 +122,7 @@ function createCorrectDict(basic_dict, exp_index)
 	if(exp_index==1)
 		
 	elseif(exp_index==2)
-		basic_dict["FACTOR_LEVEL_VECTOR"][3] =basic_dict["FACTOR_LEVEL_VECTOR"][3]*1.06 
+		basic_dict["FACTOR_LEVEL_VECTOR"][3] =basic_dict["FACTOR_LEVEL_VECTOR"][3]*1.07
 	elseif(exp_index==3)
 		basic_dict["FACTOR_LEVEL_VECTOR"][3] =basic_dict["FACTOR_LEVEL_VECTOR"][3]*.39
 	elseif(exp_index==4)

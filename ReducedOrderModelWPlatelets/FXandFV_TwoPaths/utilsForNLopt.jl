@@ -39,7 +39,7 @@ function objectiveForNLOpt(params::Vector, grad::Vector)
 	#hold("on")
 	#plot(t, FIIa, alpha = .5)
 	#write params to file
-	f = open("parameterEstimation/NLoptCOBYLA_2017_03_14AfterSomeHandFitting.txt", "a+")
+	f = open("parameterEstimation/NLoptNM_2017_03_16Run3.txt", "a+")
 	write(f, string(params, ",", MSE, "\n"))
 	close(f)
 	#toc()
@@ -86,12 +86,7 @@ end
 
 function attemptOptimizationNLOpt()
 	numvars = 44
-	opt = Opt(:LN_COBYLA,numvars)
-	lower_bounds!(opt, vec(fill(0.0,1,numvars)))
-	upperbounds = fill(1E7, 1, numvars)
-	upperbounds[3] = 70.0 #bound k_amplication to be small
-	upperbounds[17] = 70.0 #bound k_amp_active_factors to be small
-	upper_bounds!(opt, vec(upperbounds))
+	opt = Opt(:LN_NELDERMEAD,numvars)
 	min_objective!(opt, objectiveForNLOpt)
 	#ftol_abs!(opt, 1E-4)
 	#min_objective!(opt, objectiveForNLOptFourDataSets)
@@ -100,9 +95,9 @@ function attemptOptimizationNLOpt()
    kinetic_parameter_vector = Float64[]
     push!(kinetic_parameter_vector,7200*1.5)       # 1 k_trigger
     push!(kinetic_parameter_vector,.001)       # 2 K_trigger
-    push!(kinetic_parameter_vector,2.0)        # 3 k_amplification
-    push!(kinetic_parameter_vector,1)       # 4 K_FII_amplification
-    push!(kinetic_parameter_vector,.05)        # 5 k_APC_formation
+    push!(kinetic_parameter_vector,1.0)        # 3 k_amplification
+    push!(kinetic_parameter_vector,100)       # 4 K_FII_amplification
+    push!(kinetic_parameter_vector,.1)        # 5 k_APC_formation
     push!(kinetic_parameter_vector,3/100.0)         # 6 K_PC_formation
     push!(kinetic_parameter_vector,0.2*100)        # 7 k_inhibition
     push!(kinetic_parameter_vector,120)       # 8 K_FIIa_inhibition
@@ -110,7 +105,7 @@ function attemptOptimizationNLOpt()
     push!(kinetic_parameter_vector,1.2) #10 k_FV_activation, from reaction 16 in Diamond 2010 paper
     push!(kinetic_parameter_vector, 1.0) #11 K_FV_activation 
     push!(kinetic_parameter_vector, 2400) #12 k_complex
-    push!(kinetic_parameter_vector, 63.5*2 )#13 k_amp_prothombinase from reaction 18 in Diamond 2010
+    push!(kinetic_parameter_vector, 400)#13 k_amp_prothombinase from reaction 18 in Diamond 2010
     push!(kinetic_parameter_vector, 160) #14 K_FII_amp_prothombinase
     push!(kinetic_parameter_vector, 6.0*10) #k_amp_FXa
     push!(kinetic_parameter_vector, .01) #K_amp_FXa
@@ -158,7 +153,12 @@ function attemptOptimizationNLOpt()
     
  
 	#inital_parameter_estimate = vcat(kinetic_parameter_vector, control_parameter_vector, platelet_parameter_vector, timing)
-	inital_parameter_estimate=readdlm("parameterEstimation/bestAfterNM03_13_2017Round2.txt", ',')	
+	inital_parameter_estimate=readdlm("parameterEstimation/bestAfterNMround2andhandfit02_15_2017.txt",)
+	@show inital_parameter_estimate
+	lower_bounds!(opt, vec(inital_parameter_estimate)*1E-3)
+	upper_bounds!(opt, vec(inital_parameter_estimate)*1E3)
+#	upperbounds[3] = 100.0 #bound k_amplication to be small
+#	upperbounds[17] = 100.0 #bound k_amp_active_factors to be small
 	@show inital_parameter_estimate
 	(minf, minx, ret) = NLopt.optimize(opt, vec(inital_parameter_estimate))
 	println("got $minf at $minx after $count iterations (returned $ret)")

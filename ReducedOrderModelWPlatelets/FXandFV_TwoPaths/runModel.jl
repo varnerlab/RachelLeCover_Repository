@@ -347,6 +347,9 @@ end
 
 function runModelWithParams(params)
 	close("all")
+	rm("ratevector.txt")
+	rm("modifiedratevector.txt")
+	rm("times.txt")
 	TSTART = 0.0
 	Ts = .02
 	TSTOP = 60.0
@@ -361,11 +364,14 @@ function runModelWithParams(params)
 	fbalances(t,y)= BalanceEquations(t,y,dict) 
 	t,X = ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-5, reltol = 1E-5)
 	plotThrombinWData(t,X,pathToData)
-	#savefig("figures/AfterNM03_03_2017Round2.pdf")
+	times = readdlm("times.txt")
+	plotFluxes("ratevector.txt",times)
+	plotFluxes("modifiedratevector.txt",times)
 	makeLoopPlots(t,X)
 	MSE, interpolatedExperimentalData=calculateMSE(t, [a[2] for a in X], readdlm(pathToData, ','))
 	return MSE
 end
+
 
 
 function runModelWithParamsReturnAUC(params)
@@ -437,6 +443,9 @@ function runModelWithParamsSetF8(params, FVIIIcontrol, index)
 	TSTOP = 60.0
 	TSIM = collect(TSTART:Ts:TSTOP)
 	letters = ["A", "B", "C", "D", "E", "F"]
+	#rm("ratevector.txt")
+	#rm("modifiedratevector.txt")
+	#rm("times.txt")
 	#pathToData = "../data/ButenasFig1B60nMFVIIa.csv"
 	#pathToData = "../data/Buentas1999Fig4100PercentProthrombin.txt"
 	pathToData = string("../data/Luan2010Fig5",letters[index], ".csv")
@@ -452,7 +461,10 @@ function runModelWithParamsSetF8(params, FVIIIcontrol, index)
 	fbalances(t,y)= BalanceEquations(t,y,dict) 
 	t,X = ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-6, reltol = 1E-6)
 	plotThrombinWData(t,X,pathToData)
-	savefig(string("figures/AttemtingF8FittingSet",index,"_02_16_2017.pdf"))
+#	times = readdlm("times.txt")
+#	plotFluxes("ratevector.txt",times)
+#	plotFluxes("modifiedratevector.txt",times)
+	#savefig(string("figures/AttemtingF8FittingSet",index,"_02_16_2017.pdf"))
 	#makeLoopPlots(t,X)
 	MSE, interpolatedExperimentalData=calculateMSE(t, [a[2] for a in X], readdlm(pathToData, ','))
 	return MSE
