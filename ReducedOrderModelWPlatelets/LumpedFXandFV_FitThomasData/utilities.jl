@@ -63,6 +63,11 @@ end
 
 # Generates new parameter array, given current array -
 function neighbor_function(parameter_array)
+	outputfile="parameterEstimation/POETS_28_03_2017.txt"
+	#@show size(parameter_array)
+#	f = open(outputfile, "a")
+#	write(f,string(parameter_array, "\n"))
+#	close(f)
 
   SIGMA = 0.05
   number_of_parameters = length(parameter_array)
@@ -71,7 +76,7 @@ function neighbor_function(parameter_array)
   new_parameter_array = parameter_array.*(1+SIGMA*randn(number_of_parameters))
 
   # Check the bound constraints -
-  LOWER_BOUND = 1E-9
+  LOWER_BOUND = 0
   UPPER_BOUND = 1E9
   lb_arr= LOWER_BOUND*ones(number_of_parameters)
   up_arr =UPPER_BOUND*ones(number_of_parameters)
@@ -212,14 +217,13 @@ function build_param_dict(problem_vec)
 end
 
 function parsePOETsoutput(filename)
-	close("all")
 	f = open(filename)
 	alltext = readall(f)
 	close(f)
 
 	outputname = "textparsing.txt"
 	number_of_parameters = 46
-  	number_of_objectives = 5
+  	number_of_objectives = 2
 	ec_array = zeros(number_of_objectives)
   	pc_array = zeros(number_of_parameters)
 	rank_array = zeros(1)	
@@ -249,6 +253,23 @@ function parsePOETsoutput(filename)
 		
 	end
 	return ec_array[:,2:end], pc_array[:,2:end], rank_array[:,2:end]
+end
+
+function plotTradeOffCurve(ec_array, rank_array)
+	figure()
+	PyCall.PyDict(matplotlib["rcParams"])["font.sans-serif"] = ["Helvetica"]
+	hold("on")
+	#@show size(ec_array,2)
+	for j in collect(1:size(ec_array,2))
+		if(rank_array[j]==0)
+			plot(ec_array[1,j], ec_array[2,j], linewidth = .3,"ko", markersize = 2.5,markeredgewidth=0.0)
+		else
+			plot(ec_array[1,j], ec_array[2,j], linewidth = .3,"o", color = ".75", markersize = 2.5,markeredgewidth=0.0)
+		end
+	end
+	xlabel("BL Thrombin MSE", fontsize=18)
+	ylabel("HT Thombin MSE", fontsize=18)
+	savefig("figures/tradeoffCurve_28_03_2017.pdf")
 end
 
 function peturbIC(ICvec,seed)

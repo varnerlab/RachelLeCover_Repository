@@ -362,11 +362,11 @@ function runModelWithParams(params)
 	close("all")
 	TSTART = 0.0
 	Ts = .02
-	TSTOP = 60.0
+	TSTOP = 35.0
 	TSIM = collect(TSTART:Ts:TSTOP)
 	#pathToData = "../data/ButenasFig1B60nMFVIIa.csv"
 	#pathToData = "../data/Buentas1999Fig4100PercentProthrombin.txt"
-	pathToData = "../data/fromOrfeo_Thrombin_HT_PRP.txt"
+	pathToData = "../data/fromOrfeo_Thrombin_BL_PRP.txt"
 	data = readdlm(pathToData)
 	time = data[:,1]
 	avg_run = mean(data[:,2:3],2);
@@ -378,7 +378,7 @@ function runModelWithParams(params)
 	fbalances(t,y)= BalanceEquations(t,y,dict) 
 	t,X = ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-6, reltol = 1E-6)
 	plotThrombinWData(t,X,pathToData)
-	#savefig("figures/AfterSomeHandFitting02_09_2017.pdf")
+	#savefig("figures/AfterNM_24_03_2017.pdf")
 	makeLoopPlots(t,X)
 	MSE, interpolatedExperimentalData=calculateMSE(t, [a[2] for a in X], usefuldata)
 	return MSE
