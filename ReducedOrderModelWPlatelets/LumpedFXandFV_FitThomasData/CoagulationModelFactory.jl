@@ -29,15 +29,15 @@ function buildCoagulationModelDictionary(platelet_count)
     
     # Kinetic parameters -
     kinetic_parameter_vector = Float64[]
-    push!(kinetic_parameter_vector,7200/2)       #  k_trigger
+    push!(kinetic_parameter_vector,7200/1.2)       #  k_trigger
     push!(kinetic_parameter_vector,100)       # 1 K_trigger
-    push!(kinetic_parameter_vector,1.0)        # 2 k_amplification
+    push!(kinetic_parameter_vector,5.0)        # 2 k_amplification
     push!(kinetic_parameter_vector,12)       # 3 K_FII_amplification
     push!(kinetic_parameter_vector,.5)        # 4 k_APC_formation
     push!(kinetic_parameter_vector,3/100.0)         # 5 K_PC_formation
     push!(kinetic_parameter_vector,0.2*10)        # 6 k_inhibition
     push!(kinetic_parameter_vector,120)       # 7 K_FIIa_inhibition
-    push!(kinetic_parameter_vector,6E-4)     # 8 k_inhibition_ATIII
+    push!(kinetic_parameter_vector,3E-4)     # 8 k_inhibition_ATIII
     #push!(kinetic_parameter_vector,0.001)      # 9 K_inhibition_ATIII
     #push!(kinetic_parameter_vector,100.0)      # 10 K_inhibition_FIIa
     push!(kinetic_parameter_vector, 2E7*60*10.0^-4) #9 k_FV_activation, from reaction 16 in Diamond 2010 paper
@@ -47,7 +47,7 @@ function buildCoagulationModelDictionary(platelet_count)
     push!(kinetic_parameter_vector, 24) #13 k_complex
     push!(kinetic_parameter_vector, 63.5*60*2.5 )#14 k_amp_prothombinase from reaction 18 in Diamond 2010
     push!(kinetic_parameter_vector,10) #13 K_FII_amp_prothombinase
-    push!(kinetic_parameter_vector, 6.0) #k_amp_active_factors
+    push!(kinetic_parameter_vector, 1.0) #k_amp_active_factors
     push!(kinetic_parameter_vector, 1.0) #K_amp_active_factor
 
 
@@ -56,19 +56,19 @@ function buildCoagulationModelDictionary(platelet_count)
     # Control parameters -
     control_parameter_vector =Float64[]
     # Trigger -
-    push!(control_parameter_vector,140.0/10)      # 0 9 alpha_trigger_activation = control_parameter_vector[0]
-    push!(control_parameter_vector,2.0)        # 1 10 order_trigger_activation = control_parameter_vector[1]
+    push!(control_parameter_vector,1.0)      # 0 9 alpha_trigger_activation = control_parameter_vector[0]
+    push!(control_parameter_vector,1.0)        # 1 10 order_trigger_activation = control_parameter_vector[1]
     push!(control_parameter_vector,1.0)        # 2 11 alpha_trigger_inhibition_APC = control_parameter_vector[2]
     push!(control_parameter_vector,1.0)        # 3 12 order_trigger_inhibition_APC = control_parameter_vector[3]
     push!(control_parameter_vector,0.1)        # 4 13 alpha_trigger_inhibition_TFPI = control_parameter_vector[4]
-    push!(control_parameter_vector,2.0)        # 5 14 order_trigger_inhibition_TFPI = control_parameter_vector[5]
+    push!(control_parameter_vector,1.0)        # 5 14 order_trigger_inhibition_TFPI = control_parameter_vector[5]
     
     # Amplification -
     push!(control_parameter_vector,0.1)        # 6 15 alpha_amplification_FIIa = control_parameter_vector[6]
     push!(control_parameter_vector,2.0)        # 7 16 order_amplification_FIIa = control_parameter_vector[7]
     push!(control_parameter_vector,0.4)        # 8 17 alpha_amplification_APC = control_parameter_vector[8]
     push!(control_parameter_vector,2.0)        # 9 18 order_amplification_APC = control_parameter_vector[9]
-    push!(control_parameter_vector,0.01)       # 10 19 alpha_amplification_TFPI = control_parameter_vector[10]
+    push!(control_parameter_vector,0.01*100)       # 10 19 alpha_amplification_TFPI = control_parameter_vector[10]
     push!(control_parameter_vector,2.0)        # 11 20 order_amplification_TFPI = control_parameter_vector[11]
     
     # APC generation -
@@ -76,10 +76,10 @@ function buildCoagulationModelDictionary(platelet_count)
     push!(control_parameter_vector,2.0)        # 13 22 order_shutdown_APC = control_parameter_vector[13]
 
     push!(control_parameter_vector,1.0) #14 alpha_FV_activation
-    push!(control_parameter_vector,1.0/10) #15 order_FV_activation
+    push!(control_parameter_vector,1.0) #15 order_FV_activation
     push!(control_parameter_vector,1.0) #16 alpha_FX_activation
     push!(control_parameter_vector,1.0) #17 order_FX_activation
-    push!(control_parameter_vector,4.0) #14 alpha_FX_inhibition
+    push!(control_parameter_vector,1.0) #14 alpha_FX_inhibition
     push!(control_parameter_vector,1.0) #15 order_FX_inhibition
     PROBLEM_DICTIONARY["CONTROL_PARAMETER_VECTOR"] = control_parameter_vector
 
@@ -98,7 +98,7 @@ function buildCoagulationModelDictionary(platelet_count)
    PROBLEM_DICTIONARY["ALEPH"] = initial_condition_vector[2]
 
 	timing = Float64[]
-	push!(timing, 1.0) #time_delay
+	push!(timing, 0.0) #time_delay
 	push!(timing, 1.0) #coeff
 	PROBLEM_DICTIONARY["TIME_DELAY"]=timing
     

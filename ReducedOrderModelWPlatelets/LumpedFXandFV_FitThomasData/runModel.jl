@@ -237,7 +237,7 @@ end
 
 function plotThrombinWData(t,x,pathToData)
 	#close("all")
-	figure()
+	#figure()
 	data = readdlm(pathToData)
 	time = data[:,1]
 	avg_run = mean(data[:,2:3],2);
@@ -289,36 +289,76 @@ function plotAverageThrobinWData(t,meanThrombin,stdThrombin,pathToData,MSE, save
 	savefig(savestr)
 end
 
+function plotAverageThrobinWData(t,meanThrombin,stdThrombin,expdata, savestr)
+	fig = figure(figsize = (15,15))
+	println("here")
+	ylabel("Thrombin Concentration, nM")
+	xlabel("Time, in minutes")
+	plot(t, transpose(meanThrombin), "k")
+	axis([0, 35, 0, 200])
+	@show size(meanThrombin)
+	@show size(stdThrombin)
+	@show size(t)
+	upper = transpose(meanThrombin+stdThrombin)
+	lower = transpose(meanThrombin-stdThrombin)
+	@show size(vec(upper))
+	@show size(vec(lower))
+	fill_between((t), vec(upper), vec(lower), color = ".5", alpha =.5)
+	plot(expdata[:,1], expdata[:,2], ".k")
+	savefig(savestr)
+end
+
 
 function runModelWithMultipleParams(pathToParams,pathToData,savestr)
 	close("all")
-	allparams = readdlm(pathToParams, ',')
+	allparams = readdlm(pathToParams, '\t')
 	TSTART = 0.0
 	Ts = .02
-	TSTOP = 60.0
+	TSTOP =35.0
 	TSIM = collect(TSTART:Ts:TSTOP)
 	#pathToData = "../data/ButenasFig1B60nMFVIIa.csv"
 	#pathToData = "../data/Luan2010Fig5F.csv"
+	#pathToData = "../data/fromOrfeo_Thrombin_BL_PRP.txt"
+	data = readdlm(pathToData)
+	time = data[:,1]
+	avg_run = mean(data[:,2:3],2);
+	usefuldata = hcat(time/60, avg_run)
 	fig = figure(figsize = (15,15))
+	platelet_count =346
 	alldata = zeros(1,size(TSIM,1))
+	@show size(allparams)
+	if(size(allparams,1)==46) #deal with parameters being stored either vertically or horizontally
+		itridx = 2
+	else
+		itridx = 1
+	end
 	
-	for j in collect(1:size(allparams,1))
-		currparams = allparams[j,:]
+	for j in collect(1:size(allparams,itridx))
+		if(itridx ==2)
+			currparams = allparams[:,j]
+		else
+			currparams = allparams[j,:]
+		end
+		@show currparams
+		push!(currparams, platelet_count)
 		dict = buildDictFromOneVector(currparams)
 		initial_condition_vector = dict["INITIAL_CONDITION_VECTOR"]
 		reshaped_IC = vec(reshape(initial_condition_vector,11,1))
 		fbalances(t,y)= BalanceEquations(t,y,dict) 
-		t,X = ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-4, reltol = 1E-4,points=:specified)
-		#plotThrombinWData(t,X,pathToData)
+		t,X = ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-4, reltol = 1E-4, minstep = 1E-8, points=:specified)
+		plotThrombinWData(t,X,pathToData)
 		#@show alldata
 		#@show size([a[2] for a in X])
 		alldata=vcat(alldata,transpose([a[2] for a in X]))
 	end
 	alldata = alldata[2:end, :] #remove row of zeros
 	alldata = map(Float64,alldata)
+	hasdynamics = checkForDynamics(alldata)
+	idx = find(hasdynamics->(hasdynamics==1),hasdynamics); #find the indices for the parameter sets that actually produce dynamics
+	alldata = alldata[idx,:]
 	meanThrombin = mean(alldata,1)
 	stdThrombin = std(alldata,1)
-	plotAverageThrobinWData(TSIM, meanThrombin, stdThrombin, pathToData,savestr)
+	plotAverageThrobinWData(TSIM, meanThrombin, stdThrombin, usefuldata,savestr)
 	return alldata
 end
 
@@ -362,11 +402,11 @@ function runModelWithParams(params)
 	close("all")
 	TSTART = 0.0
 	Ts = .02
-	TSTOP = 60.0
+	TSTOP = 35.0
 	TSIM = collect(TSTART:Ts:TSTOP)
 	#pathToData = "../data/ButenasFig1B60nMFVIIa.csv"
 	#pathToData = "../data/Buentas1999Fig4100PercentProthrombin.txt"
-	pathToData = "../data/fromOrfeo_Thrombin_HT_PRP.txt"
+	pathToData = "../data/fromOrfeo_Thrombin_BL_PRP.txt"
 	data = readdlm(pathToData)
 	time = data[:,1]
 	avg_run = mean(data[:,2:3],2);
@@ -378,7 +418,7 @@ function runModelWithParams(params)
 	fbalances(t,y)= BalanceEquations(t,y,dict) 
 	t,X = ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-6, reltol = 1E-6)
 	plotThrombinWData(t,X,pathToData)
-	#savefig("figures/AfterSomeHandFitting02_09_2017.pdf")
+	#savefig("figures/AfterNM_24_03_2017.pdf")
 	makeLoopPlots(t,X)
 	MSE, interpolatedExperimentalData=calculateMSE(t, [a[2] for a in X], usefuldata)
 	return MSE
