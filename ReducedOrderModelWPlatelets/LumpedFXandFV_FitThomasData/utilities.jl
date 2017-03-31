@@ -279,8 +279,12 @@ function plotTradeOffCurve(ec_array, rank_array)
 	end
 	xlabel("BL Thrombin MSE", fontsize=18)
 	ylabel("HT Thombin MSE", fontsize=18)
+<<<<<<< HEAD
 	axis([0,5000,0,5000])
 	savefig("figures/tradeoffCurve_31_03_2017.pdf")
+=======
+	savefig("figures/tradeoffCurve_28_03_2017.pdf")
+>>>>>>> 7c35b68bb4209ae8d32044088d52508eecf3dbad
 end
 
 function peturbIC(ICvec,seed)

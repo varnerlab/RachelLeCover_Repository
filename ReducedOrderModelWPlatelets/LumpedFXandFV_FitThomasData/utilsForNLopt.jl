@@ -44,7 +44,11 @@ function objectiveForNLOpt(params::Vector, grad::Vector)
 	#hold("on")
 	#plot(t, FIIa, alpha = .5)
 	#write params to file
+<<<<<<< HEAD
 	f = open("parameterEstimation/NM_31_03_2017_DuringSingleObj", "a+")
+=======
+	f = open("parameterEstimation/NM_28_03_2017_DuringSingleObj", "a+")
+>>>>>>> 7c35b68bb4209ae8d32044088d52508eecf3dbad
 	write(f, string(params, ",", MSE, "\n"))
 	close(f)
 	toc()
@@ -66,7 +70,11 @@ function objectiveForPOETS(parameter_array)
 		dict = buildDictFromOneVector(temp_params)
 		initial_condition_vector = dict["INITIAL_CONDITION_VECTOR"]
 		fbalances(t,y)= BalanceEquations(t,y,dict) 
+<<<<<<< HEAD
 		t,X = ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-4, reltol = 1E-4, minstep = 1E-8)
+=======
+		t,X = ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-6, reltol = 1E-6)
+>>>>>>> 7c35b68bb4209ae8d32044088d52508eecf3dbad
 		FIIa = [a[2] for a in X]
 		MSE, interpolatedExperimentalData=calculateMSE(t, FIIa, allexperimentaldata[j])
 		obj_array[j,1]=MSE
@@ -82,7 +90,10 @@ function attemptOptimizationPOETS()
 	number_of_parameters = 46
 	number_of_objectives = 2
 	initial_parameter_estimate = readdlm("parameterEstimation/niceBellshape.txt")
+<<<<<<< HEAD
 	#inital_parameter_estimate= readdlm("parameterEstimation/paramsToRestart03_30_2017.txt")
+=======
+>>>>>>> 7c35b68bb4209ae8d32044088d52508eecf3dbad
 	outputfile = "parameterEstimation/POETS_info_27_03_2017_smallerPeturb.txt"
 	ec_array = zeros(number_of_objectives)
 	pc_array = zeros(number_of_parameters)
@@ -101,6 +112,7 @@ function attemptOptimizationPOETS()
 		f = open(outputfile, "a")
 		write(f, string(EC, ",", PC, ",", RA, "\n"))
 		close(f)
+<<<<<<< HEAD
 	end
 
 	return (ec_array,pc_array)
@@ -139,6 +151,45 @@ function attemptOptimizationSingleAndMulti()
 	end
 
 	return (ec_array,pc_array)
+=======
+	end
+
+	return (ec_array,pc_array)
+end
+
+function attemptOptimizationSingleAndMulti()
+	number_of_subdivisions = 10
+	number_of_parameters = 46
+	number_of_objectives = 2
+	platelet_counts = [420,364]
+	initial_parameter_estimate = readdlm("parameterEstimation/niceBellshape.txt")
+	outputfile = "parameterEstimation/POETS_info_27_03_2017_SingleAndMulti.txt"
+	ec_array = zeros(number_of_objectives)
+	pc_array = zeros(number_of_parameters)
+	initial_parameter_estimate =vec(initial_parameter_estimate) #get initial parameter estimate
+	global curridx = 1
+	for index in collect(1:number_of_subdivisions)
+
+		# Run JuPOETs -
+		(EC,PC,RA) = estimate_ensemble(objectiveForPOETS,neighbor_function,acceptance_probability_function,cooling_function,initial_parameter_estimate;rank_cutoff=4,maximum_number_of_iterations=10,show_trace=true)
+		#get the index of the parameter set with smallest mean error (on both sets)
+		best_index=indmax(mean(ec_arr,1))
+		best_params = PC[best_index]
+
+		# Package -
+		ec_array = [ec_array EC]
+		pc_array = [pc_array PC]
+		@show (EC, PC, RA)
+		f = open(outputfile, "a")
+		write(f, string(EC, ",", PC, ",", RA, "\n"))
+		close(f)
+		#estimate params for single objective, alternating which platelet count to use
+		curridx =mod(index,2)+1 
+		inital_parameter_estimate=attemptOptimizationNLOpt(best_params, platelet_counts[curridx])  
+	end
+
+	return (ec_array,pc_array)
+>>>>>>> 7c35b68bb4209ae8d32044088d52508eecf3dbad
 end
 
 function attemptOptimizationNLOpt()
@@ -225,6 +276,7 @@ function attemptOptimizationNLOpt()
 #	 
 	#inital_parameter_estimate = vcat(kinetic_parameter_vector, control_parameter_vector, platelet_parameter_vector, timing, platelet_count)	
 	inital_parameter_estimate = readdlm("parameterEstimation/niceBellshape.txt")	
+<<<<<<< HEAD
 	@show inital_parameter_estimate
 	(minf, minx, ret) = NLopt.optimize(opt, vec(inital_parameter_estimate))
 	println("got $minf at $minx after $count iterations (returned $ret)")
@@ -250,6 +302,8 @@ function attemptOptimizationNLOpt(inital_parameter_estimate, platelet_count)
 	min_objective!(opt, objectiveForNLOpt)
 	push!(inital_parameter_estimate, platelet_count)	
 
+=======
+>>>>>>> 7c35b68bb4209ae8d32044088d52508eecf3dbad
 	@show inital_parameter_estimate
 	(minf, minx, ret) = NLopt.optimize(opt, vec(inital_parameter_estimate))
 	println("got $minf at $minx after $count iterations (returned $ret)")
@@ -259,4 +313,26 @@ function attemptOptimizationNLOpt(inital_parameter_estimate, platelet_count)
 	return minx
 end
 
+<<<<<<< HEAD
+=======
+function attemptOptimizationNLOpt(inital_parameter_estimate, platelet_count)
+	numvars = 47
+	opt = Opt(:LN_NELDERMEAD,numvars)
+	lowerbounds =fill(0, 1, numvars)
+	upperbounds = fill(1E7, 1, numvars)
+	upperbounds[3] = 70.0 #bound k_amplication to be small
+	upperbounds[17] = 70.0 #bound k_amp_active_factors to be small
+	upperbounds[47]=platelet_count #make it so platelet count can't move
+	lowerbounds[47]=platelet_count
+	upper_bounds!(opt, vec(upperbounds))
+	lower_bounds!(opt, vec(lowerbounds))
+	min_objective!(opt, objectiveForNLOpt)
+	
+	@show inital_parameter_estimate
+	(minf, minx, ret) = NLopt.optimize(opt, vec(inital_parameter_estimate))
+	println("got $minf at $minx after $count iterations (returned $ret)")
+	return minx
+end
+
+>>>>>>> 7c35b68bb4209ae8d32044088d52508eecf3dbad
 
