@@ -76,10 +76,10 @@ function neighbor_function(parameter_array)
   new_parameter_array = parameter_array.*(1+SIGMA*randn(number_of_parameters))
 
   # Check the bound constraints -
-  #LOWER_BOUND = 0
-  #UPPER_BOUND = 1E9
-  #lb_arr= LOWER_BOUND*ones(number_of_parameters)
-  #up_arr =UPPER_BOUND*ones(number_of_parameters)
+  LOWER_BOUND = 0
+  UPPER_BOUND = 1E9
+  lb_arr= LOWER_BOUND*ones(number_of_parameters)
+  up_arr =UPPER_BOUND*ones(number_of_parameters)
 	#lb_arr[9] = 10.0 #lower bound on k_inhibition_ATIII
 	#lb_arr[45]= 3.0 #lower bound on time delay, 3 minutes
 	#up_arr[46]= .01 #upper bound on scaling for tau
@@ -332,16 +332,6 @@ function checkForDynamics(alldata)
 		if(mid>threshold)
 			hasdynamics[j] = 1
 		end
-	end
-	return hasdynamics
-end
-
-function checkForDynamics(thrombin, t)
-	threshold = 10 #it has dynamics if it creates 10 thrombin
-	hasdynamics = false
-	mid = thrombin[Int(floor(end/2))] #get the approximate midpoint
-	if(mid>threshold || maximum(thrombin)> threshold)
-		hasdynamics = true
 	end
 	return hasdynamics
 end

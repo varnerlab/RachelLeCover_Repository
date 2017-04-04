@@ -13,7 +13,7 @@ function runModel(TSTART,Ts,TSTOP, platelet_count)
 	PROBLEM_DICTIONARY = buildCoagulationModelDictionary(platelet_count)
 	TSIM = TSTART:Ts:TSTOP
 	initial_condition_vector = PROBLEM_DICTIONARY["INITIAL_CONDITION_VECTOR"]
-	reshaped_IC = vec(reshape(initial_condition_vector,11,1)) #may need to cast to vector for Sundials
+	reshaped_IC = vec(reshape(initial_condition_vector,22,1)) #may need to cast to vector for Sundials
 
 	#calling solver
 #	fbalances(t,y,ydot)=BalanceEquations(t,y,ydot,PROBLEM_DICTIONARY)
@@ -111,15 +111,16 @@ function makePlots(t,x)
 end
 
 function makeLoopPlots(t,x)
-	names = ["FII", "FIIa", "PC", "APC", "ATIII", "TM", "TRIGGER", "Fraction Activated Platelets", "FV_FX", "FV_FXa", "Prothombinase-Platelets"]
-	fig = figure(figsize = (15,15))
+	names = ["FII", "FIIa", "PC", "APC", "ATIII", "TM", "TRIGGER", "Fraction Activated Platelets", "FV_FX", "FV_FXa", "Prothombinase-Platelets",
+	"Fibrin", "Plasmin", "Fibrinogen", "Plasminogen", "uPA", "tPA", "fibrin monomer", "protofibril", "antiplasmin", "PAI_1", "Fiber"]
+	#fig = figure(figsize = (15,15))
 #	y_formatter = PyPlot.ticker.ScalarFormatter(useOffset=false)
 #	ax = fig.gca()
 #	println(ax)
 #	ax.yaxis.set_major_formatter(y_formatter)
 	#@show size(t)
 	for j in collect(1:size(names,1))
-		plt[:subplot](4,3,j)
+		plt[:subplot](5,5,j)
 		#@show size([a[j] for a in x])
 		plot(t, [a[j] for a in x], "k")
 		title(names[j])
@@ -226,8 +227,8 @@ function main()
 	avg_run = mean(data[:,2:3],2);
 	usefuldata = hcat(time, avg_run)
 	MSE, interpolatedExperimentalData=calculateMSE(t, [a[2] for a in x], usefuldata)
-	figure()
-	plot(t, interpolatedExperimentalData)
+	#figure()
+	#plot(t, interpolatedExperimentalData)
 	estimatedAUC = calculateAUC(t, [a[2] for a in x])
 	experimentalAUC = calculateAUC(t, interpolatedExperimentalData)
 	@printf("MSE: %f, AUC Difference %f", MSE, abs(estimatedAUC-experimentalAUC) )
@@ -323,7 +324,8 @@ function runModelWithMultipleParams(pathToParams,pathToData,savestr)
 	time = data[:,1]
 	avg_run = mean(data[:,2:3],2);
 	usefuldata = hcat(time/60, avg_run)
-	fig = figure(figsize = (15,15))
+	fig1 = figure(figsize = (15,15))
+	fig2 = figure(figsize = (15,15))
 	platelet_count =346
 	alldata = zeros(1,size(TSIM,1))
 	@show size(allparams)
@@ -343,10 +345,13 @@ function runModelWithMultipleParams(pathToParams,pathToData,savestr)
 		push!(currparams, platelet_count)
 		dict = buildDictFromOneVector(currparams)
 		initial_condition_vector = dict["INITIAL_CONDITION_VECTOR"]
-		reshaped_IC = vec(reshape(initial_condition_vector,11,1))
+		reshaped_IC = vec(reshape(initial_condition_vector,22,1))
 		fbalances(t,y)= BalanceEquations(t,y,dict) 
-		t,X = ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-4, reltol = 1E-4, minstep = 1E-8, points=:specified)
+		t,X = ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-6, reltol = 1E-4, minstep = 1E-6, points=:specified)
+		figure(1)
 		plotThrombinWData(t,X,pathToData)
+		figure(2)
+		makeLoopPlots(t,X)
 		#@show alldata
 		#@show size([a[2] for a in X])
 		alldata=vcat(alldata,transpose([a[2] for a in X]))
@@ -421,7 +426,7 @@ function runModelWithParams(params)
 	#savefig("figures/AfterNM_24_03_2017.pdf")
 	makeLoopPlots(t,X)
 	MSE, interpolatedExperimentalData=calculateMSE(t, [a[2] for a in X], usefuldata)
-	return MSE,t,X
+	return MSE
 end
 
 

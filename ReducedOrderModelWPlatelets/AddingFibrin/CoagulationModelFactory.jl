@@ -2,15 +2,6 @@ function buildCoagulationModelDictionary(platelet_count)
     
     # Initialize -
     PROBLEM_DICTIONARY = Dict()
-    
-    # FII     = local_state_vector[0]
-    # FIIa    = local_state_vector[1]
-    # PC      = local_state_vector[2]
-    # APC     = local_state_vector[3]
-    # ATIII   = local_state_vector[4]
-    # TM      = local_state_vector[5]
-    # TRIGGER = local_state_vector[6]
-    
     # Initial condition -
 	#from simulateFig3Butenas2002
     initial_condition_vector = Float64[]
@@ -25,6 +16,17 @@ function buildCoagulationModelDictionary(platelet_count)
     push!(initial_condition_vector,22.0)          #  FV+FX
     push!(initial_condition_vector,0.0)          #  FVa+FXa
     push!(initial_condition_vector,0.000)         #  prothombinase complex
+    push!(initial_condition_vector, 0.0)	#Fibrin
+    push!(initial_condition_vector,0.0)		#plasmin
+    push!(initial_condition_vector,10000)	#Fibrinogen
+    push!(initial_condition_vector, 2000)	#plasminogen
+    push!(initial_condition_vector,8.0)		#tPA
+    push!(initial_condition_vector,0.0)		#uPA
+    push!(initial_condition_vector,0.0)		#fibrin monomer
+    push!(initial_condition_vector,0.0)		#protofibril
+    push!(initial_condition_vector,1180)	#antiplasmin
+    push!(initial_condition_vector,.56)		#PAI_1
+    push!(initial_condition_vector,0.0)		#Fiber
     PROBLEM_DICTIONARY["INITIAL_CONDITION_VECTOR"] = initial_condition_vector
     
     # Kinetic parameters -
@@ -104,25 +106,69 @@ function buildCoagulationModelDictionary(platelet_count)
     
     # QFactor vector - from simulateFig3Butenas2002
     qualitative_factor_vector =Float64[]
-   push!(qualitative_factor_vector,2.5)           # 0 TFPI
-   push!(qualitative_factor_vector,20.0)          # 1 FV
-   push!(qualitative_factor_vector,0.7)           # 2 FVIII
-   push!(qualitative_factor_vector,90.0)           # 3 FIX
-   push!(qualitative_factor_vector,170.0)         # 4 FX
-   push!(qualitative_factor_vector,1.0)           # 5 Platelets
+   push!(qualitative_factor_vector,2.5)           # 1 TFPI
+   push!(qualitative_factor_vector,20.0)          # 2 FV
+   push!(qualitative_factor_vector,0.7)           # 3 FVIII
+   push!(qualitative_factor_vector,90.0)           # 4 FIX
+   push!(qualitative_factor_vector,170.0)         # 5 FX
+   push!(qualitative_factor_vector,1.0)           # 6 Platelets
+   push!(qualitative_factor_vector, 70)		#7 TAFI
+   push!(qualitative_factor_vector,93)		#8 FXIII
     PROBLEM_DICTIONARY["FACTOR_LEVEL_VECTOR"] = qualitative_factor_vector
 
-	nominal_levels = Float64[]
-   push!(nominal_levels,2.5)           # 0 TFPI
-   push!(nominal_levels,0.7)           # 2 FVIII
-   push!(nominal_levels,90.0)           # 3 FIX
-   push!(nominal_levels,22.0)         # 4 FV_X
-	PROBLEM_DICTIONARY["NOMINAL_VALUES"] = nominal_levels
+	fibrin_kinetic_parameters = Float64[]
+	  # Kinetic parameters for fibrin generation
+	  push!(fibrin_kinetic_parameters,0.01)            # 1 k_cat_Fibrinogen
+	  push!(fibrin_kinetic_parameters,1000.0)         # 2 Km_Fibrinogen
+	  push!(fibrin_kinetic_parameters,0.01)         # 3 k_fibrin_monomer_association
+	  push!(fibrin_kinetic_parameters,0.01)         # 4 k_protofibril_association
+	  push!(fibrin_kinetic_parameters,0.01)         # 5 k_protofibril_monomer_association
 
-	PROBLEM_DICTIONARY["FVIII_CONTROL"] = 1.0
+	  # Kinetic parameters for fibrinolysis
+	  push!(fibrin_kinetic_parameters,2.0)           # 6 k_cat_plasminogen_Fibrin_tPA
+	  push!(fibrin_kinetic_parameters,10.0)          # 7 Km_plasminogen_Fibrin_tPA
+	  push!(fibrin_kinetic_parameters,0.1)           # 8 k_cat_plasminogen_Fibrin_uPA
+	  push!(fibrin_kinetic_parameters,10.0)          # 9 Km_plasminogen_Fibrin_uPA
+	  push!(fibrin_kinetic_parameters,1.0)           # 10 k_cat_Fibrin
+	  push!(fibrin_kinetic_parameters,10.0)          # 11 Km_Fibrin
+	  push!(fibrin_kinetic_parameters,0.01)          # 12 k_inhibit_plasmin
+	  push!(fibrin_kinetic_parameters,0.01)          # 13 k_inhibit_PAI_1_APC
+	  push!(fibrin_kinetic_parameters,0.01)          # 14 k_inhibit_tPA_PAI_1
+	  push!(fibrin_kinetic_parameters,0.01)          # 15 k_inhibit_uPA_PAI_1
+
+	  # Kinetic parameter for fibrin formation
+	  push!(fibrin_kinetic_parameters,0.01)          # 16 k_fibrin_formation
+
+	  # Fiber degradation
+	  push!(fibrin_kinetic_parameters,100.0)          # 17 k_cat_fiber
+	  push!(fibrin_kinetic_parameters,10.0)          # 18 Km_fiber
+
+	  # Plasmin activation
+	  push!(fibrin_kinetic_parameters,0.01)          # 19 Km_plasminogen_Fibrin_tPA
+	  push!(fibrin_kinetic_parameters,0.01)          # 20 K_plasminogen_Fibrin_tPA
+	  push!(fibrin_kinetic_parameters,1.00)          # 21 k_cat_fibrinogen_deg
+	  push!(fibrin_kinetic_parameters,10.0)          # 22 Km_fibrinogen_deg
+	PROBLEM_DICTIONARY["FIBRIN_KINETIC_PARAMETER_VECTOR"]=fibrin_kinetic_parameters
+
+	fibrin_control_parameters = Float64[]
+	# Control constants for TAFI inhibition -
+	  push!(fibrin_control_parameters,0.1)          # 1 alpha_fib_inh_fXIII
+	  push!(fibrin_control_parameters,2.0)          # 2 order_fib_inh_fXIII
+	  push!(fibrin_control_parameters,0.1)          # 3 alpha_fib_inh_TAFI
+	  push!(fibrin_control_parameters,2.0)          # 4 order_fib_inh_TAFI
+
+	  # Control constants for plasmin activation term
+	  push!(fibrin_control_parameters,0.1)          # 5 alpha_tPA_inh_PAI_1
+	  push!(fibrin_control_parameters,2.0)          # 6 order_tPA_inh_PAI_1
+	  push!(fibrin_control_parameters,0.1)          # 7 alpha_uPA_inh_PAI_1
+	  push!(fibrin_control_parameters,2.0)          # 8 order_uPA_inh_PAI_1
+
+	PROBLEM_DICTIONARY["FIBRIN_CONTROL_PARAMETER_VECTOR"]=fibrin_control_parameters
+
+	PROBLEM_DICTIONARY["FVIII_CONTROL"] =  5.20895
 	PROBLEM_DICTIONARY["parameter_name_mapping_array"]=["k_trigger","K_trigger" ,"k_amplification" ,"K_FII_amplification" ,"k_APC_formation" ,"K_PC_formation" ,"k_inhibition" ,"K_FIIa_inhibition" ,"k_inhibition_ATIII" ,"k_FV_X_activation", "K_FV_X_actiation" ,"k_FX_activation","k_FX_activation","k_complex","k_amp_prothombinase","K_FII_amp_prothombinase","k_amp_active_factors", "k_amp_active_factors","alpha_trigger_activation","order_trigger_activation","alpha_trigger_inhibition_APC","order_trigger_inhibition_APC","alpha_trigger_inhibition_TFPI", "order_trigger_inhibition_TFPI","alpha_amplification_FIIa","order_amplification_FIIa","alpha_amplification_APC","order_amplification_APC","alpha_amplification_TFPI","order_amplification_TFPI","alpha_shutdown_APC","order_shutdown_APC","alpha_FV_activation","order_FV_activation","alpha_FX_activation","order_FX_activation","alpha_FX_inhibition","order_FX_inhibition","platelet_rate_constant",
 "platelet_power","platelet_denominator","Epsmax0","aida","koffplatelets","time_delay","coeff"] 
-	PROBLEM_DICTIONARY["number_of_states"]=11
+	PROBLEM_DICTIONARY["number_of_states"]=22
     
     return PROBLEM_DICTIONARY
 end
@@ -131,14 +177,6 @@ function buildCoagulationModelDictionary(kinetic_parameter_vector, control_param
     
     # Initialize -
     PROBLEM_DICTIONARY = Dict()
-    
-    # FII     = local_state_vector[0]
-    # FIIa    = local_state_vector[1]
-    # PC      = local_state_vector[2]
-    # APC     = local_state_vector[3]
-    # ATIII   = local_state_vector[4]
-    # TM      = local_state_vector[5]
-    # TRIGGER = local_state_vector[6]
     normal_platelet_count = 300 #*10^6 #/mL
     # Initial condition -
 	#from simulateFig3Butenas2002
@@ -152,8 +190,19 @@ function buildCoagulationModelDictionary(kinetic_parameter_vector, control_param
     push!(initial_condition_vector,5.0E-3)          # 6 TRIGGER
     push!(initial_condition_vector, 0.01) #Fraction of platelets activated
     push!(initial_condition_vector,22.0)          #  FV+FX
-    push!(initial_condition_vector,0.00)          #  FVa+FXa
-    push!(initial_condition_vector,0.00)         #  prothombinase complex
+    push!(initial_condition_vector,0.0)          #  FVa+FXa
+    push!(initial_condition_vector,0.000)         #  prothombinase complex
+    push!(initial_condition_vector, 0.0)	#Fibrin
+    push!(initial_condition_vector,0.0)		#plasmin
+    push!(initial_condition_vector,10000)	#Fibrinogen
+    push!(initial_condition_vector, 2000)	#plasminogen
+    push!(initial_condition_vector,8.0)		#tPA
+    push!(initial_condition_vector,0.0)		#uPA
+    push!(initial_condition_vector,0.0)		#fibrin monomer
+    push!(initial_condition_vector,0.0)		#protofibril
+    push!(initial_condition_vector,1180)	#antiplasmin
+    push!(initial_condition_vector,.56)		#PAI_1
+    push!(initial_condition_vector,0.0)		#Fiber
     PROBLEM_DICTIONARY["INITIAL_CONDITION_VECTOR"] = initial_condition_vector
 
     PROBLEM_DICTIONARY["KINETIC_PARAMETER_VECTOR"] = kinetic_parameter_vector
@@ -178,25 +227,69 @@ function buildCoagulationModelDictionary(kinetic_parameter_vector, control_param
 	PROBLEM_DICTIONARY["TIME_DELAY"]=timing
      # QFactor vector - from simulateFig3Butenas2002
     qualitative_factor_vector =Float64[]
-   push!(qualitative_factor_vector,2.5)           # 0 TFPI
-   push!(qualitative_factor_vector,20.0)          # 1 FV
-   push!(qualitative_factor_vector,0.7)           # 2 FVIII
-   push!(qualitative_factor_vector,90.0)           # 3 FIX
-   push!(qualitative_factor_vector,170.0)         # 4 FX
-   push!(qualitative_factor_vector,1.0)           # 5 Platelets
+   push!(qualitative_factor_vector,2.5)           # 1 TFPI
+   push!(qualitative_factor_vector,20.0)          # 2 FV
+   push!(qualitative_factor_vector,0.7)           # 3 FVIII
+   push!(qualitative_factor_vector,90.0)           # 4 FIX
+   push!(qualitative_factor_vector,170.0)         # 5 FX
+   push!(qualitative_factor_vector,1.0)           # 6 Platelets
+   push!(qualitative_factor_vector, 70)		#7 TAFI
+   push!(qualitative_factor_vector,93)		#8 FXIII
     PROBLEM_DICTIONARY["FACTOR_LEVEL_VECTOR"] = qualitative_factor_vector
 
-	nominal_levels = Float64[]
-   push!(nominal_levels,2.5)           # 0 TFPI
-   push!(nominal_levels,0.7)           # 2 FVIII
-   push!(nominal_levels,90.0)           # 3 FIX
-   push!(nominal_levels,22.0)         # 4 FV_X
-	PROBLEM_DICTIONARY["NOMINAL_VALUES"] = nominal_levels
+	fibrin_kinetic_parameters = Float64[]
+	  # Kinetic parameters for fibrin generation
+	  push!(fibrin_kinetic_parameters,0.01)            # 1 k_cat_Fibrinogen
+	  push!(fibrin_kinetic_parameters,1000.0)         # 2 Km_Fibrinogen
+	  push!(fibrin_kinetic_parameters,0.01)         # 3 k_fibrin_monomer_association
+	  push!(fibrin_kinetic_parameters,0.01)         # 4 k_protofibril_association
+	  push!(fibrin_kinetic_parameters,0.01)         # 5 k_protofibril_monomer_association
 
-	PROBLEM_DICTIONARY["FVIII_CONTROL"] = 5.2085
+	  # Kinetic parameters for fibrinolysis
+	  push!(fibrin_kinetic_parameters,2.0)           # 6 k_cat_plasminogen_Fibrin_tPA
+	  push!(fibrin_kinetic_parameters,10.0)          # 7 Km_plasminogen_Fibrin_tPA
+	  push!(fibrin_kinetic_parameters,0.1)           # 8 k_cat_plasminogen_Fibrin_uPA
+	  push!(fibrin_kinetic_parameters,10.0)          # 9 Km_plasminogen_Fibrin_uPA
+	  push!(fibrin_kinetic_parameters,1.0)           # 10 k_cat_Fibrin
+	  push!(fibrin_kinetic_parameters,10.0)          # 11 Km_Fibrin
+	  push!(fibrin_kinetic_parameters,0.01)          # 12 k_inhibit_plasmin
+	  push!(fibrin_kinetic_parameters,0.01)          # 13 k_inhibit_PAI_1_APC
+	  push!(fibrin_kinetic_parameters,0.01)          # 14 k_inhibit_tPA_PAI_1
+	  push!(fibrin_kinetic_parameters,0.01)          # 15 k_inhibit_uPA_PAI_1
+
+	  # Kinetic parameter for fibrin formation
+	  push!(fibrin_kinetic_parameters,0.01)          # 16 k_fibrin_formation
+
+	  # Fiber degradation
+	  push!(fibrin_kinetic_parameters,100.0)          # 17 k_cat_fiber
+	  push!(fibrin_kinetic_parameters,10.0)          # 18 Km_fiber
+
+	  # Plasmin activation
+	  push!(fibrin_kinetic_parameters,0.01)          # 19 Km_plasminogen_Fibrin_tPA
+	  push!(fibrin_kinetic_parameters,0.01)          # 20 K_plasminogen_Fibrin_tPA
+	  push!(fibrin_kinetic_parameters,1.00)          # 21 k_cat_fibrinogen_deg
+	  push!(fibrin_kinetic_parameters,10.0)          # 22 Km_fibrinogen_deg
+	PROBLEM_DICTIONARY["FIBRIN_KINETIC_PARAMETER_VECTOR"]=fibrin_kinetic_parameters
+
+	fibrin_control_parameters = Float64[]
+	# Control constants for TAFI inhibition -
+	  push!(fibrin_control_parameters,0.1)          # 1 alpha_fib_inh_fXIII
+	  push!(fibrin_control_parameters,2.0)          # 2 order_fib_inh_fXIII
+	  push!(fibrin_control_parameters,0.1)          # 3 alpha_fib_inh_TAFI
+	  push!(fibrin_control_parameters,2.0)          # 4 order_fib_inh_TAFI
+
+	  # Control constants for plasmin activation term
+	  push!(fibrin_control_parameters,0.1)          # 5 alpha_tPA_inh_PAI_1
+	  push!(fibrin_control_parameters,2.0)          # 6 order_tPA_inh_PAI_1
+	  push!(fibrin_control_parameters,0.1)          # 7 alpha_uPA_inh_PAI_1
+	  push!(fibrin_control_parameters,2.0)          # 8 order_uPA_inh_PAI_1
+
+	PROBLEM_DICTIONARY["FIBRIN_CONTROL_PARAMETER_VECTOR"]=fibrin_control_parameters
+
+	PROBLEM_DICTIONARY["FVIII_CONTROL"] = 5.20895
     		PROBLEM_DICTIONARY["parameter_name_mapping_array"]=["k_trigger","K_trigger" ,"k_amplification" ,"K_FII_amplification" ,"k_APC_formation" ,"K_PC_formation" ,"k_inhibition" ,"K_FIIa_inhibition" ,"k_inhibition_ATIII" ,"k_FV_X_activation", "K_FV_X_actiation" ,"k_FX_activation","k_FX_activation","k_complex","k_amp_prothombinase","K_FII_amp_prothombinase","k_amp_active_factors", "k_amp_active_factors","alpha_trigger_activation","order_trigger_activation","alpha_trigger_inhibition_APC","order_trigger_inhibition_APC","alpha_trigger_inhibition_TFPI", "order_trigger_inhibition_TFPI","alpha_amplification_FIIa","order_amplification_FIIa","alpha_amplification_APC","order_amplification_APC","alpha_amplification_TFPI","order_amplification_TFPI","alpha_shutdown_APC","order_shutdown_APC","alpha_FV_activation","order_FV_activation","alpha_FX_activation","order_FX_activation","alpha_FX_inhibition","order_FX_inhibition","platelet_rate_constant",
 "platelet_power","platelet_denominator","Epsmax0","aida","koffplatelets","time_delay","coeff"] 
 
-	PROBLEM_DICTIONARY["number_of_states"]=11
+	PROBLEM_DICTIONARY["number_of_states"]=22
     return PROBLEM_DICTIONARY
 end
