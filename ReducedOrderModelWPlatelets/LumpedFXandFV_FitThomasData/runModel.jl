@@ -325,6 +325,7 @@ function runModelWithMultipleParams(pathToParams,pathToData,savestr)
 	usefuldata = hcat(time/60, avg_run)
 	fig = figure(figsize = (15,15))
 	platelet_count =346
+	tPA = 0
 	alldata = zeros(1,size(TSIM,1))
 	@show size(allparams)
 	if(size(allparams,1)==46) #deal with parameters being stored either vertically or horizontally
@@ -347,8 +348,6 @@ function runModelWithMultipleParams(pathToParams,pathToData,savestr)
 		fbalances(t,y)= BalanceEquations(t,y,dict) 
 		t,X = ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-4, reltol = 1E-4, minstep = 1E-8, points=:specified)
 		plotThrombinWData(t,X,pathToData)
-		#@show alldata
-		#@show size([a[2] for a in X])
 		alldata=vcat(alldata,transpose([a[2] for a in X]))
 	end
 	alldata = alldata[2:end, :] #remove row of zeros
@@ -406,7 +405,7 @@ function runModelWithParams(params)
 	TSIM = collect(TSTART:Ts:TSTOP)
 	#pathToData = "../data/ButenasFig1B60nMFVIIa.csv"
 	#pathToData = "../data/Buentas1999Fig4100PercentProthrombin.txt"
-	pathToData = "../data/fromOrfeo_Thrombin_BL_PRP.txt"
+	pathToData = "../data/fromOrfeo_Thrombin_HT_PRP.txt"
 	data = readdlm(pathToData)
 	time = data[:,1]
 	avg_run = mean(data[:,2:3],2);

@@ -1,3 +1,6 @@
+using PyPlot
+using ExcelReaders
+
 function calculateMSE(t,predictedThrobin, experimentalData)
 	num_points = size(t,1)
 	interpolatedExperimentalData = Float64[]
@@ -334,4 +337,34 @@ function checkForDynamics(alldata)
 		end
 	end
 	return hasdynamics
+end
+
+function convertToROTEM(t,x, tPA)
+	F = [a[12] for a in x]+ [a[18] for a in x]+ [a[19] for a in x]+ [a[22] for a in x] # fibrin related species 12,18,19,22
+	A0 = 1.5 #baseline ROTEM signal
+	K = 5000-375*tPA
+	S = 1
+	A1 = S
+	A = A0+A1.*F.^2./(K.^2+F.^2)
+	return A
+end
+
+function setROTEMIC(tPA, ID)
+	pathToData="../data/Viscoelasticmeasurements.xlsx"
+	all_platelets = Dict("3"=>189, "4"=>208, "5"=>210, "6"=>263, "7"=>194, "8"=>190, "9"=>149, "10"=>195)
+	look_ups_0_tPA = Dict("3"=>"Timecourse!BA3:BC1387", "4"=>"Timecourse!AT3:Q9170", "5"=>"Timecourse!AM3:AO1901", "6"=>"Timecourse!AF3:AH988", "7"=>"Timecourse!Y3:AA1447", "8"=>"Timecourse!R3:T2069", "9"=>"Timecourse!K3:M1544", "10"=>"Timecourse!D3:F789")
+	look_ups_2_tPA = Dict("3"=>"Timecourse!AX3:AZ1528", "4"=>"Timecourse!AQ3:AS1682", "5"=>"Timecourse!AJ3:AL1111", "6"=>"Timecourse!AC3:AE1097", "7"=>"Timecourse!V3:X998", "8"=>"Timecourse!O3:Q1154", "9"=>"Timecourse!H3:J1166", "10"=>"Timecourse!A3:C1301")
+	currPlatelets = all_platelets[string(ID)]
+	datastr = ""
+	if(tPA ==0)
+		datastr=look_ups_0_tPA[string(ID)]
+	else
+		datastr=look_ups_2_tPA[string(ID)]
+	end
+	data=readxl(pathToData, datastr)
+	data=Array{Float64}(data)
+	time = data[:,1]
+	avg_run = mean(data[:,2:3],2);
+	exp_data = hcat(time/60, avg_run) #convert to minute from seconds
+	return currPlatelets, exp_data
 end

@@ -26,12 +26,13 @@ data
   file = odePlatelets_1.data.R
 init = 2 (Default)
 random
-  seed = 44666030
+  seed = 1175710856
 output
   file = odePlatelets_samples_1.csv
   diagnostic_file = odePlatelets_diagnostics_1.csv
   refresh = 100 (Default)
 
+mismatch in number dimensions declared and found in context; processing stage=data initialization; variable name=theta; dims declared=(51); dims found=(1,46)
 method = sample (Default)
   sample
     num_samples = 1000 (Default)
@@ -60,18 +61,18 @@ data
   file = odePlatelets_2.data.R
 init = 2 (Default)
 random
-method = sample (Default)
-  seed = 44666031
-  sample
+  seed = 1175710902
 output
-    num_samples = 1000 (Default)
   file = odePlatelets_samples_2.csv
-    num_warmup = 1000 (Default)
   diagnostic_file = odePlatelets_diagnostics_2.csv
-    save_warmup = 0 (Default)
   refresh = 100 (Default)
-    thin = 1 (Default)
 
+method = sample (Default)
+  sample
+    num_samples = 1000 (Default)
+    num_warmup = 1000 (Default)
+    save_warmup = 0 (Default)
+    thin = 1 (Default)
     adapt
       engaged = 1 (Default)
       gamma = 0.050000000000000003 (Default)
@@ -94,7 +95,7 @@ data
   file = odePlatelets_3.data.R
 init = 2 (Default)
 random
-  seed = 44666031
+  seed = 1175710902
 output
   file = odePlatelets_samples_3.csv
   diagnostic_file = odePlatelets_diagnostics_3.csv
@@ -128,13 +129,12 @@ data
   file = odePlatelets_4.data.R
 init = 2 (Default)
 random
-  seed = 44666035
+  seed = 1175710902
 output
   file = odePlatelets_samples_4.csv
   diagnostic_file = odePlatelets_diagnostics_4.csv
   refresh = 100 (Default)
 
-mismatch in number dimensions declared and found in context; processing stage=data initialization; variable name=x; dims declared=(6001,11); dims found=(118)
-mismatch in number dimensions declared and found in context; processing stage=data initialization; variable name=x; dims declared=(6001,11); dims found=(118)
-mismatch in number dimensions declared and found in context; processing stage=data initialization; variable name=x; dims declared=(6001,11); dims found=(118)
-mismatch in number dimensions declared and found in context; processing stage=data initialization; variable name=x; dims declared=(6001,11); dims found=(118)
+mismatch in number dimensions declared and found in context; processing stage=data initialization; variable name=theta; dims declared=(51); dims found=(1,46)
+mismatch in number dimensions declared and found in context; processing stage=data initialization; variable name=theta; dims declared=(51); dims found=(1,46)
+mismatch in number dimensions declared and found in context; processing stage=data initialization; variable name=theta; dims declared=(51); dims found=(1,46)

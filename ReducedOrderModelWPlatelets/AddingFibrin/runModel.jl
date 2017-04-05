@@ -315,7 +315,7 @@ function runModelWithMultipleParams(pathToParams,pathToData,savestr)
 	allparams = readdlm(pathToParams, '\t')
 	TSTART = 0.0
 	Ts = .02
-	TSTOP =35.0
+	TSTOP =60.0
 	TSIM = collect(TSTART:Ts:TSTOP)
 	#pathToData = "../data/ButenasFig1B60nMFVIIa.csv"
 	#pathToData = "../data/Luan2010Fig5F.csv"
@@ -326,7 +326,9 @@ function runModelWithMultipleParams(pathToParams,pathToData,savestr)
 	usefuldata = hcat(time/60, avg_run)
 	fig1 = figure(figsize = (15,15))
 	fig2 = figure(figsize = (15,15))
+	fig3 = figure(figsize = (15,15))
 	platelet_count =346
+	tPA = 0
 	alldata = zeros(1,size(TSIM,1))
 	@show size(allparams)
 	if(size(allparams,1)==46) #deal with parameters being stored either vertically or horizontally
@@ -347,13 +349,16 @@ function runModelWithMultipleParams(pathToParams,pathToData,savestr)
 		initial_condition_vector = dict["INITIAL_CONDITION_VECTOR"]
 		reshaped_IC = vec(reshape(initial_condition_vector,22,1))
 		fbalances(t,y)= BalanceEquations(t,y,dict) 
-		t,X = ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-6, reltol = 1E-4, minstep = 1E-6, points=:specified)
+		t,X = ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-4, reltol = 1E-4, minstep = 1E-9, points=:specified)
 		figure(1)
 		plotThrombinWData(t,X,pathToData)
 		figure(2)
 		makeLoopPlots(t,X)
 		#@show alldata
 		#@show size([a[2] for a in X])
+		A = convertToROTEM(t,X,tPA)
+		figure(3)
+		plot(t, A)
 		alldata=vcat(alldata,transpose([a[2] for a in X]))
 	end
 	alldata = alldata[2:end, :] #remove row of zeros

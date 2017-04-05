@@ -136,7 +136,7 @@ functions {
 
 				modified_rate_vector= (rate_vector).*(control_vector);
 
-				dxdt_total[1]= -1*modified_rate_vector[2] -modified_rate_vector[7]-modified_rate_vector[6];	// 1 FII
+				dxdt_total[1]= -1.0*modified_rate_vector[2] -modified_rate_vector[7]-modified_rate_vector[6];	// 1 FII
 				dxdt_total[2]= modified_rate_vector[2] - modified_rate_vector[4]+modified_rate_vector[7]+modified_rate_vector[6];// 2 FIIa
 				dxdt_total[3]= -1*modified_rate_vector[3]; // 3 PC
 				dxdt_total[4]= 1*modified_rate_vector[3] ; // 4 APC

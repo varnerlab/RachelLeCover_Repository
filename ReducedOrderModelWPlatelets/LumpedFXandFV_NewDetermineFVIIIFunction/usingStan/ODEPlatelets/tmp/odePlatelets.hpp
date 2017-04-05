@@ -572,7 +572,7 @@ Balances(const T0__& t,
             current_statement_begin__ = 137;
             stan::math::assign(modified_rate_vector, elt_multiply(rate_vector,control_vector));
             current_statement_begin__ = 139;
-            stan::math::assign(get_base1_lhs(dxdt_total,1,"dxdt_total",1), (((-(1) * get_base1(modified_rate_vector,2,"modified_rate_vector",1)) - get_base1(modified_rate_vector,7,"modified_rate_vector",1)) - get_base1(modified_rate_vector,6,"modified_rate_vector",1)));
+            stan::math::assign(get_base1_lhs(dxdt_total,1,"dxdt_total",1), (((-(1.0) * get_base1(modified_rate_vector,2,"modified_rate_vector",1)) - get_base1(modified_rate_vector,7,"modified_rate_vector",1)) - get_base1(modified_rate_vector,6,"modified_rate_vector",1)));
             current_statement_begin__ = 140;
             stan::math::assign(get_base1_lhs(dxdt_total,2,"dxdt_total",1), (((get_base1(modified_rate_vector,2,"modified_rate_vector",1) - get_base1(modified_rate_vector,4,"modified_rate_vector",1)) + get_base1(modified_rate_vector,7,"modified_rate_vector",1)) + get_base1(modified_rate_vector,6,"modified_rate_vector",1)));
             current_statement_begin__ = 141;

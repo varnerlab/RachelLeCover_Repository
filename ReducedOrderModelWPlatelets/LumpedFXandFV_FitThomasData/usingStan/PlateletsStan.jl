@@ -140,7 +140,7 @@ function runModel()
 				dxdt_total[8] <- kplatelts*(EpsMax-Eps)-koffplatelets*Eps; //frac active platelets
 				dxdt_total[9] <- -1*modified_rate_vector[1]; //FV_FX
 				dxdt_total[10] <- modified_rate_vector[1] -modified_rate_vector[5];//FV_FXa
-				dxdt_total[11] <- modified_rate_vector[5]; //Prothromibase_platelets
+				dxdt_total[11] <- modified_rate_vector[5]; //Prothromibase_platelets b
 			
 				tau <- time_coeff*(1-FIIa/aleph);
 				time_scale <-1-1*exp(-tau*(t-time_delay));
@@ -201,7 +201,7 @@ function runModel()
 		"M"=> 11,
 		"t0"=>0.0,
 		"ts"=>collect(0:.01:60),
-		"y"=>readdlm("../../../data/Luan2010Fig5A.csv", ',')[:,2]
+		"y"=>zeros(size(collect(0:.01:60),1), 11)#readdlm("../../../data/Luan2010Fig5A.csv", ',')[:,2]
 		
 	)
 
