@@ -17,16 +17,18 @@ avg_run = mean(data[:,2:3],2);
 experimentaldata = hcat(time/60, avg_run)
 
 #pathsToData = ["../data/ButenasFig1B60nMFVIIa.csv","../data/Buentas1999Fig450PercentProthrombin.txt", "../data/Buentas1999Fig4100PercentProthrombin.txt", "../data/Buentas1999Fig4150PercentProthrombin.txt"]
-pathsToData = ["../data/fromOrfeo_Thrombin_BL_PRP.txt", "../data/fromOrfeo_Thrombin_HT_PRP.txt"]
+poss_tPA = [0,2]
+ids = ["3", "4", "5", "6", "7", "8", "9", "10"]
 allexperimentaldata = Array[]
-for j in collect(1:size(pathsToData,1))
-	data = readdlm(pathsToData[j])
-	time = data[:,1]
-	avg_run = mean(data[:,2:3],2);
-	experimentaldata = hcat(time/60, avg_run)	
-	push!(allexperimentaldata, experimentaldata)
+all_platelets = Float64[]
+for j in collect(1:size(poss_tPA,1))
+	for k in collect(1:size(ids,1))
+		platelets,currdata = setROTEMIC(poss_tPA[j], ids[k])
+		push!(allexperimentaldata, currdata)
+		push!(all_platelets, platelets)
+	end
 end
-
+selected_idxs = [3,4,5,6,11,12,13,14]
 
 function objectiveForNLOpt(params::Vector, grad::Vector)
 	tic()
@@ -37,18 +39,20 @@ function objectiveForNLOpt(params::Vector, grad::Vector)
 	TSIM = collect(TSTART:Ts:TSTOP)
 	initial_condition_vector = dict["INITIAL_CONDITION_VECTOR"]
 	fbalances(t,y)= BalanceEquations(t,y,dict) 
-	t,X = ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-4, reltol = 1E-4, minstep = 1E-8)
+	#t,X = ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-6, reltol = 1E-6,minstep=1E-9)
+	t,X = ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-4, reltol = 1E-4,minstep=1E-9)
 	FIIa = [a[2] for a in X]
-	#MSE, interpolatedExperimentalData=calculateMSE(t, FIIa, experimentaldata)
-	MSE, interpolatedExperimentalData=calculateMSE(t, FIIa, allexperimentaldata[curridx])
+	hasdynamics=checkForDynamics(FIIa, t)
+	if(hasdynamics)
+		MSE, interpolatedExperimentalData=calculateMSE(t, FIIa, allexperimentaldata[curridx])
+		#MSE, interpolatedExperimentalData=calculateMSE(t, FIIa, experimentaldata)
+	else
+		MSE =1E7 #if it doesn't generate dynamics, make this parameter set very unfavorable
+	end
 	#hold("on")
 	#plot(t, FIIa, alpha = .5)
 	#write params to file
-<<<<<<< HEAD
-	f = open("parameterEstimation/NM_31_03_2017_DuringSingleObj", "a+")
-=======
-	f = open("parameterEstimation/NM_28_03_2017_DuringSingleObj", "a+")
->>>>>>> 7c35b68bb4209ae8d32044088d52508eecf3dbad
+	f = open("parameterEstimation/NM_05_04_2017.txt", "a+")
 	write(f, string(params, ",", MSE, "\n"))
 	close(f)
 	toc()
@@ -57,27 +61,39 @@ function objectiveForNLOpt(params::Vector, grad::Vector)
 end
 
 function objectiveForPOETS(parameter_array)
-	platelet_counts = [420,364]
 	tic()
-	obj_array=10^7*ones(2,1)
+	obj_array=10^7*ones(8,1)
 	TSTART = 0.0
 	Ts = .02
-	TSTOP = 35.0
-	TSIM = collect(TSTART:Ts:TSTOP)
-	
-	for j in collect(1:size(platelet_counts,1))
-		temp_params=vcat(parameter_array, platelet_counts[j])
+	count = 1
+	for j in selected_idxs
+		temp_params = parameter_array
+		temp_params[47] = all_platelets[j] #set platelets to experimental value
 		dict = buildDictFromOneVector(temp_params)
 		initial_condition_vector = dict["INITIAL_CONDITION_VECTOR"]
+		if(j<10) #no tPA, and set experimental run time
+			initial_condition_vector[16]=0.0
+			TSTOP = 180.0
+			tPA = 0.0
+		else
+			initial_condition_vector[16]=2.0
+			TSTOP = 60.0
+			tPA = 2.0
+		end
+		TSIM = collect(TSTART:Ts:TSTOP)
 		fbalances(t,y)= BalanceEquations(t,y,dict) 
-<<<<<<< HEAD
-		t,X = ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-4, reltol = 1E-4, minstep = 1E-8)
-=======
-		t,X = ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-6, reltol = 1E-6)
->>>>>>> 7c35b68bb4209ae8d32044088d52508eecf3dbad
+		#t,X = ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-6, reltol = 1E-6, minstep=1E-9)
+		t,X = ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-4, reltol = 1E-4,minstep=1E-9)
 		FIIa = [a[2] for a in X]
-		MSE, interpolatedExperimentalData=calculateMSE(t, FIIa, allexperimentaldata[j])
-		obj_array[j,1]=MSE
+		A = convertToROTEM(t,X,tPA)
+		hasdynamics=checkForDynamics(FIIa, t)
+		if(hasdynamics)
+			MSE, interpData = calculateMSE(t,A, allexperimentaldata[j])
+		else
+			MSE =10^7 #if it doesn't generate dynamics, make this parameter set very unfavorable
+		end
+		obj_array[count,1]=MSE
+		count = count+1
 	end
 	@show obj_array
 	#@show size(parameter_array)
@@ -87,94 +103,56 @@ end
 
 function attemptOptimizationPOETS()
 	number_of_subdivisions = 10
-	number_of_parameters = 46
-	number_of_objectives = 2
-	initial_parameter_estimate = readdlm("parameterEstimation/niceBellshape.txt")
-<<<<<<< HEAD
+	number_of_parameters = 77
+	number_of_objectives = 8
+	initial_parameter_estimate = vec(readdlm("parameterEstimation/startingPoint06_04_2017.txt"))
 	#inital_parameter_estimate= readdlm("parameterEstimation/paramsToRestart03_30_2017.txt")
-=======
->>>>>>> 7c35b68bb4209ae8d32044088d52508eecf3dbad
-	outputfile = "parameterEstimation/POETS_info_27_03_2017_smallerPeturb.txt"
+	outputfile = "parameterEstimation/POETS_info_06_04_2017.txt"
 	ec_array = zeros(number_of_objectives)
 	pc_array = zeros(number_of_parameters)
+	global up_arr = initial_parameter_estimate*1000
+	global lb_arr = initial_parameter_estimate/1000
 	for index in collect(1:number_of_subdivisions)
 
 		# Grab a starting point -
-		initial_parameter_estimate =vec(initial_parameter_estimate.*(rand(46,1)))
+		initial_parameter_estimate =initial_parameter_estimate+initial_parameter_estimate*rand()*.1
 
 		# Run JuPOETs -
 		(EC,PC,RA) = estimate_ensemble(objectiveForPOETS,neighbor_function,acceptance_probability_function,cooling_function,initial_parameter_estimate;rank_cutoff=4,maximum_number_of_iterations=10,show_trace=true)
 
 		# Package -
+		@show (EC, PC, RA)
 		ec_array = [ec_array EC]
 		pc_array = [pc_array PC]
-		@show (EC, PC, RA)
 		f = open(outputfile, "a")
 		write(f, string(EC, ",", PC, ",", RA, "\n"))
 		close(f)
-<<<<<<< HEAD
 	end
 
 	return (ec_array,pc_array)
 end
+
 
 function attemptOptimizationSingleAndMulti()
 	number_of_subdivisions = 10
 	number_of_parameters = 46
 	number_of_objectives = 2
 	platelet_counts = [420,364]
-	initial_parameter_estimate = readdlm("parameterEstimation/niceBellshape.txt")
-	outputfile = "parameterEstimation/POETS_info_31_03_2017_SingleAndMulti.txt"
+	initial_parameter_estimate = readdlm("parameterEstimation/BestAfterNM_05_04_2017.txt")
+	outputfile = "parameterEstimation/POETS_info_05_04_2017_SingleAndMulti.txt"
 	ec_array = zeros(number_of_objectives)
 	pc_array = zeros(number_of_parameters)
 	initial_parameter_estimate =vec(initial_parameter_estimate) #get initial parameter estimate
+	global up_arr = initial_parameter_estimate*1000
+	global lb_arr = initial_parameter_estimate/1000
 	global curridx = 1
 	for index in collect(1:number_of_subdivisions)
 
 		# Run JuPOETs -
 		(EC,PC,RA) = estimate_ensemble(objectiveForPOETS,neighbor_function,acceptance_probability_function,cooling_function,initial_parameter_estimate;rank_cutoff=4,maximum_number_of_iterations=10,show_trace=true)
 		#get the index of the parameter set with smallest mean error (on both sets)
-
-		# Package -
-		ec_array = [ec_array EC]
-		pc_array = [pc_array PC]
-
-		best_index=indmax(mean(ec_array,1))
-		best_params = pc_array[:, best_index]
-		@show (EC, PC, RA)
-		f = open(outputfile, "a")
-		write(f, string(EC, ",", PC, ",", RA, "\n"))
-		close(f)
-		#estimate params for single objective, alternating which platelet count to use
-		curridx =mod(index,2)+1 
-		inital_parameter_estimate=attemptOptimizationNLOpt(best_params, platelet_counts[curridx])  
-	end
-
-	return (ec_array,pc_array)
-=======
-	end
-
-	return (ec_array,pc_array)
-end
-
-function attemptOptimizationSingleAndMulti()
-	number_of_subdivisions = 10
-	number_of_parameters = 46
-	number_of_objectives = 2
-	platelet_counts = [420,364]
-	initial_parameter_estimate = readdlm("parameterEstimation/niceBellshape.txt")
-	outputfile = "parameterEstimation/POETS_info_27_03_2017_SingleAndMulti.txt"
-	ec_array = zeros(number_of_objectives)
-	pc_array = zeros(number_of_parameters)
-	initial_parameter_estimate =vec(initial_parameter_estimate) #get initial parameter estimate
-	global curridx = 1
-	for index in collect(1:number_of_subdivisions)
-
-		# Run JuPOETs -
-		(EC,PC,RA) = estimate_ensemble(objectiveForPOETS,neighbor_function,acceptance_probability_function,cooling_function,initial_parameter_estimate;rank_cutoff=4,maximum_number_of_iterations=10,show_trace=true)
-		#get the index of the parameter set with smallest mean error (on both sets)
-		best_index=indmax(mean(ec_arr,1))
-		best_params = PC[best_index]
+		best_index=indmax(mean(EC,1))
+		best_params = PC[:,best_index]
 
 		# Package -
 		ec_array = [ec_array EC]
@@ -189,7 +167,6 @@ function attemptOptimizationSingleAndMulti()
 	end
 
 	return (ec_array,pc_array)
->>>>>>> 7c35b68bb4209ae8d32044088d52508eecf3dbad
 end
 
 function attemptOptimizationNLOpt()
@@ -275,64 +252,38 @@ function attemptOptimizationNLOpt()
 #	push!(timing, 1.0) #coeff
 #	 
 	#inital_parameter_estimate = vcat(kinetic_parameter_vector, control_parameter_vector, platelet_parameter_vector, timing, platelet_count)	
-	inital_parameter_estimate = readdlm("parameterEstimation/niceBellshape.txt")	
-<<<<<<< HEAD
+	inital_parameter_estimate = readdlm("parameterEstimation/startingPoint05_04_2017.txt")	
 	@show inital_parameter_estimate
 	(minf, minx, ret) = NLopt.optimize(opt, vec(inital_parameter_estimate))
 	println("got $minf at $minx after $count iterations (returned $ret)")
 end
 
-function attemptOptimizationNLOpt(inital_parameter_estimate, platelet_count)
+function attemptOptimizationNLOpt(parameter_estimate, platelet_count)
 	numvars = 47
-	outputfile = "parameterEstimation/BestNMParamsDuringSequential_31_03_2017.txt"
+	outputfile = "parameterEstimation/DuringSingleObj_04_04_2017.txt"
 	opt = Opt(:LN_NELDERMEAD,numvars)
-	#lowerbounds =fill(0, 1, numvars)
-	#upperbounds = fill(1E7, 1, numvars)
-	prev_parameter_estimate = vec(readdlm("parameterEstimation/niceBellshape.txt"))
-	lowerbounds = prev_parameter_estimate*1/100
-	upperbounds = prev_parameter_estimate*100
-#	upperbounds[3] = 70.0 #bound k_amplication to be small
-#	upperbounds[17] = 70.0 #bound k_amp_active_factors to be small
+	lowerbounds =vec(lb_arr[1:46])
+	upperbounds = vec(up_arr[1:46])
 	#upperbounds[47]=platelet_count #make it so platelet count can't move
 	#lowerbounds[47]=platelet_count
 	push!(upperbounds, platelet_count)
 	push!(lowerbounds, platelet_count)
+	min_objective!(opt, objectiveForNLOpt)
+	inital_parameter_estimate = parameter_estimate[1:46]
+	push!(inital_parameter_estimate, platelet_count)
+	
+	@show size(inital_parameter_estimate)
+	@show lowerbounds
+	@show upperbounds
+	@show inital_parameter_estimate
 	upper_bounds!(opt, vec(upperbounds))
 	lower_bounds!(opt, vec(lowerbounds))
-	min_objective!(opt, objectiveForNLOpt)
-	push!(inital_parameter_estimate, platelet_count)	
-
-=======
->>>>>>> 7c35b68bb4209ae8d32044088d52508eecf3dbad
-	@show inital_parameter_estimate
 	(minf, minx, ret) = NLopt.optimize(opt, vec(inital_parameter_estimate))
 	println("got $minf at $minx after $count iterations (returned $ret)")
 	f = open(outputfile, "a")
-	write(f, string(minx, ",", minf, "\n"))
+	write(f, string(minf, ",", minx, ",", ret, "\n"))
 	close(f)
 	return minx
 end
 
-<<<<<<< HEAD
-=======
-function attemptOptimizationNLOpt(inital_parameter_estimate, platelet_count)
-	numvars = 47
-	opt = Opt(:LN_NELDERMEAD,numvars)
-	lowerbounds =fill(0, 1, numvars)
-	upperbounds = fill(1E7, 1, numvars)
-	upperbounds[3] = 70.0 #bound k_amplication to be small
-	upperbounds[17] = 70.0 #bound k_amp_active_factors to be small
-	upperbounds[47]=platelet_count #make it so platelet count can't move
-	lowerbounds[47]=platelet_count
-	upper_bounds!(opt, vec(upperbounds))
-	lower_bounds!(opt, vec(lowerbounds))
-	min_objective!(opt, objectiveForNLOpt)
-	
-	@show inital_parameter_estimate
-	(minf, minx, ret) = NLopt.optimize(opt, vec(inital_parameter_estimate))
-	println("got $minf at $minx after $count iterations (returned $ret)")
-	return minx
-end
-
->>>>>>> 7c35b68bb4209ae8d32044088d52508eecf3dbad
 

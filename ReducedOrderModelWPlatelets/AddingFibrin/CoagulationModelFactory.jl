@@ -20,7 +20,7 @@ function buildCoagulationModelDictionary(platelet_count)
     push!(initial_condition_vector,0.0)		#plasmin
     push!(initial_condition_vector,10000)	#Fibrinogen
     push!(initial_condition_vector, 2000)	#plasminogen
-    push!(initial_condition_vector,8.0)		#tPA
+    push!(initial_condition_vector,0.0)		#tPA
     push!(initial_condition_vector,0.0)		#uPA
     push!(initial_condition_vector,0.0)		#fibrin monomer
     push!(initial_condition_vector,0.0)		#protofibril
@@ -196,7 +196,7 @@ function buildCoagulationModelDictionary(kinetic_parameter_vector, control_param
     push!(initial_condition_vector,0.0)		#plasmin
     push!(initial_condition_vector,10000)	#Fibrinogen
     push!(initial_condition_vector, 2000)	#plasminogen
-    push!(initial_condition_vector,8.0)		#tPA
+    push!(initial_condition_vector,0.0)		#tPA
     push!(initial_condition_vector,0.0)		#uPA
     push!(initial_condition_vector,0.0)		#fibrin monomer
     push!(initial_condition_vector,0.0)		#protofibril
@@ -284,6 +284,80 @@ function buildCoagulationModelDictionary(kinetic_parameter_vector, control_param
 	  push!(fibrin_control_parameters,0.1)          # 7 alpha_uPA_inh_PAI_1
 	  push!(fibrin_control_parameters,2.0)          # 8 order_uPA_inh_PAI_1
 
+	PROBLEM_DICTIONARY["FIBRIN_CONTROL_PARAMETER_VECTOR"]=fibrin_control_parameters
+
+	PROBLEM_DICTIONARY["FVIII_CONTROL"] = 5.20895
+    		PROBLEM_DICTIONARY["parameter_name_mapping_array"]=["k_trigger","K_trigger" ,"k_amplification" ,"K_FII_amplification" ,"k_APC_formation" ,"K_PC_formation" ,"k_inhibition" ,"K_FIIa_inhibition" ,"k_inhibition_ATIII" ,"k_FV_X_activation", "K_FV_X_actiation" ,"k_FX_activation","k_FX_activation","k_complex","k_amp_prothombinase","K_FII_amp_prothombinase","k_amp_active_factors", "k_amp_active_factors","alpha_trigger_activation","order_trigger_activation","alpha_trigger_inhibition_APC","order_trigger_inhibition_APC","alpha_trigger_inhibition_TFPI", "order_trigger_inhibition_TFPI","alpha_amplification_FIIa","order_amplification_FIIa","alpha_amplification_APC","order_amplification_APC","alpha_amplification_TFPI","order_amplification_TFPI","alpha_shutdown_APC","order_shutdown_APC","alpha_FV_activation","order_FV_activation","alpha_FX_activation","order_FX_activation","alpha_FX_inhibition","order_FX_inhibition","platelet_rate_constant",
+"platelet_power","platelet_denominator","Epsmax0","aida","koffplatelets","time_delay","coeff"] 
+
+	PROBLEM_DICTIONARY["number_of_states"]=22
+    return PROBLEM_DICTIONARY
+end
+
+function buildCoagulationModelDictionary(kinetic_parameter_vector, control_parameter_vector, platelet_parameter_vector,timing, platelet_count,fibrin_kinetic_parameters,fibrin_control_parameters)
+    
+    # Initialize -
+    PROBLEM_DICTIONARY = Dict()
+    normal_platelet_count = 300 #*10^6 #/mL
+    # Initial condition -
+	#from simulateFig3Butenas2002
+    initial_condition_vector = Float64[]
+    push!(initial_condition_vector,1400)       # 0 FII
+    push!(initial_condition_vector,0.001)        # 1 FIIa
+    push!(initial_condition_vector,60.0)        # 2 PC
+    push!(initial_condition_vector,0.0)        # 3 APC
+    push!(initial_condition_vector,3400)       # 4 ATIII
+    push!(initial_condition_vector,12)         # 5 TM
+    push!(initial_condition_vector,5.0E-3)          # 6 TRIGGER
+    push!(initial_condition_vector, 0.01) #Fraction of platelets activated
+    push!(initial_condition_vector,22.0)          #  FV+FX
+    push!(initial_condition_vector,0.0)          #  FVa+FXa
+    push!(initial_condition_vector,0.000)         #  prothombinase complex
+    push!(initial_condition_vector, 0.0)	#Fibrin
+    push!(initial_condition_vector,0.0)		#plasmin
+    push!(initial_condition_vector,10000)	#Fibrinogen
+    push!(initial_condition_vector, 2000)	#plasminogen
+    push!(initial_condition_vector,0.0)		#tPA
+    push!(initial_condition_vector,0.0)		#uPA
+    push!(initial_condition_vector,0.0)		#fibrin monomer
+    push!(initial_condition_vector,0.0)		#protofibril
+    push!(initial_condition_vector,1180)	#antiplasmin
+    push!(initial_condition_vector,.56)		#PAI_1
+    push!(initial_condition_vector,0.0)		#Fiber
+    PROBLEM_DICTIONARY["INITIAL_CONDITION_VECTOR"] = initial_condition_vector
+
+    PROBLEM_DICTIONARY["KINETIC_PARAMETER_VECTOR"] = kinetic_parameter_vector
+    
+    PROBLEM_DICTIONARY["CONTROL_PARAMETER_VECTOR"] = control_parameter_vector
+
+   #platlet controls
+	PROBLEM_DICTIONARY["PLATELET_PARAMS"] = platelet_parameter_vector
+	PROBLEM_DICTIONARY["PLATELET_PARAMS"][5] = PROBLEM_DICTIONARY["PLATELET_PARAMS"][5]*platelet_count; #correct for differing amounts of platelets
+    
+    # Experimental output scaling -
+    # Fig 5A scaling (3.20,1.0)
+    # Fig 3 scaling (-1.0,1.0)
+    # Fig 2 scaling (1.8)
+    # Fig 1 allen scaling (4.0,1.0)
+    scaling_parameter_vector =Float64[]
+    push!(scaling_parameter_vector,4.0)        # 0 Time scale 
+    push!(scaling_parameter_vector,1.0)        # 1 Abundance scale
+    PROBLEM_DICTIONARY["SCALING_PARAMETER_VECTOR"] = scaling_parameter_vector
+
+   PROBLEM_DICTIONARY["ALEPH"] = initial_condition_vector[2]
+	PROBLEM_DICTIONARY["TIME_DELAY"]=timing
+     # QFactor vector - from simulateFig3Butenas2002
+    qualitative_factor_vector =Float64[]
+   push!(qualitative_factor_vector,2.5)           # 1 TFPI
+   push!(qualitative_factor_vector,20.0)          # 2 FV
+   push!(qualitative_factor_vector,0.7)           # 3 FVIII
+   push!(qualitative_factor_vector,90.0)           # 4 FIX
+   push!(qualitative_factor_vector,170.0)         # 5 FX
+   push!(qualitative_factor_vector,1.0)           # 6 Platelets
+   push!(qualitative_factor_vector, 70)		#7 TAFI
+   push!(qualitative_factor_vector,93)		#8 FXIII
+    PROBLEM_DICTIONARY["FACTOR_LEVEL_VECTOR"] = qualitative_factor_vector
+	PROBLEM_DICTIONARY["FIBRIN_KINETIC_PARAMETER_VECTOR"]=fibrin_kinetic_parameters
 	PROBLEM_DICTIONARY["FIBRIN_CONTROL_PARAMETER_VECTOR"]=fibrin_control_parameters
 
 	PROBLEM_DICTIONARY["FVIII_CONTROL"] = 5.20895

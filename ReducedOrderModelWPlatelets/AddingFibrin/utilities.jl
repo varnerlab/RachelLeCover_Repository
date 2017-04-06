@@ -64,6 +64,21 @@ function buildDictFromOneVector(vector)
 	return dict
 end
 
+function buildCompleteDictFromOneVector(vector)
+	kinetic_parameter_vector = vector[1:18]
+	control_parameter_vector=vector[19:38]
+	platelet_parameter_vector=vector[39:44]
+	timing = vector[45:46]
+	platelet_count=vector[47]
+	fibrin_kinetic_parameters = vector[48:69]
+	fibrin_control_parameters = vector[70:77]
+	dict = buildCoagulationModelDictionary(kinetic_parameter_vector, control_parameter_vector, platelet_parameter_vector, timing, platelet_count, fibrin_kinetic_parameters, fibrin_control_parameters)
+	return dict
+end
+
+
+
+
 # Generates new parameter array, given current array -
 function neighbor_function(parameter_array)
 	outputfile="parameterEstimation/POETS_28_03_2017.txt"
@@ -339,20 +354,35 @@ function checkForDynamics(alldata)
 	return hasdynamics
 end
 
+function checkForDynamics(thrombin, t)
+	threshold = 10 #it has dynamics if it creates 10 thrombin
+	hasdynamics = false
+	mid = thrombin[Int(floor(end/2))] #get the approximate midpoint
+	if(mid>threshold || maximum(thrombin)> threshold)
+		hasdynamics = true
+	end
+	return hasdynamics
+end
+
 function convertToROTEM(t,x, tPA)
 	F = [a[12] for a in x]+ [a[18] for a in x]+ [a[19] for a in x]+ [a[22] for a in x] # fibrin related species 12,18,19,22
 	A0 = 1.5 #baseline ROTEM signal
 	K = 5000-375*tPA
-	S = 1
+	if(tPA ==2)
+		S = 4E6
+	else
+		S = 1E6
+	end
 	A1 = S
 	A = A0+A1.*F.^2./(K.^2+F.^2)
 	return A
 end
 
 function setROTEMIC(tPA, ID)
+	@show ID
 	pathToData="../data/Viscoelasticmeasurements.xlsx"
 	all_platelets = Dict("3"=>189, "4"=>208, "5"=>210, "6"=>263, "7"=>194, "8"=>190, "9"=>149, "10"=>195)
-	look_ups_0_tPA = Dict("3"=>"Timecourse!BA3:BC1387", "4"=>"Timecourse!AT3:Q9170", "5"=>"Timecourse!AM3:AO1901", "6"=>"Timecourse!AF3:AH988", "7"=>"Timecourse!Y3:AA1447", "8"=>"Timecourse!R3:T2069", "9"=>"Timecourse!K3:M1544", "10"=>"Timecourse!D3:F789")
+	look_ups_0_tPA = Dict("3"=>"Timecourse!BA3:BC1387", "4"=>"Timecourse!AT3:AV1835", "5"=>"Timecourse!AM3:AO1901", "6"=>"Timecourse!AF3:AH988", "7"=>"Timecourse!Y3:AA1447", "8"=>"Timecourse!R3:T2069", "9"=>"Timecourse!K3:M1544", "10"=>"Timecourse!D3:F789")
 	look_ups_2_tPA = Dict("3"=>"Timecourse!AX3:AZ1528", "4"=>"Timecourse!AQ3:AS1682", "5"=>"Timecourse!AJ3:AL1111", "6"=>"Timecourse!AC3:AE1097", "7"=>"Timecourse!V3:X998", "8"=>"Timecourse!O3:Q1154", "9"=>"Timecourse!H3:J1166", "10"=>"Timecourse!A3:C1301")
 	currPlatelets = all_platelets[string(ID)]
 	datastr = ""
@@ -361,6 +391,7 @@ function setROTEMIC(tPA, ID)
 	else
 		datastr=look_ups_2_tPA[string(ID)]
 	end
+	@show datastr
 	data=readxl(pathToData, datastr)
 	data=Array{Float64}(data)
 	time = data[:,1]

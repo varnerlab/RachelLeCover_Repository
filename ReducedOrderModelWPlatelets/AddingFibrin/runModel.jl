@@ -1,6 +1,7 @@
 include("BalanceEquations.jl")
 include("CoagulationModelFactory.jl")
 include("utilities.jl")
+include("plotData.jl")
 #using Sundials
 using ODE
 using PyPlot
@@ -315,7 +316,7 @@ function runModelWithMultipleParams(pathToParams,pathToData,savestr)
 	allparams = readdlm(pathToParams, '\t')
 	TSTART = 0.0
 	Ts = .02
-	TSTOP =60.0
+	TSTOP =180.0
 	TSIM = collect(TSTART:Ts:TSTOP)
 	#pathToData = "../data/ButenasFig1B60nMFVIIa.csv"
 	#pathToData = "../data/Luan2010Fig5F.csv"
@@ -361,6 +362,8 @@ function runModelWithMultipleParams(pathToParams,pathToData,savestr)
 		plot(t, A)
 		alldata=vcat(alldata,transpose([a[2] for a in X]))
 	end
+	figure(3)
+	plotROTEM_given_tPA(tPA)
 	alldata = alldata[2:end, :] #remove row of zeros
 	alldata = map(Float64,alldata)
 	hasdynamics = checkForDynamics(alldata)

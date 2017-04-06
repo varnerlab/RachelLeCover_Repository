@@ -43,3 +43,37 @@ function plotAverageROTEM()
 	ylabel("ROTEM Curve")
 	savefig("figures/ROTEMcurvesForP_9_10_6.pdf")
 end
+
+function plotAllROTEM()
+	close("all")
+	figure(figsize=[20,20])
+	leg_arr=AbstractString[]
+	poss_tPA = [0,2]
+	colors = [".3",".7"]
+	markers = ["x", ".", "o", "h", "+", "p", "3", "8"]
+	ids = ["3", "4", "5", "6", "7", "8", "9", "10"]
+	for j in collect(1:size(poss_tPA,1))
+		for k in collect(1:size(ids,1))
+			platelets,currdata = setROTEMIC(poss_tPA[j], ids[k])
+			plot(currdata[collect(1:10:end),1], currdata[collect(1:10:end),2], color=colors[j], marker = markers[k])
+			leg_str = string("Id = ", ids[k], " tPA = ", poss_tPA[j])
+			push!(leg_arr, leg_str)
+		end
+	end
+	xlabel("Time, in minutes")
+	ylabel("Diameter")
+	legend(leg_arr)
+	savefig("figures/allROTEMcurves.pdf")
+end
+
+function plotROTEM_given_tPA(tPA)
+	#close("all")
+	ids = ["3", "4", "5", "6", "7", "8", "9", "10"]
+	for k in collect(1:size(ids,1))
+		platelets,currdata = setROTEMIC(tPA, ids[k])
+		plot(currdata[:,1], currdata[:,2], "k")
+	end
+	xlabel("Time, in minutes")
+	ylabel("Diameter")
+	savefig(string("figures/allROTEMcurves_tPA=",tPA, ".pdf"))
+end
