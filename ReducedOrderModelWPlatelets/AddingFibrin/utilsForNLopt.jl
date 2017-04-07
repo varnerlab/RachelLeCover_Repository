@@ -69,7 +69,7 @@ function objectiveForPOETS(parameter_array)
 	for j in selected_idxs
 		temp_params = parameter_array
 		temp_params[47] = all_platelets[j] #set platelets to experimental value
-		dict = buildDictFromOneVector(temp_params)
+		dict = buildCompleteDictFromOneVector(temp_params)
 		initial_condition_vector = dict["INITIAL_CONDITION_VECTOR"]
 		if(j<10) #no tPA, and set experimental run time
 			initial_condition_vector[16]=0.0
@@ -107,12 +107,12 @@ function attemptOptimizationPOETS()
 	number_of_objectives = 8
 	initial_parameter_estimate = vec(readdlm("parameterEstimation/startingPoint06_04_2017.txt"))
 	#inital_parameter_estimate= readdlm("parameterEstimation/paramsToRestart03_30_2017.txt")
-	outputfile = "parameterEstimation/POETS_info_06_04_2017.txt"
+	outputfile = "parameterEstimation/POETS_info_07_04_2017.txt"
 	ec_array = zeros(number_of_objectives)
 	pc_array = zeros(number_of_parameters)
 	global up_arr = initial_parameter_estimate*1000
 	global lb_arr = initial_parameter_estimate/1000
-	for index in collect(1:number_of_subdivisions)
+	for index in collect(7:number_of_subdivisions)
 
 		# Grab a starting point -
 		initial_parameter_estimate =initial_parameter_estimate+initial_parameter_estimate*rand()*.1

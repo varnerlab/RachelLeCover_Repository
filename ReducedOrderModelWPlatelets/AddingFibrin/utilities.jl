@@ -180,6 +180,7 @@ function generateBestNparameters(n, ec_array, pc_array)
 		@show size(pc_array)
 		@show size(total_error)
 	end
+	writedlm(string("parameterEstimation/Best", n, "OverallParameters_07_04_2017.txt"), best_params)
 	return best_params
 
 end
@@ -251,8 +252,8 @@ function parsePOETsoutput(filename)
 	close(f)
 
 	outputname = "textparsing.txt"
-	number_of_parameters = 46
-  	number_of_objectives = 2
+	number_of_parameters = 77
+  	number_of_objectives = 8
 	ec_array = zeros(number_of_objectives)
   	pc_array = zeros(number_of_parameters)
 	rank_array = zeros(1)	
@@ -296,11 +297,41 @@ function plotTradeOffCurve(ec_array, rank_array)
 			plot(ec_array[1,j], ec_array[2,j], linewidth = .3,"o", color = ".75", markersize = 2.5,markeredgewidth=0.0)
 		end
 	end
-	xlabel("BL Thrombin MSE", fontsize=18)
-	ylabel("HT Thombin MSE", fontsize=18)
-	axis([0,5000,0,5000])
-	savefig("figures/tradeoffCurve_31_03_2017.pdf")
-	savefig("figures/tradeoffCurve_28_03_2017.pdf")
+	xlabel("Objective 1", fontsize=18)
+	ylabel("Objective 2", fontsize=18)
+	axis([0,4000,0,4000])
+	savefig("figures/tradeoffCurve_07_04_2017.pdf")
+end
+
+function plotTradeOffCurve(ec_array, rank_array, obj1, obj2)
+	close("all")
+	figure()
+	PyCall.PyDict(matplotlib["rcParams"])["font.sans-serif"] = ["Helvetica"]
+	hold("on")
+	#@show size(ec_array,2)
+	for j in collect(1:size(ec_array,2))
+		if(rank_array[j]==0)
+			plot(ec_array[obj1,j], ec_array[obj2,j], linewidth = .3,"ko", markersize = 2.5,markeredgewidth=0.0)
+		else
+			plot(ec_array[obj1,j], ec_array[obj2,j], linewidth = .3,"o", color = ".75", markersize = 2.5,markeredgewidth=0.0)
+		end
+	end
+	xlabel(string("Objective ", obj1), fontsize=18)
+	ylabel(string("Objective ", obj2), fontsize=18)
+	axis([0,4000,0,4000])
+	savefig(string("figures/TradeOffCurves/tradeoffCurve_07_04_2017_obj_",obj1,"and_obj_",obj2, ".pdf"))
+end
+
+function plotAllTradeOffCurves(ec_array, pc_array, num_objectives)
+	idx1 = collect(1:1:num_objectives)
+	idx2= collect(1:1:num_objectives)
+	for(j in idx1)
+		for(k in idx2)
+			if(j!=k)
+				plotTradeOffCurve(ec_array, pc_array, j, k)
+			end
+		end
+	end
 end
 
 function peturbIC(ICvec,seed)
@@ -369,7 +400,7 @@ function convertToROTEM(t,x, tPA)
 	A0 = 1.5 #baseline ROTEM signal
 	K = 5000-375*tPA
 	if(tPA ==2)
-		S = 4E6
+		S = 4E6*.75
 	else
 		S = 1E6
 	end
@@ -399,3 +430,95 @@ function setROTEMIC(tPA, ID)
 	exp_data = hcat(time/60, avg_run) #convert to minute from seconds
 	return currPlatelets, exp_data
 end
+
+function plotAverageROTEMWData(t,meanROTEM,stdROTEM,expdata, savestr)
+	fig = figure(figsize = (15,15))
+	println("here")
+	ylabel("ROTEM")
+	xlabel("Time, in minutes")
+	plot(t, transpose(meanROTEM), "k")
+	axis([0, t[end], 0, 100])
+	@show size(meanROTEM)
+	@show size(stdROTEM)
+	@show size(t)
+	upper = transpose(meanROTEM+stdROTEM)
+	lower = transpose(meanROTEM-stdROTEM)
+	@show size(vec(upper))
+	@show size(vec(lower))
+	fill_between((t), vec(upper), vec(lower), color = ".5", alpha =.5)
+	plot(expdata[:,1], expdata[:,2], ".k")
+	savefig(savestr)
+end
+
+function makeAllPredictions()
+	pathToParams="parameterEstimation/Best10OverallParameters_07_04_2017.txt"
+	ids = [3,4,9,10]
+	tPAs = [0,2]
+	for j in collect(1:size(ids,1))
+		for k in collect(1:size(tPAs,1))
+			savestr = string("figures/PredictingPatient", ids[j], "_tPA=", tPAs[k], ".pdf")
+			testROTEMPredicition(pathToParams, ids[j], tPAs[k], savestr)
+		end
+	end
+end
+
+
+function testROTEMPredicition(pathToParams,patient_id,tPA,savestr)
+	close("all")
+	allparams = readdlm(pathToParams, '\t')
+	TSTART = 0.0
+	Ts = .02
+	if(tPA==0)
+		TSTOP =180.0
+	else
+		TSTOP = 60.0
+	end
+	TSIM = collect(TSTART:Ts:TSTOP)
+	platelets,usefuldata = setROTEMIC(tPA, patient_id)
+	fig1 = figure(figsize = (15,15))
+	fig2 = figure(figsize = (15,15))
+	fig3 = figure(figsize = (15,15))
+	platelet_count =platelets
+	alldata = zeros(1,size(TSIM,1))
+	@show size(alldata)
+	@show size(allparams)
+	if(size(allparams,1)==46) #deal with parameters being stored either vertically or horizontally
+		itridx = 2
+	else
+		itridx = 1
+	end
+	
+	for j in collect(1:size(allparams,itridx))
+		if(itridx ==2)
+			currparams = vec(allparams[:,j])
+		else
+			currparams = vec(allparams[j,:])
+		end
+		@show currparams
+		currparams[47]=platelet_count
+		dict = buildCompleteDictFromOneVector(currparams)
+		initial_condition_vector = dict["INITIAL_CONDITION_VECTOR"]
+		initial_condition_vector[16]=tPA #set tPA level
+		reshaped_IC = vec(reshape(initial_condition_vector,22,1))
+		fbalances(t,y)= BalanceEquations(t,y,dict) 
+		t,X = ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-4, reltol = 1E-4, minstep = 1E-9, points=:specified)
+		#figure(1)
+		#plotThrombinWData(t,X,pathToData)
+		figure(2)
+		makeLoopPlots(t,X)
+		#@show alldata
+		#@show size([a[2] for a in X])
+		A = convertToROTEM(t,X,tPA)
+		figure(3)
+		plot(t, A)
+		@show size(A)
+		alldata=vcat(alldata,transpose(A))
+	end
+	alldata = alldata[2:end, :] #remove row of zeros
+	alldata = map(Float64,alldata)
+	meanROTEM = mean(alldata,1)
+	stdROTEM = std(alldata,1)
+	plotAverageROTEMWData(TSIM, meanROTEM, stdROTEM, usefuldata,savestr)
+	return alldata
+end
+

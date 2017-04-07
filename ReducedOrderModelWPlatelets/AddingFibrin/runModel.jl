@@ -310,7 +310,6 @@ function plotAverageThrobinWData(t,meanThrombin,stdThrombin,expdata, savestr)
 	savefig(savestr)
 end
 
-
 function runModelWithMultipleParams(pathToParams,pathToData,savestr)
 	close("all")
 	allparams = readdlm(pathToParams, '\t')
