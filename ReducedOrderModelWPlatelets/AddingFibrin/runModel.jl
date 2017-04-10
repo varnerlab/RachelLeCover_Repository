@@ -113,7 +113,7 @@ end
 
 function makeLoopPlots(t,x)
 	names = ["FII", "FIIa", "PC", "APC", "ATIII", "TM", "TRIGGER", "Fraction Activated Platelets", "FV_FX", "FV_FXa", "Prothombinase-Platelets",
-	"Fibrin", "Plasmin", "Fibrinogen", "Plasminogen", "uPA", "tPA", "fibrin monomer", "protofibril", "antiplasmin", "PAI_1", "Fiber"]
+	"Fibrin", "Plasmin", "Fibrinogen", "Plasminogen", "tPA", "uPA", "fibrin monomer", "protofibril", "antiplasmin", "PAI_1", "Fiber"]
 	#fig = figure(figsize = (15,15))
 #	y_formatter = PyPlot.ticker.ScalarFormatter(useOffset=false)
 #	ax = fig.gca()

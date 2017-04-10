@@ -465,7 +465,9 @@ end
 
 function testROTEMPredicition(pathToParams,patient_id,tPA,savestr)
 	close("all")
-	allparams = readdlm(pathToParams, '\t')
+	numparams = 77
+	allparams = readdlm(pathToParams, ',')
+	pathToThrombinData="../data/fromOrfeo_Thrombin_HT_PRP.txt"
 	TSTART = 0.0
 	Ts = .02
 	if(tPA==0)
@@ -478,11 +480,12 @@ function testROTEMPredicition(pathToParams,patient_id,tPA,savestr)
 	fig1 = figure(figsize = (15,15))
 	fig2 = figure(figsize = (15,15))
 	fig3 = figure(figsize = (15,15))
-	platelet_count =platelets
+	platelet_count =346#platelets
 	alldata = zeros(1,size(TSIM,1))
 	@show size(alldata)
 	@show size(allparams)
-	if(size(allparams,1)==46) #deal with parameters being stored either vertically or horizontally
+	@show allparams
+	if(size(allparams,1)==numparams) #deal with parameters being stored either vertically or horizontally
 		itridx = 2
 	else
 		itridx = 1
@@ -499,11 +502,12 @@ function testROTEMPredicition(pathToParams,patient_id,tPA,savestr)
 		dict = buildCompleteDictFromOneVector(currparams)
 		initial_condition_vector = dict["INITIAL_CONDITION_VECTOR"]
 		initial_condition_vector[16]=tPA #set tPA level
+		@show dict
 		reshaped_IC = vec(reshape(initial_condition_vector,22,1))
 		fbalances(t,y)= BalanceEquations(t,y,dict) 
-		t,X = ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-4, reltol = 1E-4, minstep = 1E-9, points=:specified)
-		#figure(1)
-		#plotThrombinWData(t,X,pathToData)
+		t,X = ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-6, reltol = 1E-6, minstep = 1E-8, points=:specified)
+		figure(1)
+		plotThrombinWData(t,X,pathToThrombinData)
 		figure(2)
 		makeLoopPlots(t,X)
 		#@show alldata

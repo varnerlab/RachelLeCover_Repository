@@ -5,28 +5,28 @@ function buildCoagulationModelDictionary(platelet_count)
     # Initial condition -
 	#from simulateFig3Butenas2002
     initial_condition_vector = Float64[]
-    push!(initial_condition_vector,1400)       # 0 FII
-    push!(initial_condition_vector,0.001)        # 1 FIIa
-    push!(initial_condition_vector,60.0)        # 2 PC
-    push!(initial_condition_vector,0.0)        # 3 APC
-    push!(initial_condition_vector,3400)       # 4 ATIII
-    push!(initial_condition_vector,12)         # 5 TM
-    push!(initial_condition_vector,5.0E-3)          # 6 TRIGGER
-    push!(initial_condition_vector, 0.01) #Fraction of platelets activated
-    push!(initial_condition_vector,22.0)          #  FV+FX
-    push!(initial_condition_vector,0.0)          #  FVa+FXa
-    push!(initial_condition_vector,0.000)         #  prothombinase complex
-    push!(initial_condition_vector, 0.0)	#Fibrin
-    push!(initial_condition_vector,0.0)		#plasmin
-    push!(initial_condition_vector,10000)	#Fibrinogen
-    push!(initial_condition_vector, 2000)	#plasminogen
-    push!(initial_condition_vector,0.0)		#tPA
-    push!(initial_condition_vector,0.0)		#uPA
-    push!(initial_condition_vector,0.0)		#fibrin monomer
-    push!(initial_condition_vector,0.0)		#protofibril
-    push!(initial_condition_vector,1180)	#antiplasmin
-    push!(initial_condition_vector,.56)		#PAI_1
-    push!(initial_condition_vector,0.0)		#Fiber
+    push!(initial_condition_vector,1400)       # 1 FII
+    push!(initial_condition_vector,0.001)        # 2 FIIa
+    push!(initial_condition_vector,60.0)        # 3 PC
+    push!(initial_condition_vector,0.0)        # 4 APC
+    push!(initial_condition_vector,3400)       # 5 ATIII
+    push!(initial_condition_vector,12)         # 6 TM
+    push!(initial_condition_vector,5.0E-3)          # 7 TRIGGER
+    push!(initial_condition_vector, 0.01) #8 Fraction of platelets activated
+    push!(initial_condition_vector,22.0)          #9  FV+FX
+    push!(initial_condition_vector,0.0)          #10  FVa+FXa
+    push!(initial_condition_vector,0.000)         #11  prothombinase complex
+    push!(initial_condition_vector, 0.0)	#12 Fibrin
+    push!(initial_condition_vector,0.0)		#13 plasmin
+    push!(initial_condition_vector,10000)	#14 Fibrinogen
+    push!(initial_condition_vector, 2000)	#15 plasminogen
+    push!(initial_condition_vector,0.0)		#16 tPA
+    push!(initial_condition_vector,0.0)		#17 uPA
+    push!(initial_condition_vector,0.0)		#18 fibrin monomer
+    push!(initial_condition_vector,0.0)		#19 protofibril
+    push!(initial_condition_vector,1180)	#20 antiplasmin
+    push!(initial_condition_vector,.56)		#21 PAI_1
+    push!(initial_condition_vector,0.0)		#22 Fiber
     PROBLEM_DICTIONARY["INITIAL_CONDITION_VECTOR"] = initial_condition_vector
     
     # Kinetic parameters -

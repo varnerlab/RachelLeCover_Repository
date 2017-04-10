@@ -292,7 +292,7 @@ function BalanceEquations(t,x,PROBLEM_DICTIONARY)
 	dxdt_total[2] = modified_rate_vector[2] - modified_rate_vector[4]+modified_rate_vector[7]+modified_rate_vector[6]	 # 2 FIIa
 	dxdt_total[3] = -1*modified_rate_vector[3] # 3 PC
 	dxdt_total[4] = 1*modified_rate_vector[3]  # 4 APC
-	dxdt_total[5] = -1*k_inhibition_ATIII*(ATIII)*(FIIa^1.26)# 5 ATIII
+	dxdt_total[5] = -modified_rate_vector[4]# 5 ATIII
 	dxdt_total[6] = 0.0 # 6 TM (acts as enzyme, so no change)
 	dxdt_total[7] = -0.0*TRIGGER	# 7 TRIGGER
 	dxdt_total[8] = kplatelts*(EpsMax-Eps)-koffplatelets*Eps#-rate_vector[5] #frac active platelets
@@ -319,14 +319,15 @@ function BalanceEquations(t,x,PROBLEM_DICTIONARY)
 
 	tau = time_coeff*(1-FIIa/aleph)
 	time_scale =1-1*exp(-tau*(t-time_delay))
-	#@show t
+	@show t-time_delay, tau, tau*(t-time_delay)
+	@show 1-1*exp(-tau*(t-time_delay))
 	if(t<time_delay)
 		time_scale = 0.0
+		@show t, time_scale, time_delay
+	else
+		print("time greater than delay")
+		@show t, time_scale
 	end
-	if(isnan(time_scale))
-		time_scale = 1.0
-	end
-	#@show dxdt_total
 	idx = find(dxdt_total->(abs(dxdt_total)<1E-15),dxdt_total); #lets make anything less than 1E-9 zero
 	#@show idx
 	dxdt_total[idx] = 0.0;
