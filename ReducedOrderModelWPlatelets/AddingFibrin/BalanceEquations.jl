@@ -319,14 +319,10 @@ function BalanceEquations(t,x,PROBLEM_DICTIONARY)
 
 	tau = time_coeff*(1-FIIa/aleph)
 	time_scale =1-1*exp(-tau*(t-time_delay))
-	@show t-time_delay, tau, tau*(t-time_delay)
-	@show 1-1*exp(-tau*(t-time_delay))
+	#@show 1-1*exp(-tau*(t-time_delay))
 	if(t<time_delay)
 		time_scale = 0.0
-		@show t, time_scale, time_delay
-	else
-		print("time greater than delay")
-		@show t, time_scale
+		#@show t, time_scale, time_delaye
 	end
 	idx = find(dxdt_total->(abs(dxdt_total)<1E-15),dxdt_total); #lets make anything less than 1E-9 zero
 	#@show idx

@@ -83,7 +83,7 @@ function objectiveForPOETS(parameter_array)
 		TSIM = collect(TSTART:Ts:TSTOP)
 		fbalances(t,y)= BalanceEquations(t,y,dict) 
 		#t,X = ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-6, reltol = 1E-6, minstep=1E-9)
-		t,X = ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-4, reltol = 1E-4,minstep=1E-9)
+		t,X=ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-6, reltol = 1E-6, minstep = 1E-8,maxstep = 1)
 		FIIa = [a[2] for a in X]
 		A = convertToROTEM(t,X,tPA)
 		hasdynamics=checkForDynamics(FIIa, t)
@@ -105,14 +105,15 @@ function attemptOptimizationPOETS()
 	number_of_subdivisions = 10
 	number_of_parameters = 77
 	number_of_objectives = 8
-	initial_parameter_estimate = vec(readdlm("parameterEstimation/startingPoint06_04_2017.txt"))
+	initial_parameter_estimate = vec(readdlm("parameterEstimation/startingPoint10_04_2017.txt", ','))
 	#inital_parameter_estimate= readdlm("parameterEstimation/paramsToRestart03_30_2017.txt")
-	outputfile = "parameterEstimation/POETS_info_07_04_2017.txt"
+	outputfile = "parameterEstimation/POETS_info_11_04_2017maxstep1.txt"
 	ec_array = zeros(number_of_objectives)
 	pc_array = zeros(number_of_parameters)
-	global up_arr = initial_parameter_estimate*1000
-	global lb_arr = initial_parameter_estimate/1000
-	for index in collect(7:number_of_subdivisions)
+	#bound thrombin generation parameters more tightly than fibrinolysis ones
+	global up_arr = vcat(initial_parameter_estimate[1:46]*10, initial_parameter_estimate[47:end]*1000)
+	global lb_arr = vcat(initial_parameter_estimate[1:46]/10, initial_parameter_estimate[47:end]/1000)
+	for index in collect(1:number_of_subdivisions)
 
 		# Grab a starting point -
 		initial_parameter_estimate =initial_parameter_estimate+initial_parameter_estimate*rand()*.1
