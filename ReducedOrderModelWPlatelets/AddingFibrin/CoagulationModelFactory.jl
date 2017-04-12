@@ -1,4 +1,4 @@
-function buildCoagulationModelDictionary(platelet_count)
+@everywhere function buildCoagulationModelDictionary(platelet_count)
     
     # Initialize -
     PROBLEM_DICTIONARY = Dict()
@@ -173,7 +173,7 @@ function buildCoagulationModelDictionary(platelet_count)
     return PROBLEM_DICTIONARY
 end
 
-function buildCoagulationModelDictionary(kinetic_parameter_vector, control_parameter_vector, platelet_parameter_vector,timing, platelet_count)
+@everywhere function buildCoagulationModelDictionary(kinetic_parameter_vector, control_parameter_vector, platelet_parameter_vector,timing, platelet_count)
     
     # Initialize -
     PROBLEM_DICTIONARY = Dict()
@@ -294,7 +294,7 @@ function buildCoagulationModelDictionary(kinetic_parameter_vector, control_param
     return PROBLEM_DICTIONARY
 end
 
-function buildCoagulationModelDictionary(kinetic_parameter_vector, control_parameter_vector, platelet_parameter_vector,timing, platelet_count,fibrin_kinetic_parameters,fibrin_control_parameters)
+@everywhere function buildCoagulationModelDictionary(kinetic_parameter_vector, control_parameter_vector, platelet_parameter_vector,timing, platelet_count,fibrin_kinetic_parameters,fibrin_control_parameters)
     
     # Initialize -
     PROBLEM_DICTIONARY = Dict()

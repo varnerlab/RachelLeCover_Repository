@@ -18,7 +18,7 @@ function AdjBalanceEquations(t,x,parameter_index, data_dictionary)
 end
 
 
-function BalanceEquations(t,x,PROBLEM_DICTIONARY)
+@everywhere function BalanceEquations(t,x,PROBLEM_DICTIONARY)
 	num_rates = 21
 	#@show t
 	# Correct nagative x's = throws errors in control even if small - 

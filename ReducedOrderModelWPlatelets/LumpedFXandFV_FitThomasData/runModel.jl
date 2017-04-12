@@ -344,10 +344,12 @@ function runModelWithMultipleParams(pathToParams,pathToData,savestr)
 		push!(currparams, platelet_count)
 		dict = buildDictFromOneVector(currparams)
 		initial_condition_vector = dict["INITIAL_CONDITION_VECTOR"]
+		@show dict
 		reshaped_IC = vec(reshape(initial_condition_vector,11,1))
 		fbalances(t,y)= BalanceEquations(t,y,dict) 
 		t,X = ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-4, reltol = 1E-4, minstep = 1E-8, points=:specified)
 		plotThrombinWData(t,X,pathToData)
+		makeLoopPlots(t,X)
 		alldata=vcat(alldata,transpose([a[2] for a in X]))
 	end
 	alldata = alldata[2:end, :] #remove row of zeros
@@ -380,6 +382,7 @@ function runModelWithMultipleParams(pathToParams,pathToData,index,savestr)
 		initial_condition_vector = dict["INITIAL_CONDITION_VECTOR"]
 		fbalances(t,y)= BalanceEquations(t,y,dict) 
 		t,X = ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-4, reltol = 1E-6,points=:specified)
+
 		@show size(TSIM)
 		@show size(t)
 		@show size(X)

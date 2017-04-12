@@ -1,7 +1,7 @@
 using PyPlot
 using ExcelReaders
 
-function calculateMSE(t,predictedThrobin, experimentalData)
+@everywhere function calculateMSE(t,predictedThrobin, experimentalData)
 	num_points = size(t,1)
 	interpolatedExperimentalData = Float64[]
 	for j in collect(1:num_points)
@@ -31,7 +31,7 @@ function calculateMSE(t,predictedThrobin, experimentalData)
 	return sum/size(predictedThrobin,1), interpolatedExperimentalData#MSE
 end
 
-function linearInterp(lowerVal, upperVal, tstart, tend,tdesired)
+@everywhere function linearInterp(lowerVal, upperVal, tstart, tend,tdesired)
 	
 	val = lowerVal + (upperVal-lowerVal)/(tend-tstart)*(tdesired-tstart)
 	if(isnan(val))
@@ -40,7 +40,7 @@ function linearInterp(lowerVal, upperVal, tstart, tend,tdesired)
 	return val
 end
 
-function calculateAUC(t,y)
+@everywhere function calculateAUC(t,y)
 	   local n = length(t)
     if (length(y) != n)
         error("Vectors 't', 'y' must be of same length")
@@ -54,7 +54,7 @@ function calculateAUC(t,y)
 	return sum
 end
 
-function buildDictFromOneVector(vector)
+@everywhere function buildDictFromOneVector(vector)
 	kinetic_parameter_vector = vector[1:18]
 	control_parameter_vector=vector[19:38]
 	platelet_parameter_vector=vector[39:44]
@@ -64,7 +64,7 @@ function buildDictFromOneVector(vector)
 	return dict
 end
 
-function buildCompleteDictFromOneVector(vector)
+@everywhere function buildCompleteDictFromOneVector(vector)
 	kinetic_parameter_vector = vector[1:18]
 	control_parameter_vector=vector[19:38]
 	platelet_parameter_vector=vector[39:44]
@@ -80,7 +80,7 @@ end
 
 
 # Generates new parameter array, given current array -
-function neighbor_function(parameter_array)
+@everywhere function neighbor_function(parameter_array)
 	outputfile="parameterEstimation/POETS_28_03_2017.txt"
 	#@show size(parameter_array)
 #	f = open(outputfile, "a")
@@ -107,11 +107,11 @@ function neighbor_function(parameter_array)
   return parameter_bounds_function(new_parameter_array,lb_arr, up_arr)
 end
 
-function acceptance_probability_function(rank_array,temperature)
+@everywhere function acceptance_probability_function(rank_array,temperature)
   return (exp(-rank_array[end]/temperature))
 end
 
-function cooling_function(temperature)
+@everywhere function cooling_function(temperature)
 
   # define my new temperature -
   alpha = 0.9
@@ -121,7 +121,7 @@ end
 
 
 # Helper functions -
-function parameter_bounds_function(parameter_array,lower_bound_array,upper_bound_array)
+@everywhere function parameter_bounds_function(parameter_array,lower_bound_array,upper_bound_array)
 
   # reflection_factor -
   epsilon = 0.01
@@ -143,7 +143,7 @@ function parameter_bounds_function(parameter_array,lower_bound_array,upper_bound
   return new_parameter_array
 end
 
-function createCorrectDict(basic_dict, exp_index)
+@everywhere function createCorrectDict(basic_dict, exp_index)
 	if(exp_index==1)
 		
 	elseif(exp_index==2)
@@ -160,7 +160,7 @@ function createCorrectDict(basic_dict, exp_index)
 	return basic_dict
 end
 
-function generateBestNparameters(n, ec_array, pc_array)
+@everywhere function generateBestNparameters(n, ec_array, pc_array)
 	#calculate error
 	best_params = Array[]
 	total_error = sum(ec_array[:,2:end],1)
@@ -185,7 +185,7 @@ function generateBestNparameters(n, ec_array, pc_array)
 
 end
 
-function generateNbestPerObjective(n,ec_array, pc_array)
+@everywhere function generateNbestPerObjective(n,ec_array, pc_array)
 	num_objectives =size(ec_array,1)
 	best_params=Array{Array}(num_objectives*n)
 	counter = 1
@@ -385,7 +385,7 @@ function checkForDynamics(alldata)
 	return hasdynamics
 end
 
-function checkForDynamics(thrombin, t)
+@everywhere function checkForDynamics(thrombin, t)
 	threshold = 10 #it has dynamics if it creates 10 thrombin
 	hasdynamics = false
 	mid = thrombin[Int(floor(end/2))] #get the approximate midpoint
@@ -395,7 +395,7 @@ function checkForDynamics(thrombin, t)
 	return hasdynamics
 end
 
-function convertToROTEM(t,x, tPA)
+@everywhere function convertToROTEM(t,x, tPA)
 	F = [a[12] for a in x]+ [a[18] for a in x]+ [a[19] for a in x]+ [a[22] for a in x] # fibrin related species 12,18,19,22
 	A0 = 1.5 #baseline ROTEM signal
 	K = 5000-375*tPA
@@ -409,7 +409,7 @@ function convertToROTEM(t,x, tPA)
 	return A
 end
 
-function setROTEMIC(tPA, ID)
+@everywhere function setROTEMIC(tPA, ID)
 	@show ID
 	pathToData="../data/Viscoelasticmeasurements.xlsx"
 	all_platelets = Dict("3"=>189, "4"=>208, "5"=>210, "6"=>263, "7"=>194, "8"=>190, "9"=>149, "10"=>195)
@@ -480,7 +480,7 @@ function testROTEMPredicition(pathToParams,patient_id,tPA,savestr)
 	fig1 = figure(figsize = (15,15))
 	fig2 = figure(figsize = (15,15))
 	fig3 = figure(figsize = (15,15))
-	platelet_count =346#platelets
+	platelet_count =platelets
 	alldata = zeros(1,size(TSIM,1))
 	@show size(alldata)
 	@show size(allparams)
@@ -506,7 +506,7 @@ function testROTEMPredicition(pathToParams,patient_id,tPA,savestr)
 		reshaped_IC = vec(reshape(initial_condition_vector,22,1))
 		fbalances(t,y)= BalanceEquations(t,y,dict)
 		tic() 
-		t,X = ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-6, reltol = 1E-6, minstep = 1E-8,maxstep = 5.0, points=:specified)
+		t,X = ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-3, reltol = 1E-5, minstep = 1E-8,maxstep = 5.0, points=:specified)
 		toc()	
 		figure(1)
 		plotThrombinWData(t,X,pathToThrombinData)
