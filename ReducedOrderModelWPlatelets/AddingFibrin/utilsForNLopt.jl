@@ -113,12 +113,12 @@ function attemptOptimizationPOETS()
 	number_of_objectives = 8
 	initial_parameter_estimate = vec(readdlm("parameterEstimation/startingPoint10_04_2017.txt", ','))
 	#inital_parameter_estimate= readdlm("parameterEstimation/paramsToRestart03_30_2017.txt")
-	outputfile = "parameterEstimation/POETS_info_12_04_2017maxstep1.txt"
+	outputfile = "parameterEstimation/POETS_info_13_04_2017maxstep1.txt"
 	ec_array = zeros(number_of_objectives)
 	pc_array = zeros(number_of_parameters)
 	#bound thrombin generation parameters more tightly than fibrinolysis ones
-	global up_arr = vcat(initial_parameter_estimate[1:46]*10, initial_parameter_estimate[47:end]*1000)
-	global lb_arr = vcat(initial_parameter_estimate[1:46]/10, initial_parameter_estimate[47:end]/1000)
+	global up_arr = vcat(initial_parameter_estimate[1:46]*1.5, initial_parameter_estimate[47:end]*1000)
+	global lb_arr = vcat(initial_parameter_estimate[1:46]/1.5, initial_parameter_estimate[47:end]/1000)
 	for index in collect(1:number_of_subdivisions)
 
 		# Grab a starting point -

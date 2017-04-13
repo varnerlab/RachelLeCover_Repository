@@ -226,8 +226,8 @@ end
 	k_fibrin_formation=fibrin_kinetic_parameter_vector[16]
 	k_cat_fiber=fibrin_kinetic_parameter_vector[17]
 	Km_fiber=fibrin_kinetic_parameter_vector[18]
-	Km_plasminogen_Fibrin_tPA=fibrin_kinetic_parameter_vector[19]
-	K_plasminogen_Fibring_uPA = fibrin_kinetic_parameter_vector[20]
+	Ka_plasminogen_Fibrin_tPA=fibrin_kinetic_parameter_vector[19]
+	K_plasminogen_Fibrin_tPA = fibrin_kinetic_parameter_vector[20]
 	k_cat_fibrinogen_deg=fibrin_kinetic_parameter_vector[21]
 	Km_fibrinogen_deg=fibrin_kinetic_parameter_vector[22]
 	#@show FIIa, FII, PROTHOMBINASE_PLATELETS, FV_FXA

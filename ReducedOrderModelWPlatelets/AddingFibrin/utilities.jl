@@ -180,7 +180,7 @@ end
 		@show size(pc_array)
 		@show size(total_error)
 	end
-	writedlm(string("parameterEstimation/Best", n, "OverallParameters_07_04_2017.txt"), best_params)
+	writedlm(string("parameterEstimation/Best", n, "OverallParameters_12_04_2017.txt"), best_params)
 	return best_params
 
 end
@@ -319,7 +319,7 @@ function plotTradeOffCurve(ec_array, rank_array, obj1, obj2)
 	xlabel(string("Objective ", obj1), fontsize=18)
 	ylabel(string("Objective ", obj2), fontsize=18)
 	axis([0,4000,0,4000])
-	savefig(string("figures/TradeOffCurves/tradeoffCurve_07_04_2017_obj_",obj1,"and_obj_",obj2, ".pdf"))
+	savefig(string("figures/TradeOffCurves/tradeoffCurve_13_04_2017_obj_",obj1,"and_obj_",obj2, ".pdf"))
 end
 
 function plotAllTradeOffCurves(ec_array, pc_array, num_objectives)
@@ -451,12 +451,12 @@ function plotAverageROTEMWData(t,meanROTEM,stdROTEM,expdata, savestr)
 end
 
 function makeAllPredictions()
-	pathToParams="parameterEstimation/Best10OverallParameters_07_04_2017.txt"
+	pathToParams="parameterEstimation/Best10OverallParameters_12_04_2017.txt"
 	ids = [3,4,9,10]
 	tPAs = [0,2]
 	for j in collect(1:size(ids,1))
 		for k in collect(1:size(tPAs,1))
-			savestr = string("figures/PredictingPatient", ids[j], "_tPA=", tPAs[k], ".pdf")
+			savestr = string("figures/PredictingPatient", ids[j], "_tPA=", tPAs[k], "_12_04_2017.pdf")
 			testROTEMPredicition(pathToParams, ids[j], tPAs[k], savestr)
 		end
 	end
@@ -466,7 +466,7 @@ end
 function testROTEMPredicition(pathToParams,patient_id,tPA,savestr)
 	close("all")
 	numparams = 77
-	allparams = readdlm(pathToParams, ',')
+	allparams = readdlm(pathToParams, '\t')
 	pathToThrombinData="../data/fromOrfeo_Thrombin_HT_PRP.txt"
 	TSTART = 0.0
 	Ts = .02
@@ -506,7 +506,7 @@ function testROTEMPredicition(pathToParams,patient_id,tPA,savestr)
 		reshaped_IC = vec(reshape(initial_condition_vector,22,1))
 		fbalances(t,y)= BalanceEquations(t,y,dict)
 		tic() 
-		t,X = ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-3, reltol = 1E-5, minstep = 1E-8,maxstep = 5.0, points=:specified)
+		t,X=ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-6, reltol = 1E-6, minstep = 1E-8,maxstep = 1.0, points=:specified)
 		toc()	
 		figure(1)
 		plotThrombinWData(t,X,pathToThrombinData)
