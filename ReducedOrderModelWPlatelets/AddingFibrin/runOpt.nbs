@@ -1,0 +1,3 @@
+#!/bin/sh
+
+/usr/local/julia/icse/bin/julia -p 4 runOpt.jl

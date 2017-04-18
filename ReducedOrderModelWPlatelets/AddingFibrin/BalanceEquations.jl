@@ -255,7 +255,6 @@ end
   	rate_vector[20] = (Plasmin*k_cat_fiber*Fiber)/(Km_fiber+Fiber)                                           # Plasmin degrading fiber
   	rate_vector[21] = (Plasmin*k_cat_fibrinogen_deg*Fibrinogen)/(Km_fibrinogen_deg+Fibrinogen)
 
-
 	for j in collect(1:length(rate_vector))
 		if(isnan(rate_vector[j]) || !isfinite(rate_vector[j]))
 		#	println("Found NAN at rate_vector $j")
@@ -324,18 +323,20 @@ end
 		time_scale = 0.0
 		#@show t, time_scale, time_delaye
 	end
-	idx = find(dxdt_total->(abs(dxdt_total)<1E-15),dxdt_total); #lets make anything less than 1E-9 zero
+	idx = find(dxdt_total->(abs(dxdt_total)<1E-25),dxdt_total); #lets make anything less than 1E-9 zero
 	#@show idx
 	dxdt_total[idx] = 0.0;
 
+	#dxdt_total[1:11]=dxdt_total[1:11].*time_scale
 	dxdt_total = dxdt_total.*time_scale
 #	dxdt_total[1:7]=dxdt_total[1:7].*time_scale
 #	dxdt_total[9:end]=dxdt_total[9:end].*time_scale
 #	@show x
 #	@show control_vector
 #	@show rate_vector
-#	@show modified_rate_vector
-#	@show dxdt_total
+#	@show t, x[2]
+#	@show modified_rate_vector[12:end]
+#	@show dxdt_total[12:end]
 	 return dxdt_total
 
 end

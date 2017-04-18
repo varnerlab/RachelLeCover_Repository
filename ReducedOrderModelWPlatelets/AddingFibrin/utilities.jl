@@ -96,8 +96,8 @@ end
   # Check the bound constraints -
   LOWER_BOUND = 0
   UPPER_BOUND = 1E9
-  lb_arr= LOWER_BOUND*ones(number_of_parameters)
-  up_arr =UPPER_BOUND*ones(number_of_parameters)
+#  lb_arr= LOWER_BOUND*ones(number_of_parameters)
+#  up_arr =UPPER_BOUND*ones(number_of_parameters)
 	#lb_arr[9] = 10.0 #lower bound on k_inhibition_ATIII
 	#lb_arr[45]= 3.0 #lower bound on time delay, 3 minutes
 	#up_arr[46]= .01 #upper bound on scaling for tau
@@ -180,7 +180,7 @@ end
 		@show size(pc_array)
 		@show size(total_error)
 	end
-	writedlm(string("parameterEstimation/Best", n, "OverallParameters_12_04_2017.txt"), best_params)
+	writedlm(string("parameterEstimation/Best", n, "OverallParameters_18_04_2017.txt"), best_params)
 	return best_params
 
 end
@@ -208,6 +208,7 @@ end
 			counter=counter+1
 		end
 	end
+	writedlm(string("parameterEstimation/Best", n, "PerObjectiveParameters_18_04_2017.txt"), best_params)
 	return best_params
 end
 
@@ -319,16 +320,16 @@ function plotTradeOffCurve(ec_array, rank_array, obj1, obj2)
 	xlabel(string("Objective ", obj1), fontsize=18)
 	ylabel(string("Objective ", obj2), fontsize=18)
 	axis([0,4000,0,4000])
-	savefig(string("figures/TradeOffCurves/tradeoffCurve_13_04_2017_obj_",obj1,"and_obj_",obj2, ".pdf"))
+	savefig(string("figures/TradeOffCurves/tradeoffCurve_18_04_2017_obj_",obj1,"and_obj_",obj2, ".pdf"))
 end
 
-function plotAllTradeOffCurves(ec_array, pc_array, num_objectives)
+function plotAllTradeOffCurves(ec_array, ra_array, num_objectives)
 	idx1 = collect(1:1:num_objectives)
 	idx2= collect(1:1:num_objectives)
 	for(j in idx1)
 		for(k in idx2)
 			if(j!=k)
-				plotTradeOffCurve(ec_array, pc_array, j, k)
+				plotTradeOffCurve(ec_array, ra_array, j, k)
 			end
 		end
 	end
@@ -397,10 +398,10 @@ end
 
 @everywhere function convertToROTEM(t,x, tPA)
 	F = [a[12] for a in x]+ [a[18] for a in x]+ [a[19] for a in x]+ [a[22] for a in x] # fibrin related species 12,18,19,22
-	A0 = 1.5 #baseline ROTEM signal
+	A0 = .01 #baseline ROTEM signal
 	K = 5000-375*tPA
 	if(tPA ==2)
-		S = 4E6*.75
+		S = 4E6*.7
 	else
 		S = 1E6
 	end
@@ -451,16 +452,29 @@ function plotAverageROTEMWData(t,meanROTEM,stdROTEM,expdata, savestr)
 end
 
 function makeAllPredictions()
-	pathToParams="parameterEstimation/Best10OverallParameters_12_04_2017.txt"
+	pathToParams="parameterEstimation/Best5PerObjectiveParameters_18_04_2017.txt"
 	ids = [3,4,9,10]
 	tPAs = [0,2]
 	for j in collect(1:size(ids,1))
 		for k in collect(1:size(tPAs,1))
-			savestr = string("figures/PredictingPatient", ids[j], "_tPA=", tPAs[k], "_12_04_2017.pdf")
+			savestr = string("figures/PredictingPatient", ids[j], "_tPA=", tPAs[k], "OnlyTimeDelayOnThrombogenesis_18_04_2017.pdf")
 			testROTEMPredicition(pathToParams, ids[j], tPAs[k], savestr)
 		end
 	end
 end
+
+function makeAllEstimatedCurves()
+	pathToParams="parameterEstimation/Best5PerObjectiveParameters_18_04_2017.txt"
+	ids = [5,6,7,8]
+	tPAs = [0,2]
+	for j in collect(1:size(ids,1))
+		for k in collect(1:size(tPAs,1))
+			savestr = string("figures/Patient", ids[j], "_tPA=", tPAs[k], "_18_04_2017.pdf")
+			testROTEMPredicition(pathToParams, ids[j], tPAs[k], savestr)
+		end
+	end
+end
+
 
 
 function testROTEMPredicition(pathToParams,patient_id,tPA,savestr)
