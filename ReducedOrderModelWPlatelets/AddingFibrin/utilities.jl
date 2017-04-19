@@ -180,7 +180,7 @@ end
 		@show size(pc_array)
 		@show size(total_error)
 	end
-	writedlm(string("parameterEstimation/Best", n, "OverallParameters_18_04_2017.txt"), best_params)
+	writedlm(string("parameterEstimation/Best", n, "OverallParameters_19_04_2017.txt"), best_params)
 	return best_params
 
 end
@@ -208,7 +208,7 @@ end
 			counter=counter+1
 		end
 	end
-	writedlm(string("parameterEstimation/Best", n, "PerObjectiveParameters_18_04_2017.txt"), best_params)
+	writedlm(string("parameterEstimation/Best", n, "PerObjectiveParameters_19_04_2017.txt"), best_params)
 	return best_params
 end
 
@@ -320,7 +320,7 @@ function plotTradeOffCurve(ec_array, rank_array, obj1, obj2)
 	xlabel(string("Objective ", obj1), fontsize=18)
 	ylabel(string("Objective ", obj2), fontsize=18)
 	axis([0,4000,0,4000])
-	savefig(string("figures/TradeOffCurves/tradeoffCurve_18_04_2017_obj_",obj1,"and_obj_",obj2, ".pdf"))
+	savefig(string("figures/TradeOffCurves/tradeoffCurve_19_04_2017_obj_",obj1,"and_obj_",obj2, ".pdf"))
 end
 
 function plotAllTradeOffCurves(ec_array, ra_array, num_objectives)
@@ -452,12 +452,12 @@ function plotAverageROTEMWData(t,meanROTEM,stdROTEM,expdata, savestr)
 end
 
 function makeAllPredictions()
-	pathToParams="parameterEstimation/Best5PerObjectiveParameters_18_04_2017.txt"
+	pathToParams="parameterEstimation/Best11OverallParameters_19_04_2017.txt"
 	ids = [3,4,9,10]
 	tPAs = [0,2]
 	for j in collect(1:size(ids,1))
 		for k in collect(1:size(tPAs,1))
-			savestr = string("figures/PredictingPatient", ids[j], "_tPA=", tPAs[k], "OnlyTimeDelayOnThrombogenesis_18_04_2017.pdf")
+			savestr = string("figures/UsingBest11PredictingPatient", ids[j], "_tPA=", tPAs[k], "_19_04_2017.pdf")
 			testROTEMPredicition(pathToParams, ids[j], tPAs[k], savestr)
 		end
 	end
@@ -540,5 +540,37 @@ function testROTEMPredicition(pathToParams,patient_id,tPA,savestr)
 	stdROTEM = std(alldata,1)
 	plotAverageROTEMWData(TSIM, meanROTEM, stdROTEM, usefuldata,savestr)
 	return alldata
+end
+
+function generateSobolParams()
+	startingpt =  readdlm("parameterEstimation/Best11OverallParameters_19_04_2017.txt")
+	outputfn="sensitivity/sobolboundspm50percent_04_19_17.txt"
+	best = startingpt[1,:]
+	data_dictionary=buildCompleteDictFromOneVector(best)
+	names = data_dictionary["parameter_name_mapping_array"]
+	str = ""
+	j = 1
+	for name in names
+		currstr = string(name, " ", best[j]*.5, " ", best[j]*1.5, "\n")
+		str = string(str,currstr)
+		j=j+1
+	end
+	touch(outputfn)
+	f = open(outputfn, "a")
+	write(f,str)
+	close(f)
+	
+end
+
+function concatSobolResults()
+	filestr1 = "sensitivity/tPA_2_AUCForSobolPM50PercentN20_"
+	filestr2="_of_8.txt"
+	str = ""
+	for j in collect(1:8)
+		fn = string(filestr1, j, filestr2)
+		currstr = readstring(fn)
+		str = string(str, currstr)
+	end
+	write("sensitivity/AllSobol_tPA_2_PM50_04_19_2017.txt", str)
 end
 

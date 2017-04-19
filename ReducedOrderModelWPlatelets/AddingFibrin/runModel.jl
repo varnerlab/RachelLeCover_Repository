@@ -460,16 +460,21 @@ function runModelWithParams(params)
 end
 
 
-function runModelWithParamsReturnAUC(params,tPA)
+@everywhere function runModelWithParamsReturnAUC(params,tPA)
 	close("all")
 	TSTART = 0.0
 	Ts = .02
-	TSTOP = 180
+	if(tPA==0)
+		TSTOP=60.0
+	else
+		TSTOP=180
+	end
 	TSIM = collect(TSTART:Ts:TSTOP)
-	curr_platelets,usefulROTEMdata = setROTEMIC(tPA,"5")
+	#curr_platelets,usefulROTEMdata = setROTEMIC(tPA,"5")
 	#pathToData = "../data/ButenasFig1B60nMFVIIa.csv"
 	#pathToData = "../data/Buentas1999Fig4100PercentProthrombin.txt"
-	params[47]=curr_platelets
+	#use default platelets	
+	#params[47]=curr_platelets
 	dict = buildCompleteDictFromOneVector(params)
 	initial_condition_vector = dict["INITIAL_CONDITION_VECTOR"]
 	initial_condition_vector[16]=tPA
