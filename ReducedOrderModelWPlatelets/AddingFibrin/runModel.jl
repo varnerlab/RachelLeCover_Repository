@@ -28,12 +28,12 @@ end
 function solveAdjBalances(TSTART,TSTOP,Ts,parameter_index, PROBLEM_DICTIONARY)
 	TSIM = TSTART:Ts:TSTOP
 	initial_condition_array = PROBLEM_DICTIONARY["INITIAL_CONDITION_VECTOR"]
-	initial_condition_vector=vcat(initial_condition_array, vec(zeros(11,1)))
+	initial_condition_vector=vcat(initial_condition_array, vec(zeros(22,1)))
 	PROBLEM_DICTIONARY["INITIAL_CONDITION_VECTOR"] = initial_condition_vector
 	@show size(initial_condition_vector)
 	epsilon = 1e-6
 	fbalances(t,y) = AdjBalanceEquations(t,y,parameter_index, PROBLEM_DICTIONARY)
-	(t,y) = ODE.ode23s(fbalances,initial_condition_vector, TSIM; points=:specified, abstol=1E-3, reltol = 1E-3)
+	(t,y) =ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-6, reltol = 1E-6, minstep = 1E-8,maxstep = 1.0)
 	#Map
 	  number_of_timesteps = length(t)
 	  number_of_states = length(initial_condition_vector)

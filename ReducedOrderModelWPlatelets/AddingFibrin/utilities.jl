@@ -563,7 +563,7 @@ function generateSobolParams()
 end
 
 function concatSobolResults()
-	filestr1 = "sensitivity/tPA_2_AUCForSobolPM50PercentN100_"
+	filestr1 = "sensitivity/tPA_2_AUCForSobolPM50PercentN5000_"
 	filestr2="_of_8.txt"
 	str = ""
 	for j in collect(1:8)
@@ -571,6 +571,6 @@ function concatSobolResults()
 		currstr = readstring(fn)
 		str = string(str, currstr)
 	end
-	write("sensitivity/AllSobol_tPA_2_PM50_N100_04_19_2017.txt", str)
+	write("sensitivity/AllSobol_tPA_2_PM50_N5000_04_24_2017.txt", str)
 end
 

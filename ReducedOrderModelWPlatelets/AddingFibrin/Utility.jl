@@ -573,26 +573,32 @@ end
 
 function calculate_bmatrix_row(time,state_array,balance_index,data_dictionary)
 
-  # define some constants -
-  const epsilon = 1e-6
-  const delta = 0.01
+	# define some constants -
+	const epsilon = 1e-6
+	const delta = 0.01
 
-  # parameter name dictionary -
-  parameter_name_mapping_array = data_dictionary["parameter_name_mapping_array"]
-  kinetic_parameter_dictionary = data_dictionary["KINETIC_PARAMETER_VECTOR"]
-  control_parameter_dictionary = data_dictionary["CONTROL_PARAMETER_VECTOR"]
-  platelet_parameter_dictionary = data_dictionary["PLATELET_PARAMS"]
-  timing_parameter_dictionary = data_dictionary["TIME_DELAY"]
-  number_of_parameters = length(parameter_name_mapping_array)
+	# parameter name dictionary -
+	parameter_name_mapping_array = data_dictionary["parameter_name_mapping_array"]
+	kinetic_parameter_dictionary = data_dictionary["KINETIC_PARAMETER_VECTOR"]
+	control_parameter_dictionary = data_dictionary["CONTROL_PARAMETER_VECTOR"]
+	platelet_parameter_dictionary = data_dictionary["PLATELET_PARAMS"]
+	timing_parameter_dictionary = data_dictionary["TIME_DELAY"]
+	platelet_count = 300
 
-  # how many binding parameters do we have?
-  number_of_kinetic_parameters = length(kinetic_parameter_dictionary)
-  number_of_control_parameters = length(control_parameter_dictionary)
-  number_of_platelet_parameters = length(platelet_parameter_dictionary)
-  number_of_timing_parameters = length(timing_parameter_dictionary)
+	fibrin_kinetic_dictionary = data_dictionary["FIBRIN_KINETIC_PARAMETER_VECTOR"]
+	fibrin_control_dictionary = data_dictionary["FIBRIN_CONTROL_PARAMETER_VECTOR"]	
+	number_of_parameters = length(parameter_name_mapping_array)
+
+	# how many binding parameters do we have?
+	number_of_kinetic_parameters = length(kinetic_parameter_dictionary)
+	number_of_control_parameters = length(control_parameter_dictionary)
+	number_of_platelet_parameters = length(platelet_parameter_dictionary)
+	number_of_timing_parameters = length(timing_parameter_dictionary)
+	number_of_kinetic_fibrin_parameters = length(fibrin_kinetic_dictionary)
+	number_of_fibrin_control_parameters = length(fibrin_control_dictionary)
 
   # create a mega dictionary -
-  total_parameter_dictionary = vcat(kinetic_parameter_dictionary,control_parameter_dictionary,platelet_parameter_dictionary, timing_parameter_dictionary)
+  total_parameter_dictionary = vcat(kinetic_parameter_dictionary,control_parameter_dictionary,platelet_parameter_dictionary, timing_parameter_dictionary,platelet_count, fibrin_kinetic_dictionary, fibrin_control_dictionary)
 
   # create delta parameter array -
   parameter_delta_array = Float64[]
@@ -641,23 +647,42 @@ function calculate_bmatrix_row(time,state_array,balance_index,data_dictionary)
         perturbed_parameter_array[local_index] = total_parameter_dictionary[parameter_index] #make sure this change is correct
       end
     end
+	kinetic_lb = 1
+	kinetic_up =18
+	control_lb =19
+	control_up = 38
+	platelet_lb = 39
+	platelet_up=44
+	timing_lb=45
+	timing_up = 46
+	fibrin_kinetic_lb=48
+	fibrin_kinetic_up = 69
+	fibrin_control_lb=70
+	fibrin_control_up = 77 
 
-    if (parameter_index<=number_of_kinetic_parameters)
-	 # we are in the binding section -
-	curr_idx = parameter_index
-      local_data_dictionary["KINETIC_PARAMETER_VECTOR"][curr_idx] = perturbed_parameter_array[parameter_index]
-    elseif (parameter_index>number_of_kinetic_parameters && parameter_index<=(number_of_kinetic_parameters+number_of_control_parameters))
-      # we are in the control section -
-	curr_idx = parameter_index-(number_of_kinetic_parameters)
-      local_data_dictionary["CONTROL_PARAMETER_VECTOR"][curr_idx] = perturbed_parameter_array[parameter_index]
-    elseif(parameter_index>number_of_kinetic_parameters+number_of_control_parameters && parameter_index<=(number_of_kinetic_parameters+number_of_control_parameters+number_of_platelet_parameters))
-      # we are in the bar parameter section -
-	curr_idx = parameter_index-(number_of_control_parameters+number_of_kinetic_parameters)
-      local_data_dictionary["PLATELET_PARAMS"][curr_idx] = perturbed_parameter_array[parameter_index]
-	else #in timing_parameter_dicti
+	#@show parameter_index
+	if (parameter_index<=kinetic_up)
+		 # we are in the binding section -
+		curr_idx = parameter_index
+		local_data_dictionary["KINETIC_PARAMETER_VECTOR"][curr_idx] = perturbed_parameter_array[parameter_index]
+	elseif (parameter_index>kinetic_up && parameter_index<=control_up)
+		# we are in the control section -
+		curr_idx = parameter_index-(number_of_kinetic_parameters)
+		local_data_dictionary["CONTROL_PARAMETER_VECTOR"][curr_idx] = perturbed_parameter_array[parameter_index]
+	elseif(parameter_index>control_up && parameter_index<=platelet_up)
+		# we are in the bar parameter section -
+		curr_idx = parameter_index-(number_of_control_parameters+number_of_kinetic_parameters)
+		local_data_dictionary["PLATELET_PARAMS"][curr_idx] = perturbed_parameter_array[parameter_index]
+	elseif(parameter_index>platelet_up && parameter_index<=timing_up)  #in timing_parameter_dicti
 		curr_idx = parameter_index-(number_of_control_parameters+number_of_kinetic_parameters+number_of_platelet_parameters)
-	local_data_dictionary["TIME_DELAY"][curr_idx] = perturbed_parameter_array[parameter_index]
-    end
+		local_data_dictionary["TIME_DELAY"][curr_idx] = perturbed_parameter_array[parameter_index]
+	elseif(parameter_index>timing_up && parameter_index<fibrin_kinetic_up)
+		curr_idx = parameter_index-(number_of_control_parameters+number_of_kinetic_parameters+number_of_platelet_parameters+number_of_timing_parameters)
+		local_data_dictionary["FIBRIN_KINETIC_PARAMETER_VECTOR"][curr_idx] = perturbed_parameter_array[parameter_index]
+	elseif(parameter_index>=fibrin_control_lb&& parameter_index<fibrin_control_up)
+		curr_idx = parameter_index-(number_of_control_parameters+number_of_kinetic_parameters+number_of_platelet_parameters+number_of_timing_parameters+number_of_kinetic_fibrin_parameters)
+		local_data_dictionary["FIBRIN_CONTROL_PARAMETER_VECTOR"][curr_idx] = perturbed_parameter_array[parameter_index]
+	end
 
 
     # calculate the perturbed balances -
