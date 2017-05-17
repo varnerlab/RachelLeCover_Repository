@@ -434,7 +434,6 @@ end
 
 function plotAverageROTEMWData(t,meanROTEM,stdROTEM,expdata, savestr)
 	fig = figure(figsize = (15,15))
-	println("here")
 	ylabel("ROTEM")
 	xlabel("Time, in minutes")
 	plot(t, transpose(meanROTEM), "k")
@@ -451,6 +450,21 @@ function plotAverageROTEMWData(t,meanROTEM,stdROTEM,expdata, savestr)
 	savefig(savestr)
 end
 
+function plotAverageROTEMWDataSubplot(fig,t,meanROTEM,stdROTEM,expdata)
+	plot(t, transpose(meanROTEM), "k")
+	axis([0, t[end], 0, 100])
+	@show size(meanROTEM)
+	@show size(stdROTEM)
+	@show size(t)
+	upper = transpose(meanROTEM+stdROTEM)
+	lower = transpose(meanROTEM-stdROTEM)
+	@show size(vec(upper))
+	@show size(vec(lower))
+	fill_between((t), vec(upper), vec(lower), color = ".5", alpha =.5)
+	plot(expdata[:,1], expdata[:,2], ".k")
+	return fig
+end
+
 function makeAllPredictions()
 	pathToParams="parameterEstimation/Best11OverallParameters_19_04_2017.txt"
 	ids = [3,4,9,10]
@@ -464,20 +478,171 @@ function makeAllPredictions()
 end
 
 function makeAllEstimatedCurves()
-	pathToParams="parameterEstimation/Best5PerObjectiveParameters_18_04_2017.txt"
+	pathToParams="parameterEstimation/Best11OverallParameters_19_04_2017.txt"
 	ids = [5,6,7,8]
 	tPAs = [0,2]
 	for j in collect(1:size(ids,1))
 		for k in collect(1:size(tPAs,1))
 			savestr = string("figures/Patient", ids[j], "_tPA=", tPAs[k], "_18_04_2017.pdf")
-			testROTEMPredicition(pathToParams, ids[j], tPAs[k], savestr)
+			alldata, meanROTEM, stdROTEM=testROTEMPredicition(pathToParams, ids[j], tPAs[k], savestr)
 		end
 	end
 end
 
+function makeTrainingFigure()
+	font2 = Dict("family"=>"sans-serif",
+	    "color"=>"black",
+	    "weight"=>"normal",
+	    "size"=>20)
+	close("all")
+	pathToParams="parameterEstimation/Best11OverallParameters_19_04_2017.txt"
+	ids = [5,6,7,8]
+	tPAs = [0,2]
+	close("all")
+	fig=figure(figsize = [15,15])
+	counter = 1
+	for j in collect(1:size(ids,1))
+		for k in collect(1:size(tPAs,1))
+			savestr = string("figures/Patient", ids[j], "_tPA=", tPAs[k], "_18_04_2017.pdf")
+			alldata, meanROTEM, stdROTEM,TSIM=testROTEMPredicition(pathToParams, ids[j], tPAs[k], savestr)
+			platelets,expdata = setROTEMIC(tPAs[k], ids[j])
+			@show counter
+			plt[:subplot](4,2,counter)
+			fig=plotAverageROTEMWDataSubplot(fig,TSIM,meanROTEM,stdROTEM,expdata)
+			if(counter==7 || counter ==8)
+				xlabel("Time, in minutes", fontdict = font2)
+			else
+				ax =gca()
+				ax[:xaxis][:set_ticklabels]([]) #remove tick labels if we're not at the bottom of a column
+			end
+			counter=counter+1
+		end
+	end
+	#label columns
+	annotate("tPA = 0 micromolar",
+               xy=[.12;.95],
+               xycoords="figure fraction",
+               xytext=[.39,0.95],
+               textcoords="figure fraction",
+               ha="right",
+               va="top", fontsize = 24, family = "sans-serif")
+	annotate("tPA = 2 micromolar",
+               xy=[.12;.95],
+               xycoords="figure fraction",
+               xytext=[.85,0.95],
+               textcoords="figure fraction",
+               ha="right",
+               va="top", fontsize = 24, family = "sans-serif")
+
+	savefig("figures/trainingFigure.pdf")
+end
+
+function makePredictionsFigure()
+	font2 = Dict("family"=>"sans-serif",
+	    "color"=>"black",
+	    "weight"=>"normal",
+	    "size"=>20)
+	close("all")
+	pathToParams="parameterEstimation/Best11OverallParameters_19_04_2017.txt"
+	ids = [3,4,9,10]
+	tPAs = [0,2]
+	close("all")
+	fig=figure(figsize = [15,15])
+	counter = 1
+	for j in collect(1:size(ids,1))
+		for k in collect(1:size(tPAs,1))
+			savestr = string("figures/Patient", ids[j], "_tPA=", tPAs[k], "_18_04_2017.pdf")
+			alldata, meanROTEM, stdROTEM,TSIM=testROTEMPredicition(pathToParams, ids[j], tPAs[k], savestr)
+			platelets,expdata = setROTEMIC(tPAs[k], ids[j])
+			@show counter
+			plt[:subplot](4,2,counter)
+			fig=plotAverageROTEMWDataSubplot(fig,TSIM,meanROTEM,stdROTEM,expdata)
+			if(counter==7 || counter ==8)
+				xlabel("Time, in minutes", fontdict = font2)
+			else
+				ax =gca()
+				ax[:xaxis][:set_ticklabels]([]) #remove tick labels if we're not at the bottom of a column
+			end
+			counter=counter+1
+		end
+	end
+	#label columns
+	annotate("tPA = 0 micromolar",
+               xy=[.12;.95],
+               xycoords="figure fraction",
+               xytext=[.39,0.95],
+               textcoords="figure fraction",
+               ha="right",
+               va="top", fontsize = 24, family = "sans-serif")
+	annotate("tPA = 2 micromolar",
+               xy=[.12;.95],
+               xycoords="figure fraction",
+               xytext=[.85,0.95],
+               textcoords="figure fraction",
+               ha="right",
+               va="top", fontsize = 24, family = "sans-serif")
+
+	savefig("figures/PredictionsFigure.pdf")
+end
+
+
+
 
 
 function testROTEMPredicition(pathToParams,patient_id,tPA,savestr)
+	numparams = 77
+	allparams = readdlm(pathToParams, '\t')
+	pathToThrombinData="../data/fromOrfeo_Thrombin_HT_PRP.txt"
+	TSTART = 0.0
+	Ts = .02
+	if(tPA==0)
+		TSTOP =180.0
+	else
+		TSTOP = 60.0
+	end
+	TSIM = collect(TSTART:Ts:TSTOP)
+	platelets,usefuldata = setROTEMIC(tPA, patient_id)
+	platelet_count =platelets
+	alldata = zeros(1,size(TSIM,1))
+	@show size(alldata)
+	@show size(allparams)
+	@show allparams
+	if(size(allparams,1)==numparams) #deal with parameters being stored either vertically or horizontally
+		itridx = 2
+	else
+		itridx = 1
+	end
+	
+	for j in collect(1:size(allparams,itridx))
+		if(itridx ==2)
+			currparams = vec(allparams[:,j])
+		else
+			currparams = vec(allparams[j,:])
+		end
+		@show currparams
+		currparams[47]=platelet_count
+		dict = buildCompleteDictFromOneVector(currparams)
+		initial_condition_vector = dict["INITIAL_CONDITION_VECTOR"]
+		initial_condition_vector[16]=tPA #set tPA level
+		@show dict
+		reshaped_IC = vec(reshape(initial_condition_vector,22,1))
+		fbalances(t,y)= BalanceEquations(t,y,dict)
+		tic() 
+		t,X=ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-6, reltol = 1E-6, minstep = 1E-8,maxstep = 1.0, points=:specified)
+		toc()	
+		#@show size([a[2] for a in X])
+		A = convertToROTEM(t,X,tPA)
+		alldata=vcat(alldata,transpose(A))
+	end
+	alldata = alldata[2:end, :] #remove row of zeros
+	alldata = map(Float64,alldata)
+	meanROTEM = mean(alldata,1)
+	stdROTEM = std(alldata,1)
+	#plotAverageROTEMWData(TSIM, meanROTEM, stdROTEM, usefuldata,savestr)
+	return alldata, meanROTEM, stdROTEM, TSIM
+end
+
+function testROTEMPredicitionAndPlot(pathToParams,patient_id,tPA,savestr)
 	close("all")
 	numparams = 77
 	allparams = readdlm(pathToParams, '\t')
@@ -539,7 +704,7 @@ function testROTEMPredicition(pathToParams,patient_id,tPA,savestr)
 	meanROTEM = mean(alldata,1)
 	stdROTEM = std(alldata,1)
 	plotAverageROTEMWData(TSIM, meanROTEM, stdROTEM, usefuldata,savestr)
-	return alldata
+	return alldata, meanROTEM, stdROTEM, TSIM
 end
 
 function generateSobolParams()
