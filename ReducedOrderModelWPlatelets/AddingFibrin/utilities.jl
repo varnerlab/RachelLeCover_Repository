@@ -199,7 +199,7 @@ end
 			best_params[counter] = curr_best_params
 			removed = deleteat!(removed, min_index)
 			@show min_index
-			@show curr_best_params
+			#@show curr_best_params
 			#delete the best ones we've found
 			#@show size(total_error)
 			#pc_array=pc_array[:,removed]
@@ -211,6 +211,31 @@ end
 	writedlm(string("parameterEstimation/Best", n, "PerObjectiveParameters_19_04_2017.txt"), best_params)
 	return best_params
 end
+
+@everywhere function generateNbestGivenObjective(n,ec_array, pc_array,objectivenum)
+	num_objectives =size(ec_array,1)
+	best_params=Array{Array}(n)
+	counter = 1
+	curr_error=ec_array[objectivenum,:]
+	allidx = collect(1:size(pc,2))
+	removed = allidx
+	for k in collect(1:n)
+		min_index = indmin(curr_error)
+		curr_best_params = pc_array[:,min_index]
+		best_params[counter] = curr_best_params
+		removed = deleteat!(removed, min_index)
+		@show min_index, curr_error[min_index]
+		#@show curr_best_params
+		#delete the best ones we've found
+		#@show size(total_error)
+		#pc_array=pc_array[:,removed]
+		curr_error=deleteat!(vec(curr_error),min_index)
+		@show size(pc_array)
+		counter=counter+1
+	end
+	return best_params
+end
+
 
 function analyzeParams()
 	allparams = zeros(1,46)
@@ -399,14 +424,18 @@ end
 @everywhere function convertToROTEM(t,x, tPA)
 	F = [a[12] for a in x]+ [a[18] for a in x]+ [a[19] for a in x]+ [a[22] for a in x] # fibrin related species 12,18,19,22
 	A0 = .01 #baseline ROTEM signal
-	K = 5000-375*tPA
+	#K = 5000-375*tPA
+	K = 1
+	n = 1
 	if(tPA ==2)
-		S = 4E6*.7
+		#S = 4E6*.7
+		S = 3.5
 	else
-		S = 1E6
+		#S = 1E6
+		S = 1.5
 	end
 	A1 = S
-	A = A0+A1.*F.^2./(K.^2+F.^2)
+	A = A0+A1.*F.^n#./(K.^n+F.^n)
 	return A
 end
 
@@ -452,7 +481,7 @@ end
 
 function plotAverageROTEMWDataSubplot(fig,t,meanROTEM,stdROTEM,expdata)
 	plot(t, transpose(meanROTEM), "k")
-	axis([0, t[end], 0, 100])
+	#axis([0, t[end], 0, 150])
 	@show size(meanROTEM)
 	@show size(stdROTEM)
 	@show size(t)
@@ -495,16 +524,20 @@ function makeTrainingFigure()
 	    "weight"=>"normal",
 	    "size"=>20)
 	close("all")
-	pathToParams="parameterEstimation/Best11OverallParameters_19_04_2017.txt"
+	#pathToParams="parameterEstimation/Best11OverallParameters_19_04_2017.txt"
+	POETs_data = "parameterEstimation/POETS_info_18_04_2017maxstep1.txt"
+	ec,pc,ra=parsePOETsoutput(POETs_data)
 	ids = [5,6,7,8]
 	tPAs = [0,2]
 	close("all")
 	fig=figure(figsize = [15,15])
 	counter = 1
+	numParamSets = 5
 	for j in collect(1:size(ids,1))
 		for k in collect(1:size(tPAs,1))
 			savestr = string("figures/Patient", ids[j], "_tPA=", tPAs[k], "_18_04_2017.pdf")
-			alldata, meanROTEM, stdROTEM,TSIM=testROTEMPredicition(pathToParams, ids[j], tPAs[k], savestr)
+			bestparams=generateNbestGivenObjective(numParamSets,ec, pc,counter)
+			alldata, meanROTEM, stdROTEM,TSIM=testROTEMPredicitionGivenParams(bestparams, ids[j], tPAs[k], savestr)
 			platelets,expdata = setROTEMIC(tPAs[k], ids[j])
 			@show counter
 			plt[:subplot](4,2,counter)
@@ -534,7 +567,7 @@ function makeTrainingFigure()
                ha="right",
                va="top", fontsize = 24, family = "sans-serif")
 
-	savefig("figures/trainingFigure.pdf")
+	savefig(string("figures/trainingFigureUsing",numParamSets, "ParameterSets.pdf"))
 end
 
 function makePredictionsFigure()
@@ -543,7 +576,7 @@ function makePredictionsFigure()
 	    "weight"=>"normal",
 	    "size"=>20)
 	close("all")
-	pathToParams="parameterEstimation/Best11OverallParameters_19_04_2017.txt"
+	pathToParams="parameterEstimation/Best1PerObjectiveParameters_19_04_2017.txt"
 	ids = [3,4,9,10]
 	tPAs = [0,2]
 	close("all")
@@ -557,6 +590,11 @@ function makePredictionsFigure()
 			@show counter
 			plt[:subplot](4,2,counter)
 			fig=plotAverageROTEMWDataSubplot(fig,TSIM,meanROTEM,stdROTEM,expdata)
+			if(mod(counter,2)==1)
+				axis([0, TSIM[end], 0, 100])
+			else
+				axis([0, TSIM[end], 0, 140])
+			end
 			if(counter==7 || counter ==8)
 				xlabel("Time, in minutes", fontdict = font2)
 			else
@@ -582,10 +620,62 @@ function makePredictionsFigure()
                ha="right",
                va="top", fontsize = 24, family = "sans-serif")
 
-	savefig("figures/PredictionsFigure.pdf")
+	savefig("figures/PredictionsFigureUsingBest1ParamSetPerObj.pdf")
 end
 
-
+function testROTEMPredicitionGivenParams(allparams,patient_id,tPA,savestr)
+	numparams = 77
+	pathToThrombinData="../data/fromOrfeo_Thrombin_HT_PRP.txt"
+	TSTART = 0.0
+	Ts = .02
+	if(tPA==0)
+		TSTOP =180.0
+	else
+		TSTOP = 60.0
+	end
+	TSIM = collect(TSTART:Ts:TSTOP)
+	platelets,usefuldata = setROTEMIC(tPA, patient_id)
+	platelet_count =platelets
+	alldata = zeros(1,size(TSIM,1))
+	@show size(alldata)
+	@show size(allparams)
+	if(size(allparams,1)==numparams) #deal with parameters being stored either vertically or horizontally
+		itridx = 2
+	else
+		itridx = 1
+	end
+	
+	for j in collect(1:size(allparams,itridx))
+		if(itridx ==2)
+			currparams = vec(allparams[:,j])
+		else
+			currparams = vec(allparams[j,:])
+		end
+		@show currparams
+		if(typeof(currparams)==Array{Array,1}) #deal with params being inside an extra layer of array
+			currparams= currparams[1]
+		end
+		currparams[47]=platelet_count
+		dict = buildCompleteDictFromOneVector(currparams)
+		initial_condition_vector = dict["INITIAL_CONDITION_VECTOR"]
+		initial_condition_vector[16]=tPA #set tPA level
+		#@show dict
+		reshaped_IC = vec(reshape(initial_condition_vector,22,1))
+		fbalances(t,y)= BalanceEquations(t,y,dict)
+		tic() 
+		t,X=ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-6, reltol = 1E-6, minstep = 1E-8,maxstep = 1.0, points=:specified)
+		toc()	
+		#@show size([a[2] for a in X])
+		A = convertToROTEM(t,X,tPA)
+		alldata=vcat(alldata,transpose(A))
+	end
+	alldata = alldata[2:end, :] #remove row of zeros
+	alldata = map(Float64,alldata)
+	meanROTEM = mean(alldata,1)
+	stdROTEM = std(alldata,1)
+	#plotAverageROTEMWData(TSIM, meanROTEM, stdROTEM, usefuldata,savestr)
+	return alldata, meanROTEM, stdROTEM, TSIM
+end
 
 
 

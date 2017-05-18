@@ -444,7 +444,7 @@ function runModelWithParams(params)
 	initial_condition_vector = dict["INITIAL_CONDITION_VECTOR"]
 	initial_condition_vector[16]=tPA
 	fbalances(t,y)= BalanceEquations(t,y,dict) 
-	t,X=ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-6, reltol = 1E-6, minstep = 1E-8,maxstep = 1.0)
+	t,X=ODE.ode23s(fbalances,vec(initial_condition_vector),TSIM, abstol = 1E-6, reltol = 1E-6, minstep = 1E-8,maxstep = .10)
 	plotThrombinWData(t,X,pathToData)
 	figure()
 	plotFibrinSpecies(t,X)

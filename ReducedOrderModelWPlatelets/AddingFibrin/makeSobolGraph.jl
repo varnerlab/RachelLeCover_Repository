@@ -23,13 +23,13 @@ function makeSobolGraph()
 	bar(positions, usefulData[:,4],color = "k", yerr=usefulData[:,5], align="center")
 	ax = gca()
 	ax[:xaxis][:set_ticks](positions)
-	ax[:xaxis][:set_ticklabels](usefulData[:,1], rotation = 80, fontsize = 5)
 	ylabel("Total Order Sensitivity Indicies", fontdict=font1)
 	axis("tight")
 	axis([0,numparams,0,1])
 	ax[:tick_params](labelsize=20)
 	#lines and label for kinetic parameters
 	ax[:xaxis][:set_ticklabels]([], rotation = 80, fontsize = 5)
+	#ax[:xaxis][:set_ticklabels](usefulData[:,1], rotation = 80, fontsize = 5)
 	annotate("",
 		xy=[.125;.83],
 		xycoords="figure fraction",
@@ -113,6 +113,34 @@ function makeSobolGraph()
 		textcoords="figure fraction",
 		ha="right",
 		va="top")
+	#label columns of interest
+	annotate("k_inhibition_ATIII",
+		xy=[8;.35],# Arrow tip
+		xycoords="data", # Coordinates in in "data" units
+		xytext=[9;.45], # Text offset from tip
+		textcoords="data",
+		ha="right",
+		va="top",
+		arrowprops=Dict("facecolor"=>"black", "width"=>.5, "headwidth"=>3)) #
+
+	annotate("Trigger Control Parameters",
+		xy=[18.5,0.05],
+		xycoords="data",
+		xytext=[20.5,0.15],
+		textcoords="data",
+		ha="right",
+		va="top",
+		arrowprops = Dict("facecolor"=> "black", "width"=>.5))
+
+	annotate("k_cat_fibrinogen",
+		xy=[47;.33],# Arrow tip
+		xycoords="data", # Coordinates in in "data" units
+		xytext=[46;.45], # Text offset from tip
+		textcoords="data",
+		ha="right",
+		va="top",
+		arrowprops=Dict("facecolor"=>"black", "width"=>.5, "headwidth"=>3))
+
 	savefig("sensitivity/SobolTotalOrderN5000.pdf")
 	
 end

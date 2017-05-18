@@ -69,7 +69,7 @@ function objectiveForPOETS(parameter_array)
 	count = 1
 	@show parameter_array
 	@sync @parallel for j in selected_idxs
-		@show myid(), j
+		#@show myid(), j
 		temp_params = parameter_array
 		temp_params[47] = all_platelets[j] #set platelets to experimental value
 		dict = buildCompleteDictFromOneVector(temp_params)
@@ -111,9 +111,9 @@ function attemptOptimizationPOETS()
 	number_of_subdivisions = 10
 	number_of_parameters = 77
 	number_of_objectives = 8
-	initial_parameter_estimate = vec(readdlm("parameterEstimation/HandFit_18_04_2017.txt", ','))
+	initial_parameter_estimate = vec(readdlm("parameterEstimation/startingPoint18_05_17.txt", ','))
 	#inital_parameter_estimate= readdlm("parameterEstimation/paramsToRestart03_30_2017.txt")
-	outputfile = "parameterEstimation/POETS_info_18_04_2017maxstep1.txt"
+	outputfile = "parameterEstimation/POETS_info_18_05_2017maxstep1.txt"
 	ec_array = zeros(number_of_objectives)
 	pc_array = zeros(number_of_parameters)
 	#bound thrombin generation parameters more tightly than fibrinolysis ones
