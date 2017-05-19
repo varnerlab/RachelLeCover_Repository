@@ -18,7 +18,7 @@
     push!(initial_condition_vector,0.000)         #11  prothombinase complex
     push!(initial_condition_vector, 0.0)	#12 Fibrin
     push!(initial_condition_vector,0.0)		#13 plasmin
-    push!(initial_condition_vector,10000)	#14 Fibrinogen
+    push!(initial_condition_vector,7400)	#14 Fibrinogen
     push!(initial_condition_vector, 2000)	#15 plasminogen
     push!(initial_condition_vector,0.0)		#16 tPA
     push!(initial_condition_vector,0.0)		#17 uPA
@@ -199,7 +199,7 @@ end
     push!(initial_condition_vector,0.000)         #  prothombinase complex
     push!(initial_condition_vector, 0.0)	#Fibrin
     push!(initial_condition_vector,0.0)		#plasmin
-    push!(initial_condition_vector,10000)	#Fibrinogen
+    push!(initial_condition_vector,7400)	#Fibrinogen
     push!(initial_condition_vector, 2000)	#plasminogen
     push!(initial_condition_vector,0.0)		#tPA
     push!(initial_condition_vector,0.0)		#uPA
@@ -325,7 +325,7 @@ end
     push!(initial_condition_vector,0.000)         #  prothombinase complex
     push!(initial_condition_vector, 0.0)	#Fibrin
     push!(initial_condition_vector,0.0)		#plasmin
-    push!(initial_condition_vector,10000)	#Fibrinogen
+    push!(initial_condition_vector,7400)	#Fibrinogen
     push!(initial_condition_vector, 2000)	#plasminogen
     push!(initial_condition_vector,0.0)		#tPA
     push!(initial_condition_vector,0.0)		#uPA

@@ -208,7 +208,7 @@ end
 			counter=counter+1
 		end
 	end
-	writedlm(string("parameterEstimation/Best", n, "PerObjectiveParameters_19_04_2017.txt"), best_params)
+	writedlm(string("parameterEstimation/Best", n, "PerObjectiveParameters_19_05_2017.txt"), best_params)
 	return best_params
 end
 
@@ -345,7 +345,7 @@ function plotTradeOffCurve(ec_array, rank_array, obj1, obj2)
 	xlabel(string("Objective ", obj1), fontsize=18)
 	ylabel(string("Objective ", obj2), fontsize=18)
 	axis([0,4000,0,4000])
-	savefig(string("figures/TradeOffCurves/tradeoffCurve_19_04_2017_obj_",obj1,"and_obj_",obj2, ".pdf"))
+	savefig(string("figures/TradeOffCurves/tradeoffCurve_19_05_2017_obj_",obj1,"and_obj_",obj2, ".pdf"))
 end
 
 function plotAllTradeOffCurves(ec_array, ra_array, num_objectives)
@@ -393,6 +393,48 @@ function setIC(IC, exp_index)
 	elseif(exp_index ==6)
 		IC[1] = IC[1]*.65
 		IC[7] = IC[7]*.55
+	end
+	return IC
+end
+
+function setCompleteModelIC(IC, patient_id)
+	# 1 FII
+   	 # 2 FIIa
+   	 # 3 PC
+	 # 4 APC
+	 # 5 ATIII
+    	# 6 TM
+	# 7 TRIGGER
+	#8 Fraction of platelets activated
+ 	#9  FV+FX
+	#10  FVa+FXa
+	#11  prothombinase complex
+	#12 Fibrin
+	#13 plasmin
+  	#14 Fibrinogen
+	#15 plasminogen
+  	#16 tPA
+	#17 uPA
+	#18 fibrin monomer
+	#19 protofibril
+	#20 antiplasmin
+    	#21 PAI_1
+	#22 Fiber
+	println(string("Adjusting IC for patient", patient_id))
+	if(patient_id==3)
+		IC[1]=IC[1]*1.15
+		IC[5] = IC[5]*.95
+		IC[7] = IC[7]*1.01
+		IC[14] = IC[14]*1.1
+		IC[15] = IC[15]*.9
+		IC[20] = IC[20]*1.1
+	elseif(patient_id==4)
+		IC[1]=IC[1]*1.05
+		IC[15] = IC[15]*.8
+		IC[14]=IC[14]*.5
+		IC[16] = IC[16]*.95
+	elseif(patient_id==9)
+		IC[1]=IC[1]*1.05
 	end
 	return IC
 end
@@ -525,14 +567,14 @@ function makeTrainingFigure()
 	    "size"=>20)
 	close("all")
 	#pathToParams="parameterEstimation/Best11OverallParameters_19_04_2017.txt"
-	POETs_data = "parameterEstimation/POETS_info_18_04_2017maxstep1.txt"
+	POETs_data = "parameterEstimation/POETS_info_18_05_2017maxstep1.txt"
 	ec,pc,ra=parsePOETsoutput(POETs_data)
 	ids = [5,6,7,8]
 	tPAs = [0,2]
 	close("all")
 	fig=figure(figsize = [15,15])
 	counter = 1
-	numParamSets = 5
+	numParamSets = 8
 	for j in collect(1:size(ids,1))
 		for k in collect(1:size(tPAs,1))
 			savestr = string("figures/Patient", ids[j], "_tPA=", tPAs[k], "_18_04_2017.pdf")
@@ -542,6 +584,13 @@ function makeTrainingFigure()
 			@show counter
 			plt[:subplot](4,2,counter)
 			fig=plotAverageROTEMWDataSubplot(fig,TSIM,meanROTEM,stdROTEM,expdata)
+			if(mod(counter,2)==1)
+				axis([0, TSIM[end], 0, 70])
+				ylabel(string("Patient ", ids[j]), fontdict=font2)
+			else
+				axis([0, TSIM[end], 0, 90])
+			end
+
 			if(counter==7 || counter ==8)
 				xlabel("Time, in minutes", fontdict = font2)
 			else
@@ -567,7 +616,7 @@ function makeTrainingFigure()
                ha="right",
                va="top", fontsize = 24, family = "sans-serif")
 
-	savefig(string("figures/trainingFigureUsing",numParamSets, "ParameterSets.pdf"))
+	savefig(string("figures/trainingFigureUsing",numParamSets, "ParameterSets_19_05_17.pdf"))
 end
 
 function makePredictionsFigure()
@@ -576,7 +625,7 @@ function makePredictionsFigure()
 	    "weight"=>"normal",
 	    "size"=>20)
 	close("all")
-	pathToParams="parameterEstimation/Best1PerObjectiveParameters_19_04_2017.txt"
+	pathToParams="parameterEstimation/Best1PerObjectiveParameters_19_05_2017.txt"
 	ids = [3,4,9,10]
 	tPAs = [0,2]
 	close("all")
@@ -588,12 +637,13 @@ function makePredictionsFigure()
 			alldata, meanROTEM, stdROTEM,TSIM=testROTEMPredicition(pathToParams, ids[j], tPAs[k], savestr)
 			platelets,expdata = setROTEMIC(tPAs[k], ids[j])
 			@show counter
-			plt[:subplot](4,2,counter)
+			plt[:subplot](size(ids,1),size(tPAs,1),counter)
 			fig=plotAverageROTEMWDataSubplot(fig,TSIM,meanROTEM,stdROTEM,expdata)
 			if(mod(counter,2)==1)
-				axis([0, TSIM[end], 0, 100])
+				axis([0, TSIM[end], 0, 80])
+				ylabel(string("Patient ", ids[j]), fontdict=font2)
 			else
-				axis([0, TSIM[end], 0, 140])
+				axis([0, TSIM[end], 0, 80])
 			end
 			if(counter==7 || counter ==8)
 				xlabel("Time, in minutes", fontdict = font2)
@@ -620,7 +670,7 @@ function makePredictionsFigure()
                ha="right",
                va="top", fontsize = 24, family = "sans-serif")
 
-	savefig("figures/PredictionsFigureUsingBest1ParamSetPerObj.pdf")
+	savefig("figures/PredictionsFigureUsingBest1ParamSetPerObj_19_05_17.pdf")
 end
 
 function testROTEMPredicitionGivenParams(allparams,patient_id,tPA,savestr)
@@ -637,8 +687,6 @@ function testROTEMPredicitionGivenParams(allparams,patient_id,tPA,savestr)
 	platelets,usefuldata = setROTEMIC(tPA, patient_id)
 	platelet_count =platelets
 	alldata = zeros(1,size(TSIM,1))
-	@show size(alldata)
-	@show size(allparams)
 	if(size(allparams,1)==numparams) #deal with parameters being stored either vertically or horizontally
 		itridx = 2
 	else
@@ -651,7 +699,7 @@ function testROTEMPredicitionGivenParams(allparams,patient_id,tPA,savestr)
 		else
 			currparams = vec(allparams[j,:])
 		end
-		@show currparams
+		#@show currparams
 		if(typeof(currparams)==Array{Array,1}) #deal with params being inside an extra layer of array
 			currparams= currparams[1]
 		end
@@ -659,7 +707,7 @@ function testROTEMPredicitionGivenParams(allparams,patient_id,tPA,savestr)
 		dict = buildCompleteDictFromOneVector(currparams)
 		initial_condition_vector = dict["INITIAL_CONDITION_VECTOR"]
 		initial_condition_vector[16]=tPA #set tPA level
-		#@show dict
+		initial_condition_vector=setCompleteModelIC(initial_condition_vector,patient_id)
 		reshaped_IC = vec(reshape(initial_condition_vector,22,1))
 		fbalances(t,y)= BalanceEquations(t,y,dict)
 		tic() 
@@ -694,9 +742,9 @@ function testROTEMPredicition(pathToParams,patient_id,tPA,savestr)
 	platelets,usefuldata = setROTEMIC(tPA, patient_id)
 	platelet_count =platelets
 	alldata = zeros(1,size(TSIM,1))
-	@show size(alldata)
-	@show size(allparams)
-	@show allparams
+#	@show size(alldata)
+#	@show size(allparams)
+#	@show allparams
 	if(size(allparams,1)==numparams) #deal with parameters being stored either vertically or horizontally
 		itridx = 2
 	else
@@ -714,7 +762,8 @@ function testROTEMPredicition(pathToParams,patient_id,tPA,savestr)
 		dict = buildCompleteDictFromOneVector(currparams)
 		initial_condition_vector = dict["INITIAL_CONDITION_VECTOR"]
 		initial_condition_vector[16]=tPA #set tPA level
-		@show dict
+		initial_condition_vector=setCompleteModelIC(initial_condition_vector,patient_id)
+		#@show dict
 		reshaped_IC = vec(reshape(initial_condition_vector,22,1))
 		fbalances(t,y)= BalanceEquations(t,y,dict)
 		tic() 
@@ -751,9 +800,9 @@ function testROTEMPredicitionAndPlot(pathToParams,patient_id,tPA,savestr)
 	fig3 = figure(figsize = (15,15))
 	platelet_count =platelets
 	alldata = zeros(1,size(TSIM,1))
-	@show size(alldata)
-	@show size(allparams)
-	@show allparams
+#	@show size(alldata)
+#	@show size(allparams)
+#	@show allparams
 	if(size(allparams,1)==numparams) #deal with parameters being stored either vertically or horizontally
 		itridx = 2
 	else
