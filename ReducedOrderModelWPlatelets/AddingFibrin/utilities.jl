@@ -466,18 +466,18 @@ end
 @everywhere function convertToROTEM(t,x, tPA)
 	F = [a[12] for a in x]+ [a[18] for a in x]+ [a[19] for a in x]+ [a[22] for a in x] # fibrin related species 12,18,19,22
 	A0 = .01 #baseline ROTEM signal
-	#K = 5000-375*tPA
-	K = 1
-	n = 1
+	K = 5.0-3.75*tPA
+	#K = 1
+	n = 2
 	if(tPA ==2)
-		#S = 4E6*.7
-		S = 3.5
+		S = 60
+		#S = 3.5
 	else
-		#S = 1E6
-		S = 1.5
+		S = 60
+		#S = 1.5
 	end
 	A1 = S
-	A = A0+A1.*F.^n#./(K.^n+F.^n)
+	A = A0+A1.*F.^n./(K.^n+F.^n)
 	return A
 end
 
@@ -616,7 +616,7 @@ function makeTrainingFigure()
                ha="right",
                va="top", fontsize = 24, family = "sans-serif")
 
-	savefig(string("figures/trainingFigureUsing",numParamSets, "ParameterSets_19_05_17.pdf"))
+	savefig(string("figures/trainingFigureUsing",numParamSets, "ParameterSets_22_05_17OnlyFibrin.pdf"))
 end
 
 function makePredictionsFigure()
@@ -670,7 +670,7 @@ function makePredictionsFigure()
                ha="right",
                va="top", fontsize = 24, family = "sans-serif")
 
-	savefig("figures/PredictionsFigureUsingBest1ParamSetPerObj_19_05_17.pdf")
+	savefig("figures/PredictionsFigureUsingBest1ParamSetPerObj_22_05_17OnlyFibrin.pdf")
 end
 
 function testROTEMPredicitionGivenParams(allparams,patient_id,tPA,savestr)

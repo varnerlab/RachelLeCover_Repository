@@ -427,7 +427,7 @@ function runModelWithParams(params)
 	Ts = .02
 	TSTOP = 180
 	TSIM = collect(TSTART:Ts:TSTOP)
-	tPA = 2.0
+	tPA = 0.0
 	#pathToData = "../data/ButenasFig1B60nMFVIIa.csv"
 	#pathToData = "../data/Buentas1999Fig4100PercentProthrombin.txt"
 	pathToData = "../data/fromOrfeo_Thrombin_BL_PRP.txt"
@@ -456,7 +456,8 @@ function runModelWithParams(params)
 	figure(figsize=[15,15])
 	makeLoopPlots(t,X)
 	MSE, interpolatedExperimentalData=calculateMSE(t, [a[2] for a in X], usefuldata)
-	return MSE
+	ROTEM_MSE, interpROTEM = calculateMSE(t, A, usefulROTEMdata)
+	return MSE, ROTEM_MSE
 end
 
 

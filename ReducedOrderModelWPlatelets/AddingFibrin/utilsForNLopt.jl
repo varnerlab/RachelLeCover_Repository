@@ -111,9 +111,9 @@ function attemptOptimizationPOETS()
 	number_of_subdivisions = 10
 	number_of_parameters = 77
 	number_of_objectives = 8
-	initial_parameter_estimate = vec(readdlm("parameterEstimation/startingPoint18_05_17.txt", ','))
+	initial_parameter_estimate = vec(readdlm("parameterEstimation/startingPoint_22_05_17_originalShapeFunction.txt", ','))
 	#inital_parameter_estimate= readdlm("parameterEstimation/paramsToRestart03_30_2017.txt")
-	outputfile = "parameterEstimation/POETS_info_18_05_2017maxstep1.txt"
+	outputfile = "parameterEstimation/POETS_info_22_05_2017maxstep1_OriginalShapeFunction.txt"
 	ec_array = zeros(number_of_objectives)
 	pc_array = zeros(number_of_parameters)
 	#bound thrombin generation parameters more tightly than fibrinolysis ones
