@@ -208,7 +208,7 @@ end
 			counter=counter+1
 		end
 	end
-	writedlm(string("parameterEstimation/Best", n, "PerObjectiveParameters_19_05_2017.txt"), best_params)
+	writedlm(string("parameterEstimation/Best", n, "PerObjectiveParameters_23_05_2017OriginalShapeFunction.txt"), best_params)
 	return best_params
 end
 
@@ -217,7 +217,7 @@ end
 	best_params=Array{Array}(n)
 	counter = 1
 	curr_error=ec_array[objectivenum,:]
-	allidx = collect(1:size(pc,2))
+	allidx = collect(1:size(pc_array,2))
 	removed = allidx
 	for k in collect(1:n)
 		min_index = indmin(curr_error)
@@ -422,8 +422,8 @@ function setCompleteModelIC(IC, patient_id)
 	#22 Fiber
 	println(string("Adjusting IC for patient", patient_id))
 	if(patient_id==3)
-		IC[1]=IC[1]*1.15
-		IC[5] = IC[5]*.95
+		IC[1]=IC[1]*1.35
+		IC[5] = IC[5]*.9
 		IC[7] = IC[7]*1.01
 		IC[14] = IC[14]*1.1
 		IC[15] = IC[15]*.9
@@ -432,9 +432,25 @@ function setCompleteModelIC(IC, patient_id)
 		IC[1]=IC[1]*1.05
 		IC[15] = IC[15]*.8
 		IC[14]=IC[14]*.5
-		IC[16] = IC[16]*.95
+		IC[16] = IC[16]*.90
+		#IC[20]=IC[20]*1.35
+		#IC[21] = IC[21]*.75
+	elseif(patient_id==5)
+		IC[1]=IC[1]*1.4
+		IC[5]=IC[5]*.95
+		#IC[20]=IC[20]*1.35
+	elseif(patient_id==6)
+		IC[1]=IC[1]*.95
+	elseif(patient_id==7)
+		IC[1] = IC[1]*.95
+	elseif(patient_id==8)
+		IC[1]= IC[1]*.95
+		#IC[20]=IC[20]*1.35
 	elseif(patient_id==9)
 		IC[1]=IC[1]*1.05
+		IC[20]=IC[20]*1.35
+	elseif(patient_id==10)
+		#IC[1]=IC[1]*1.05
 	end
 	return IC
 end
@@ -567,14 +583,14 @@ function makeTrainingFigure()
 	    "size"=>20)
 	close("all")
 	#pathToParams="parameterEstimation/Best11OverallParameters_19_04_2017.txt"
-	POETs_data = "parameterEstimation/POETS_info_18_05_2017maxstep1.txt"
+	POETs_data = "parameterEstimation/POETS_info_22_05_2017maxstep1_OriginalShapeFunction.txt"
 	ec,pc,ra=parsePOETsoutput(POETs_data)
 	ids = [5,6,7,8]
 	tPAs = [0,2]
 	close("all")
 	fig=figure(figsize = [15,15])
 	counter = 1
-	numParamSets = 8
+	numParamSets = 15
 	for j in collect(1:size(ids,1))
 		for k in collect(1:size(tPAs,1))
 			savestr = string("figures/Patient", ids[j], "_tPA=", tPAs[k], "_18_04_2017.pdf")
@@ -616,7 +632,61 @@ function makeTrainingFigure()
                ha="right",
                va="top", fontsize = 24, family = "sans-serif")
 
-	savefig(string("figures/trainingFigureUsing",numParamSets, "ParameterSets_22_05_17OnlyFibrin.pdf"))
+	savefig(string("figures/trainingFigureUsing",numParamSets, "ParameterSets_22_05_17OriginalShapeFunction.pdf"))
+end
+
+function makeTrainingFigureBestOveralParams()
+	font2 = Dict("family"=>"sans-serif",
+	    "color"=>"black",
+	    "weight"=>"normal",
+	    "size"=>20)
+	close("all")
+	pathToParams="parameterEstimation/Best1PerObjectiveParameters_23_05_2017OriginalShapeFunction.txt"
+	ids = [5,6,7,8]
+	tPAs = [0,2]
+	close("all")
+	fig=figure(figsize = [15,15])
+	counter = 1
+	for j in collect(1:size(ids,1))
+		for k in collect(1:size(tPAs,1))
+			savestr = string("figures/Patient", ids[j], "_tPA=", tPAs[k], "_18_04_2017.pdf")
+			alldata, meanROTEM, stdROTEM,TSIM=testROTEMPredicition(pathToParams, ids[j], tPAs[k], savestr)
+			platelets,expdata = setROTEMIC(tPAs[k], ids[j])
+			@show counter
+			plt[:subplot](size(ids,1),size(tPAs,1),counter)
+			fig=plotAverageROTEMWDataSubplot(fig,TSIM,meanROTEM,stdROTEM,expdata)
+			if(mod(counter,2)==1)
+				axis([0, TSIM[end], 0, 80])
+				ylabel(string("Patient ", ids[j]), fontdict=font2)
+			else
+				axis([0, TSIM[end], 0, 80])
+			end
+			if(counter==7 || counter ==8)
+				xlabel("Time, in minutes", fontdict = font2)
+			else
+				ax =gca()
+				ax[:xaxis][:set_ticklabels]([]) #remove tick labels if we're not at the bottom of a column
+			end
+			counter=counter+1
+		end
+	end
+	#label columns
+	annotate("tPA = 0 micromolar",
+               xy=[.12;.95],
+               xycoords="figure fraction",
+               xytext=[.39,0.95],
+               textcoords="figure fraction",
+               ha="right",
+               va="top", fontsize = 24, family = "sans-serif")
+	annotate("tPA = 2 micromolar",
+               xy=[.12;.95],
+               xycoords="figure fraction",
+               xytext=[.85,0.95],
+               textcoords="figure fraction",
+               ha="right",
+               va="top", fontsize = 24, family = "sans-serif")
+
+	savefig("figures/TrainingFigureUsingBest1ParamSetPerObj_23_05_17OriginalShapeFunction.pdf")
 end
 
 function makePredictionsFigure()
@@ -625,7 +695,7 @@ function makePredictionsFigure()
 	    "weight"=>"normal",
 	    "size"=>20)
 	close("all")
-	pathToParams="parameterEstimation/Best1PerObjectiveParameters_19_05_2017.txt"
+	pathToParams="parameterEstimation/Best1PerObjectiveParameters_23_05_2017OriginalShapeFunction.txt"
 	ids = [3,4,9,10]
 	tPAs = [0,2]
 	close("all")
@@ -670,7 +740,7 @@ function makePredictionsFigure()
                ha="right",
                va="top", fontsize = 24, family = "sans-serif")
 
-	savefig("figures/PredictionsFigureUsingBest1ParamSetPerObj_22_05_17OnlyFibrin.pdf")
+	savefig("figures/PredictionsFigureUsingBest1ParamSetPerObj_23_05_17OriginalShapeFunction.pdf")
 end
 
 function testROTEMPredicitionGivenParams(allparams,patient_id,tPA,savestr)
