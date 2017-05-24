@@ -1,7 +1,7 @@
 using PyPlot
 using ExcelReaders
 
-@everywhere function calculateMSE(t,predictedThrobin, experimentalData)
+@everywhere function calculateMSE(t,predictedCurve, experimentalData)
 	num_points = size(t,1)
 	interpolatedExperimentalData = Float64[]
 	for j in collect(1:num_points)
@@ -22,13 +22,13 @@ using ExcelReaders
 		push!(interpolatedExperimentalData,val)
 	end
 	sum = 0.0
-	for j in collect(1:size(predictedThrobin,1))
-		sum = sum +(predictedThrobin[j]-interpolatedExperimentalData[j])^2
+	for j in collect(1:size(predictedCurve,1))
+		sum = sum +(predictedCurve[j]-interpolatedExperimentalData[j])^2
 	end
 #	figure()
 #	plot(t, interpolatedExperimentalData)
-	@show sum, size(predictedThrobin,1)
-	return sum/size(predictedThrobin,1), interpolatedExperimentalData#MSE
+	@show sum, size(predictedCurve,1)
+	return sum/size(predictedCurve,1), interpolatedExperimentalData#MSE
 end
 
 @everywhere function linearInterp(lowerVal, upperVal, tstart, tend,tdesired)

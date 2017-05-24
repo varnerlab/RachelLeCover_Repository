@@ -425,9 +425,9 @@ function runModelWithParams(params)
 	close("all")
 	TSTART = 0.0
 	Ts = .02
-	TSTOP = 180
+	TSTOP = 60
 	TSIM = collect(TSTART:Ts:TSTOP)
-	tPA = 0.0
+	tPA = 2.0
 	#pathToData = "../data/ButenasFig1B60nMFVIIa.csv"
 	#pathToData = "../data/Buentas1999Fig4100PercentProthrombin.txt"
 	pathToData = "../data/fromOrfeo_Thrombin_BL_PRP.txt"
@@ -437,14 +437,14 @@ function runModelWithParams(params)
 	avg_run = mean(data[:,2:3],2);
 	usefuldata = hcat(time, avg_run)
 
-	curr_platelets,usefulROTEMdata = setROTEMIC(tPA,"5")
+	curr_platelets,usefulROTEMdata = setROTEMIC(tPA,"6")
 	fig = figure(figsize = (15,15))
 	params[47]=curr_platelets
 	dict = buildCompleteDictFromOneVector(params)
 	initial_condition_vector = dict["INITIAL_CONDITION_VECTOR"]
 	initial_condition_vector[16]=tPA
 	fbalances(t,y)= BalanceEquations(t,y,dict) 
-	t,X=ODE.ode23s(fbalances,vec(initial_condition_vector),TSIM, abstol = 1E-6, reltol = 1E-6, minstep = 1E-8,maxstep = .10)
+	t,X=ODE.ode23s(fbalances,vec(initial_condition_vector),TSIM, abstol = 1E-6, reltol = 1E-6, minstep = 1E-8,maxstep = 1.00)
 	plotThrombinWData(t,X,pathToData)
 	figure()
 	plotFibrinSpecies(t,X)
