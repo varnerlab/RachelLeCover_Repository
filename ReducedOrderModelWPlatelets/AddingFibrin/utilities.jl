@@ -207,8 +207,8 @@ end
 			@show size(pc_array)
 			counter=counter+1
 		end
-	end
-	writedlm(string("parameterEstimation/Best", n, "PerObjectiveParameters_23_05_2017OriginalShapeFunction.txt"), best_params)
+	end	
+	writedlm(string("parameterEstimation/Best", n, "PerObjectiveParameters_25_05_2017OriginalShapeFunctionOnlyFittingtPA2.txt"), best_params)
 	return best_params
 end
 
@@ -279,7 +279,7 @@ function parsePOETsoutput(filename)
 
 	outputname = "textparsing.txt"
 	number_of_parameters = 77
-  	number_of_objectives = 8
+  	number_of_objectives = 8#4
 	ec_array = zeros(number_of_objectives)
   	pc_array = zeros(number_of_parameters)
 	rank_array = zeros(1)	
@@ -439,18 +439,18 @@ function setCompleteModelIC(IC, patient_id)
 		IC[1]=IC[1]*1.4
 		IC[5]=IC[5]*.95
 		#IC[20]=IC[20]*1.35
-	elseif(patient_id==6)
-		IC[1]=IC[1]*.95
-	elseif(patient_id==7)
-		IC[1] = IC[1]*.95
+#	elseif(patient_id==6)
+#		IC[1]=IC[1]*.95
+#	elseif(patient_id==7)
+#		IC[1] = IC[1]*.95
 	elseif(patient_id==8)
 		IC[1]= IC[1]*.95
 		#IC[20]=IC[20]*1.35
-	elseif(patient_id==9)
-		IC[1]=IC[1]*1.05
-		IC[20]=IC[20]*1.35
-	elseif(patient_id==10)
-		#IC[1]=IC[1]*1.05
+#	elseif(patient_id==9)
+#		IC[1]=IC[1]*1.05
+#		IC[20]=IC[20]*1.35
+#	elseif(patient_id==10)
+#		#IC[1]=IC[1]*1.05
 	end
 	return IC
 end
@@ -583,7 +583,7 @@ function makeTrainingFigure()
 	    "size"=>20)
 	close("all")
 	#pathToParams="parameterEstimation/Best11OverallParameters_19_04_2017.txt"
-	POETs_data = "parameterEstimation/POETS_info_22_05_2017maxstep1_OriginalShapeFunction.txt"
+	POETs_data = "parameterEstimation/POETS_info_24_05_2017maxstep1_OriginalShapeFunction.txt"
 	ec,pc,ra=parsePOETsoutput(POETs_data)
 	ids = [5,6,7,8]
 	tPAs = [0,2]
@@ -641,7 +641,7 @@ function makeTrainingFigureBestOveralParams()
 	    "weight"=>"normal",
 	    "size"=>20)
 	close("all")
-	pathToParams="parameterEstimation/Best1PerObjectiveParameters_23_05_2017OriginalShapeFunction.txt"
+	pathToParams="parameterEstimation/Best2PerObjectiveParameters_25_05_2017OriginalShapeFunctionOnlyFittingtPA2.txt"
 	ids = [5,6,7,8]
 	tPAs = [0,2]
 	close("all")
@@ -686,7 +686,7 @@ function makeTrainingFigureBestOveralParams()
                ha="right",
                va="top", fontsize = 24, family = "sans-serif")
 
-	savefig("figures/TrainingFigureUsingBest1ParamSetPerObj_23_05_17OriginalShapeFunction.pdf")
+	savefig("figures/TrainingFigureUsingBest2ParamSetPerObj_25_05_17OriginalShapeFunctionOnlyFittPA2.pdf")
 end
 
 function makePredictionsFigure()
@@ -695,7 +695,7 @@ function makePredictionsFigure()
 	    "weight"=>"normal",
 	    "size"=>20)
 	close("all")
-	pathToParams="parameterEstimation/Best1PerObjectiveParameters_23_05_2017OriginalShapeFunction.txt"
+	pathToParams="parameterEstimation/Best2PerObjectiveParameters_25_05_2017OriginalShapeFunctionOnlyFittingtPA2.txt"
 	ids = [3,4,9,10]
 	tPAs = [0,2]
 	close("all")
@@ -740,7 +740,7 @@ function makePredictionsFigure()
                ha="right",
                va="top", fontsize = 24, family = "sans-serif")
 
-	savefig("figures/PredictionsFigureUsingBest1ParamSetPerObj_23_05_17OriginalShapeFunction.pdf")
+	savefig("figures/PredictionsFigureUsingBest2ParamSetPerObj_25_05_17OriginalShapeFunctionOnlyFittPA2.pdf")
 end
 
 function testROTEMPredicitionGivenParams(allparams,patient_id,tPA,savestr)
