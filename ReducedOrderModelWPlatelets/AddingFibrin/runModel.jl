@@ -486,6 +486,28 @@ end
 	return AUC
 end
 
+@everywhere function runModelWithParamsSetICReturnAUC(params)
+	close("all")
+	TSTART = 0.0
+	Ts = .02
+	TSTOP=120.0
+	TSIM = collect(TSTART:Ts:TSTOP)
+	#curr_platelets,usefulROTEMdata = setROTEMIC(tPA,"5")
+	#pathToData = "../data/ButenasFig1B60nMFVIIa.csv"
+	#pathToData = "../data/Buentas1999Fig4100PercentProthrombin.txt"
+	#use default platelets	
+	#params[47]=curr_platelets
+	modelparams = params[1:77]
+	dict = buildCompleteDictFromOneVector(modelparams)
+	initial_condition_vector = params[78:end]
+	tPA = initial_condition_vector[16]
+	fbalances(t,y)= BalanceEquations(t,y,dict) 
+	t,X=ODE.ode23s(fbalances,(initial_condition_vector),TSIM, abstol = 1E-6, reltol = 1E-6, minstep = 1E-8,maxstep = 1.0)
+	A = convertToROTEM(t,X,tPA)
+	AUC=calculateAUC(t, A)
+	return AUC
+end
+
 
 
 function runModelWithParamsPeturbIC(params, num_runs)

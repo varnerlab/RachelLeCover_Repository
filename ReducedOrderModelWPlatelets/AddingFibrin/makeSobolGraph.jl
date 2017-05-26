@@ -2,6 +2,36 @@ using PyPlot
 using PyCall
 PyDict(pyimport("matplotlib")["rcParams"])["font.sans-serif"] = ["Helvetica"]
 
+function makeSobolGraphNoAnnotations()
+	font1 = Dict("family"=>"sans-serif",
+	    "color"=>"black",
+	    "weight"=>"normal",
+	    "size"=>24)
+
+	font2 = Dict("family"=>"sans-serif",
+	    "color"=>"black",
+	    "weight"=>"normal",
+	    "size"=>12)
+	close("all")
+	numparams = 77+22
+	fig=figure(figsize=[25,15])
+	data = readdlm("sensitivity/soboloutputpm50percent_05_26_17.txt")
+	topHalf = data[1:numparams+1, :]
+	@show topHalf
+	usefulData = topHalf[2:end, :]
+	positions = collect(0:numparams-1)
+	bar(positions, usefulData[:,4],color = "k", yerr=usefulData[:,5], align="center")
+	ax = gca()
+	ax[:xaxis][:set_ticks](positions)
+	ylabel("Total Order Sensitivity Indicies", fontdict=font1)
+	axis("tight")
+	axis([0,numparams,0,1])
+	ax[:tick_params](labelsize=20)
+	#lines and label for kinetic parameters
+	ax[:xaxis][:set_ticklabels](usefulData[:,1], rotation = 80, fontsize = 5)
+	savefig("sensitivity/SobolTotalOrderN100_05_26_17.pdf")
+end
+
 function makeSobolGraph()
 	font1 = Dict("family"=>"sans-serif",
 	    "color"=>"black",

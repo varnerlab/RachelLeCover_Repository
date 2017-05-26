@@ -936,8 +936,44 @@ function generateSobolParams()
 	
 end
 
+function generateSobolParamsForPerturbIC()
+	#let's use the averaged top 8 parameter sets
+	startingpt =  readdlm("parameterEstimation/Best2PerObjectiveParameters_25_05_2017OriginalShapeFunctionOnlyFittingtPA2.txt")
+	outputfn="sensitivity/sobolboundspm50percent_05_26_17.txt"
+	meanparams = mean(startingpt,1)
+	data_dictionary=buildCompleteDictFromOneVector(meanparams)
+	names = data_dictionary["parameter_name_mapping_array"]
+	initial_conditions = data_dictionary["INITIAL_CONDITION_VECTOR"]
+	IC_names = ["FII", "FIIa", "PC", "APC", "ATIII", "TM", "TRIGGER", "Fraction_Platelets_Activated", "FV+FX", "[FV+FX]a", "Prothrombinase_Complex", "Fibrin", "Plasmin", "Fibrinogen", "Plasminogen", "tPA", "uPA", "Fibrin_Monomer", "Protofibril", "Antiplasmin", "PAI1", "Fiber"]
+	str = ""
+	j = 1
+	for name in names
+		currstr = string(name, " ", meanparams[j]*.5, " ", meanparams[j]*1.5, "\n")
+		str = string(str,currstr)
+		j=j+1
+	end
+	j = 1
+	for name in IC_names
+		if(initial_conditions[j]==0)
+			lb = 0.0
+			up = .1
+		else
+			lb = initial_conditions[j]*.5
+			up = initial_conditions[j]*1.5
+		end
+		currstr = string("initial_", name, " ", lb, " ", up, "\n")
+		str = string(str, currstr)
+		j = j+1
+	end
+
+	touch(outputfn)
+	f = open(outputfn, "a")
+	write(f,str)
+	close(f)
+end
+
 function concatSobolResults()
-	filestr1 = "sensitivity/tPA_2_AUCForSobolPM50PercentN5000_"
+	filestr1 = "sensitivity/05_26_17_AUCForSobolPM50PercentN100_"
 	filestr2="_of_8.txt"
 	str = ""
 	for j in collect(1:8)
@@ -945,6 +981,6 @@ function concatSobolResults()
 		currstr = readstring(fn)
 		str = string(str, currstr)
 	end
-	write("sensitivity/AllSobol_tPA_2_PM50_N5000_04_24_2017.txt", str)
+	write("sensitivity/AllSobol_05_26_17_AUCForSobolPM50PercentN100.txt", str)
 end
 
