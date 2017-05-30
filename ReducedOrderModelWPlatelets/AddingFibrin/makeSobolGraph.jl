@@ -15,7 +15,7 @@ function makeSobolGraphNoAnnotations()
 	close("all")
 	numparams = 77+22
 	fig=figure(figsize=[25,15])
-	data = readdlm("sensitivity/soboloutputpm50percent_05_26_17.txt")
+	data = readdlm("sensitivity/soboloutputpm50percent_05_30_17N500.txt")
 	topHalf = data[1:numparams+1, :]
 	@show topHalf
 	usefulData = topHalf[2:end, :]
@@ -29,7 +29,37 @@ function makeSobolGraphNoAnnotations()
 	ax[:tick_params](labelsize=20)
 	#lines and label for kinetic parameters
 	ax[:xaxis][:set_ticklabels](usefulData[:,1], rotation = 80, fontsize = 5)
-	savefig("sensitivity/SobolTotalOrderN100_05_26_17.pdf")
+	savefig("sensitivity/SobolTotalOrderN500_05_26_17.pdf")
+end
+
+function makeSobolGraphNoAnnotationsOnlyIC()
+	font1 = Dict("family"=>"sans-serif",
+	    "color"=>"black",
+	    "weight"=>"normal",
+	    "size"=>24)
+
+	font2 = Dict("family"=>"sans-serif",
+	    "color"=>"black",
+	    "weight"=>"normal",
+	    "size"=>12)
+	close("all")
+	numparams =22
+	fig=figure(figsize=[25,15])
+	data = readdlm("sensitivity/soboloutputpm50percentOnlyIC_05_30_17N2000.txt")
+	topHalf = data[1:numparams+1, :]
+	@show topHalf
+	usefulData = topHalf[2:end, :]
+	positions = collect(1:numparams)
+	bar(positions, usefulData[:,4],color = "k", yerr=usefulData[:,5], align="center")
+	ax = gca()
+	ax[:xaxis][:set_ticks](positions)
+	ylabel("Total Order Sensitivity Indicies", fontdict=font1)
+	axis("tight")
+	axis([0,numparams,0,1])
+	ax[:tick_params](labelsize=20)
+	#lines and label for kinetic parameters
+	ax[:xaxis][:set_ticklabels](usefulData[:,1], rotation = 50, fontsize = 8)
+	savefig("sensitivity/SobolTotalOrderOnlyICN52000_05_30_17.pdf")
 end
 
 function makeSobolGraph()

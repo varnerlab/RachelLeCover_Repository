@@ -917,9 +917,10 @@ function testROTEMPredicitionAndPlot(pathToParams,patient_id,tPA,savestr)
 end
 
 function generateSobolParams()
-	startingpt =  readdlm("parameterEstimation/Best11OverallParameters_19_04_2017.txt")
-	outputfn="sensitivity/sobolboundspm50percent_04_19_17.txt"
-	best = startingpt[1,:]
+	#let's use the averaged top 8 parameter sets
+	startingpt =  readdlm("parameterEstimation/Best2PerObjectiveParameters_25_05_2017OriginalShapeFunctionOnlyFittingtPA2.txt")
+	outputfn="sensitivity/sobolboundspm50percentOnlyParams_05_30_17.txt"
+	best = mean(startingpt,1)
 	data_dictionary=buildCompleteDictFromOneVector(best)
 	names = data_dictionary["parameter_name_mapping_array"]
 	str = ""
@@ -972,15 +973,45 @@ function generateSobolParamsForPerturbIC()
 	close(f)
 end
 
+function generateSobolParamsForOnlyPerturbIC()
+	#let's use the averaged top 8 parameter sets
+	startingpt =  readdlm("parameterEstimation/Best2PerObjectiveParameters_25_05_2017OriginalShapeFunctionOnlyFittingtPA2.txt")
+	outputfn="sensitivity/sobolboundspm50percentOnlyIC_05_30_17.txt"
+	meanparams = mean(startingpt,1)
+	data_dictionary=buildCompleteDictFromOneVector(meanparams)
+	names = data_dictionary["parameter_name_mapping_array"]
+	initial_conditions = data_dictionary["INITIAL_CONDITION_VECTOR"]
+	IC_names = ["FII", "FIIa", "PC", "APC", "ATIII", "TM", "TRIGGER", "Fraction_Platelets_Activated", "FV+FX", "[FV+FX]a", "Prothrombinase_Complex", "Fibrin", "Plasmin", "Fibrinogen", "Plasminogen", "tPA", "uPA", "Fibrin_Monomer", "Protofibril", "Antiplasmin", "PAI1", "Fiber"]
+	str = ""
+	j = 1
+	for name in IC_names
+		if(initial_conditions[j]==0)
+			lb = 0.0
+			up = 1.0
+		else
+			lb = initial_conditions[j]*.5
+			up = initial_conditions[j]*1.5
+		end
+		currstr = string("initial_", name, " ", lb, " ", up, "\n")
+		str = string(str, currstr)
+		j = j+1
+	end
+
+	touch(outputfn)
+	f = open(outputfn, "a")
+	write(f,str)
+	close(f)
+end
+
 function concatSobolResults()
-	filestr1 = "sensitivity/05_26_17_AUCForSobolPM50PercentN100_"
+	filestr1 = "sensitivity/05_30_17_AUCForSobolPM50PercentOnlyICN2000_"
 	filestr2="_of_8.txt"
 	str = ""
 	for j in collect(1:8)
 		fn = string(filestr1, j, filestr2)
-		currstr = readstring(fn)
+		currstr = replace(readstring(fn), ",", " ")
 		str = string(str, currstr)
 	end
-	write("sensitivity/AllSobol_05_26_17_AUCForSobolPM50PercentN100.txt", str)
+	write("sensitivity/AllSobol_05_30_17_AUCForSobolOnlyICPM50PercentN2000.txt", str)
 end
 
